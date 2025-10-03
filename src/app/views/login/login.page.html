@@ -12,27 +12,58 @@
       <img class="dog-img" src="../../../assets/images/login image.png" alt="dog">
     </div>
 
+    <!-- ✅ Usando variables normales -->
     <form class="form">
+
+      <!-- Username -->
       <div class="pill">
-        <input type="text" placeholder="Username" />
+        <input 
+          type="text" 
+          placeholder="Username" 
+          [(ngModel)]="username" 
+          name="username"/>
       </div>
 
+      <!-- Password con toggle -->
       <div class="pill">
-  <input type="password" placeholder="Password" />
-  <button type="button" class="eye" aria-label="toggle password"></button>
-</div>
+        <input 
+          [type]="passwordVisible ? 'text' : 'password'" 
+          placeholder="Password" 
+          [(ngModel)]="password" 
+          name="password"/>
+        
+        <!-- 👁️ Botón de mostrar/ocultar -->
+        <button 
+          type="button" 
+          class="eye" 
+          aria-label="toggle password" 
+          (click)="togglePassword()">
+        </button>
+      </div>
 
+      <a class="forgot" (click)="GoToHome()">Forgot password</a>
 
-      <a class="forgot" href="#">Forgot password</a>
-
-      <button type="button" class="btn-signup">Sign Up</button>
+      <!-- Botón de login principal -->
+      <button 
+        type="button" 
+        class="btn-signup"
+        (click)="onLogin()">
+        Sign In
+      </button>
 
       <div class="divider"><span>Or Sign With</span></div>
 
       <div class="socials">
-        <img src="../../../assets/images/gmail.png" alt="gm" />
-        <img src="../../../assets/images/logo app.png" alt="dog icon" />
-      </div>
+  <!-- Gmail -->
+  <button type="button" class="gmail-btn" (click)="loginWithGoogle()">
+    <img src="../../../assets/images//google.png" alt="gm" />
+  </button>
+
+  <!-- Logo de la app que lleva al registro -->
+  <button type="button" class="register-btn" (click)="goToRegister()">
+    <img src="../../../assets/images/logo app.png" alt="dog icon" />
+  </button>
+</div>
     </form>
   </div>
 </ion-content>

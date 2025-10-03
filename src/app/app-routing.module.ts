@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { RegisterPageModule } from './views/register/register.module';
 
 const routes: Routes = [
   {
@@ -15,6 +16,12 @@ const routes: Routes = [
     path: 'login',
     loadChildren: () => import('./views/login/login.module').then( m => m.LoginPageModule)
   },
+
+  {
+    path: 'register',
+    loadChildren: () => import('./views/register/register.module').then( m => m.RegisterPageModule)
+  },
+  
 ];
 
 @NgModule({
