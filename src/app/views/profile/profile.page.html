@@ -1,0 +1,64 @@
+<ion-content [fullscreen]="true">
+  
+  <!-- Fondo naranja superior -->
+  <div class="header-section">
+    
+    <!-- Botón de volver -->
+    <button class="back-btn" (click)="router.navigate(['/home'])">
+      <ion-icon name="arrow-back"></ion-icon>
+    </button>
+
+    
+
+    <!-- Avatar -->
+    <app-avatar 
+      [imageUrl]="profileImage" 
+      [username]="username" 
+      [editable]="true"
+      (imageChange)="onImageChange($event)">
+    </app-avatar>
+  </div>
+
+  <!-- Card blanca con opciones -->
+  <div class="menu-card">
+    
+    <app-menu-item 
+      icon="../../../assets/images/UpdateProfileIcon.png"
+      label="Update profile"
+      (clicked)="goToUpdateProfile()">
+    </app-menu-item>
+
+    <app-menu-item 
+      icon="../../../assets/images/ListPets.png"
+      label="List my pets"
+      (clicked)="goToMyPets()">
+    </app-menu-item>
+
+    <app-menu-item 
+      icon="../../../assets/images/changePassword.png"
+      label="Change password"
+      (clicked)="goToChangePassword()">
+    </app-menu-item>
+
+    <app-menu-item 
+      icon="../../../assets/images/settings.png"
+      label="Settings"
+      (clicked)="goToSettings()">
+    </app-menu-item>
+
+  </div>
+
+  <!-- Botón de Log out -->
+  <div class="logout-container">
+    <app-menu-item 
+      icon="../../../assets/images/logOut.png"
+      label="Log out"
+      [isLogout]="true"
+      (clicked)="onLogout()">
+    </app-menu-item>
+  </div>
+
+  <!-- Tab Bar fijo abajo -->
+  <app-tab-bar></app-tab-bar>
+
+</ion-content>

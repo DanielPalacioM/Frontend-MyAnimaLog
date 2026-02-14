@@ -1,0 +1,36 @@
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  border-radius: 8px;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+
+  .menu-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 16px;
+  }
+
+  .menu-label {
+    font-size: 16px;
+    color: #000;
+    font-weight: 500;
+  }
+
+  &.logout {
+    margin-top: 20px;
+    
+    .menu-icon {
+      filter: brightness(0) saturate(100%) invert(16%) sepia(92%) saturate(7497%) hue-rotate(357deg) brightness(95%) contrast(118%);
+    }
+    
+    .menu-label {
+      color: #fd0d0d;
+    }
+  }
+}

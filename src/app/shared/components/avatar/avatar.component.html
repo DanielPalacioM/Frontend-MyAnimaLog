@@ -1,0 +1,17 @@
+<div class="avatar-container">
+  <div class="avatar-wrapper">
+    <div class="avatar-circle" (click)="triggerFileInput()">
+      <img [src]="imageUrl" alt="profile">
+    </div>
+    
+    
+  
+  <p class="username">{{ username }}</p>
+  
+  <input 
+    type="file" 
+    id="fileInput" 
+    accept="image/*" 
+    (change)="onFileSelected($event)" 
+    style="display: none;">
+</div>

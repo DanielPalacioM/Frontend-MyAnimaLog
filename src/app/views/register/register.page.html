@@ -1,13 +1,51 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>register</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content fullscreen>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">register</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <!-- Fondo con olas -->
+  <div class="bg">
+    <div class="wave top"></div>
+    <div class="wave bottom"></div>
+  </div>
+
+  <!-- ✅ Botón home FUERA del register-container -->
+  <button class="home-btn" type="button" (click)="goToLogin()">
+    <img src="../../../assets/images/home.png" alt="home">
+  </button>
+
+  <div class="register-container">
+
+    <!-- Animales arriba -->
+    <img src="../../../assets/images/cat register.png" class="cat-img" alt="cat">
+    <img src="../../../assets/images/loro register.png" class="parrot-img" alt="parrot">
+
+    <!-- Texto -->
+    <p class="intro-text">
+      In our application we ensure the<br>
+      comfort and care of your pet
+    </p>
+
+    <!-- Caja blanca donde van los inputs -->
+    <div class="form-box">
+      <form>
+
+        <div class="pill white">
+          <input type="text" placeholder="Username" [(ngModel)]="username" name="username">
+        </div>
+
+        <div class="pill white">
+          <input type="email" placeholder="Email" [(ngModel)]="email" name="email">
+        </div>
+
+        <div class="pill white">
+          <input [type]="passwordVisible ? 'text' : 'password'" placeholder="Password" [(ngModel)]="password" name="password">
+          <button type="button" class="eye" (click)="togglePassword()"></button>
+        </div>
+
+        <button class="btn-register" type="button" (click)="onRegister()">
+          Register
+        </button>
+
+      </form>
+    </div>
+  </div>
+
 </ion-content>

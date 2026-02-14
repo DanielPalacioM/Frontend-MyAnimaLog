@@ -9,19 +9,17 @@
     <h1 class="title">MyAnimalog</h1>
 
     <div class="hero">
-      <img class="dog-img" src="../../../assets/images/login image.png" alt="dog">
+      <img class="dog-img" src="../../../assets/images/login dog.png" alt="dog">
     </div>
 
-    <!-- ✅ Usando variables normales -->
     <form class="form">
-
-      <!-- Username -->
+      <!-- Email (cambiado de Username) -->
       <div class="pill">
         <input 
-          type="text" 
-          placeholder="Username" 
-          [(ngModel)]="username" 
-          name="username"/>
+          type="email" 
+          placeholder="Email" 
+          [(ngModel)]="email" 
+          name="email"/>
       </div>
 
       <!-- Password con toggle -->
@@ -32,7 +30,6 @@
           [(ngModel)]="password" 
           name="password"/>
         
-        <!-- 👁️ Botón de mostrar/ocultar -->
         <button 
           type="button" 
           class="eye" 
@@ -41,9 +38,8 @@
         </button>
       </div>
 
-      <a class="forgot" (click)="GoToHome()">Forgot password</a>
+      <a class="forgot" (click)="GoToRecoverPassword()">Forgot password</a>
 
-      <!-- Botón de login principal -->
       <button 
         type="button" 
         class="btn-signup"
@@ -54,16 +50,19 @@
       <div class="divider"><span>Or Sign With</span></div>
 
       <div class="socials">
-  <!-- Gmail -->
-  <button type="button" class="gmail-btn" (click)="loginWithGoogle()">
-    <img src="../../../assets/images//google.png" alt="gm" />
-  </button>
+        <!-- Gmail - Tu botón personalizado -->
+        <button type="button" class="gmail-btn" (click)="loginWithGoogle()">
+          <img src="../../../assets/images/google.png" alt="gm" />
+        </button>
 
-  <!-- Logo de la app que lleva al registro -->
-  <button type="button" class="register-btn" (click)="goToRegister()">
-    <img src="../../../assets/images/logo app.png" alt="dog icon" />
-  </button>
-</div>
+        <!-- 🔥 Botón invisible de Google (se clickea programáticamente) -->
+        <div id="googleButtonDiv" style="display: none;"></div>
+
+        <!-- Logo de la app que lleva al registro -->
+        <button type="button" class="register-btn" (click)="goToRegister()">
+          <img src="../../../assets/images/logo app.png" alt="dog icon" />
+        </button>
+      </div>
     </form>
   </div>
 </ion-content>

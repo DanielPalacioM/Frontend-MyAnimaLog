@@ -1,0 +1,39 @@
+.avatar-container {
+  text-align: center;
+  margin-top: 20px;
+  position: relative;
+  z-index: 5;
+}
+
+.avatar-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.avatar-circle {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  
+
+  img {
+    width: 80%;
+    height: 80%;
+    object-fit: cover;
+  }
+}
+
+
+.username {
+  margin-top: -15px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
