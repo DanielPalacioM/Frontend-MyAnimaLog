@@ -1,13 +1,21 @@
 <div class="avatar-container">
   <div class="avatar-wrapper">
-    <div class="avatar-circle" (click)="triggerFileInput()">
+    
+    <!-- ✅ Click en el círculo o en el icono -->
+    <div class="avatar-circle" (click)="onAvatarClick()">
       <img [src]="imageUrl" alt="profile">
     </div>
-    
-    
-  
+
+    <!-- ✅ Icono de edición encima -->
+    <div class="edit-icon" *ngIf="editable" (click)="onAvatarClick()">
+      <ion-icon name="create-outline"></ion-icon>
+    </div>
+
+  </div>
+
   <p class="username">{{ username }}</p>
-  
+
+  <!-- ✅ Input oculto -->
   <input 
     type="file" 
     id="fileInput" 

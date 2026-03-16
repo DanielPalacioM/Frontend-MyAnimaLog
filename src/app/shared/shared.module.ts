@@ -12,6 +12,8 @@ import { ButtonComponent } from './components/button/button.component';
 import { AvatarComponent } from './components/avatar/avatar.component';
 import { MenuItemComponent } from './components/menu-item/menu-item.component';
 import { TabBarComponent } from './components/tab-bar/tab-bar.component';
+import { UpdateUsernameModalComponent } from './components/update-username-modal/update-username-modal.component';
+
 
 @NgModule({
   declarations: [
@@ -19,7 +21,8 @@ import { TabBarComponent } from './components/tab-bar/tab-bar.component';
     ButtonComponent,
     AvatarComponent,
     MenuItemComponent,
-    TabBarComponent
+    TabBarComponent,
+    UpdateUsernameModalComponent
   ],
   imports: [
     CommonModule,
@@ -32,7 +35,8 @@ import { TabBarComponent } from './components/tab-bar/tab-bar.component';
     ButtonComponent,
     AvatarComponent,
     MenuItemComponent,
-    TabBarComponent
+    TabBarComponent,
+    UpdateUsernameModalComponent
   ]
 })
 export class SharedModule {}

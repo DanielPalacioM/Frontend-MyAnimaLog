@@ -20,16 +20,21 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/user/register`, userData);
   }
 
+  // ✅ Login con Google - Envía objeto JSON { idToken }
   loginWithGoogle(idToken: string): Observable<any> {
     return this.http.post(
       `${this.baseUrl}/auth/google`,
-      idToken,
-      { headers: { 'Content-Type': 'text/plain' } }
+      { idToken }  // ✅ Objeto JSON
     ).pipe(
       tap((response: any) => {
         if (response.token) {
           this.saveToken(response.token);
-          this.extractAndSaveUserId(response.token);  // ✅ Extrae y guarda el userId
+          this.extractAndSaveUserId(response.token);
+          
+          // ✅ Guardar imagen de Google si viene en el response
+          if (response.profileImage) {
+            this.saveGoogleProfileImage(response.profileImage);
+          }
         }
       })
     );
@@ -40,7 +45,7 @@ export class AuthService {
       tap((response: any) => {
         if (response.token) {
           this.saveToken(response.token);
-          this.extractAndSaveUserId(response.token);  // ✅ Extrae y guarda el userId
+          this.extractAndSaveUserId(response.token);
         }
       })
     );
@@ -56,16 +61,15 @@ export class AuthService {
 
   clearSession(): void {
     localStorage.removeItem('token');
-    localStorage.removeItem('userId');  // ✅ También limpia el userId
+    localStorage.removeItem('userId');
+    localStorage.removeItem('profileImage');  // ✅ Limpia también la imagen
     this.router.navigate(['/login']);
   }
 
-  // ✅ Método para solicitar reset de contraseña
   requestPasswordReset(email: string): Observable<any> {
     return this.http.post(`${this.baseUrl}/auth/request-password-reset`, { email });
   }
 
-  // ✅ Método para resetear contraseña con token
   resetPassword(token: string, newPassword: string): Observable<any> {
     return this.http.post(`${this.baseUrl}/auth/reset-password`, { 
       token, 
@@ -73,20 +77,25 @@ export class AuthService {
     });
   }
 
-  // ✅ Guardar token
   saveToken(token: string): void {
     localStorage.setItem('token', token);
     console.log('💾 Token guardado');
   }
 
-  // ✅ Extraer y guardar userId del token
+  // ✅ Guardar imagen de Google en localStorage
+  saveGoogleProfileImage(imageUrl: string): void {
+    if (imageUrl) {
+      localStorage.setItem('profileImage', imageUrl);
+      console.log('💾 Imagen de Google guardada:', imageUrl);
+    }
+  }
+
   private extractAndSaveUserId(token: string): void {
     try {
       const decoded: any = jwtDecode(token);
       console.log('🔍 Token decodificado:', decoded);
       
-      // ✅ Busca el UUID en diferentes campos
-      const userId = decoded.sub || decoded.userId || decoded.id || decoded.user_id;
+      const userId = decoded.id || decoded.sub || decoded.userId || decoded.user_id;
       
       if (userId) {
         localStorage.setItem('userId', userId);
@@ -99,17 +108,14 @@ export class AuthService {
     }
   }
 
-  // ✅ Obtener token
   getToken(): string | null {
     return localStorage.getItem('token');
   }
 
-  // ✅ Obtener userId guardado
   getUserId(): string | null {
     return localStorage.getItem('userId');
   }
 
-  // ✅ Verificar si está logueado
   isLoggedIn(): boolean {
     return !!this.getToken();
   }

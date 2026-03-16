@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { ModalController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/authServices/auth';
 import { ProfileService } from 'src/app/services/ProfileService/profile';
+import { UpdateUsernameModalComponent } from 'src/app/shared/components/update-username-modal/update-username-modal.component';
 import { jwtDecode } from 'jwt-decode';
 
 @Component({
@@ -18,15 +20,15 @@ export class ProfilePage implements OnInit {
   constructor(
     public router: Router,
     private authService: AuthService,
-    private profileService: ProfileService
+    private profileService: ProfileService,
+    private modalController: ModalController
   ) {}
 
   ngOnInit() {
-    this.loadUserFromToken();  // ✅ Primero carga del token
-    this.loadProfile();         // ✅ Luego carga del backend (si necesitas más datos)
+    this.loadUserFromToken();
+    this.loadProfileImageFromStorage();  // ✅ Cargar imagen al iniciar
   }
 
-  // ✅ Cargar username desde el token (inmediato)
   loadUserFromToken() {
     const token = this.authService.getToken();
     
@@ -35,7 +37,6 @@ export class ProfilePage implements OnInit {
         const decoded: any = jwtDecode(token);
         console.log('🔍 Token decodificado:', decoded);
         
-        // ✅ Toma el username del token
         this.username = decoded.username || decoded.name || 'Username';
         
         console.log('👤 Username del token:', this.username);
@@ -45,24 +46,31 @@ export class ProfilePage implements OnInit {
     }
   }
 
-  // ✅ Cargar perfil completo del backend (opcional, para más datos)
+  // ✅ Cargar imagen de localStorage (Google o upload)
+  loadProfileImageFromStorage() {
+    const savedImage = localStorage.getItem('profileImage');
+    if (savedImage) {
+      this.profileImage = savedImage;
+      console.log('🖼️ Imagen cargada desde localStorage:', savedImage);
+    }
+  }
+
   loadProfile() {
     this.profileService.getProfile().subscribe({
       next: (data) => {
         console.log('✅ Perfil cargado del backend:', data);
         
-        // Actualiza con datos del backend si están disponibles
         if (data.username) {
           this.username = data.username;
         }
         
         if (data.profileImage) {
           this.profileImage = data.profileImage;
+          localStorage.setItem('profileImage', data.profileImage);
         }
       },
       error: (error) => {
         console.error('❌ Error al cargar perfil del backend:', error);
-        // No es crítico, ya tenemos el username del token
       }
     });
   }
@@ -72,9 +80,10 @@ export class ProfilePage implements OnInit {
     
     this.profileService.uploadProfileImage(file).subscribe({
       next: (response) => {
-        console.log('✅ Imagen actualizada:', response);
-        if (response.imageUrl) {
+        console.log('✅ Imagen subida al backend:', response);
+        if (response?.imageUrl) {
           this.profileImage = response.imageUrl;
+          localStorage.setItem('profileImage', response.imageUrl);
         }
       },
       error: (error) => {
@@ -83,8 +92,40 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  goToUpdateProfile() {
-    this.router.navigate(['/update-profile']);
+  onImageRemove() {
+    console.log('🗑️ Eliminando imagen...');
+    
+    this.profileService.removeProfileImage().subscribe({
+      next: (response) => {
+        console.log('✅ Imagen eliminada del backend:', response);
+        this.profileImage = '../../../assets/images/ProfileImage.png';
+        localStorage.removeItem('profileImage');
+      },
+      error: (error) => {
+        console.error('❌ Error al eliminar imagen del backend:', error);
+        this.profileImage = '../../../assets/images/ProfileImage.png';
+        localStorage.removeItem('profileImage');
+      }
+    });
+  }
+
+  async goToUpdateProfile() {
+    const modal = await this.modalController.create({
+      component: UpdateUsernameModalComponent,
+      componentProps: {
+        currentUsername: this.username
+      },
+      cssClass: 'transparent-modal'
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+    
+    if (data?.updated) {
+      console.log('✅ Username actualizado a:', data.newUsername);
+      this.username = data.newUsername;
+    }
   }
 
   goToMyPets() {

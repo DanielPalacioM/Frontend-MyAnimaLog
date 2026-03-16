@@ -42,36 +42,55 @@ export class ProfileService {
     });
   }
 
-  // ✅ Actualizar foto de perfil
-  uploadProfileImage(file: File): Observable<any> {
-    const userId = this.getUserId();
-    
-    if (!userId) {
-      console.error('❌ No hay userId disponible');
-      return throwError(() => new Error('No userId available'));
-    }
+  // ✅ Subir imagen con token en el header
+uploadProfileImage(file: File): Observable<any> {
+  const token = this.authService.getToken();
 
-    const formData = new FormData();
-    formData.append('image', file);
-
-    console.log('📸 Subiendo imagen para usuario:', userId);
-    return this.http.post(`${this.baseUrl}/user/profile/${userId}/image`, formData, { 
-      headers: this.getAuthHeaders() 
-    });
+  if (!token) {
+    return throwError(() => new Error('No token available'));
   }
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
+
+  // ✅ URL SIN el userId - el backend lo saca del token
+  console.log('📸 Subiendo imagen...');
+  return this.http.post(`${this.baseUrl}/user/profile/image`, formData, { headers });
+}
+
+  removeProfileImage(): Observable<any> {
+  const token = this.authService.getToken();
+
+  if (!token) {
+    return throwError(() => new Error('No token available'));
+  }
+
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
+
+  console.log('🗑️ Eliminando imagen de perfil...');
+  return this.http.delete(`${this.baseUrl}/user/profile/image`, { headers });
+}
 
   // ✅ Actualizar perfil
-  updateProfile(data: any): Observable<any> {
-    const userId = this.getUserId();
-    
-    if (!userId) {
-      console.error('❌ No hay userId disponible');
-      return throwError(() => new Error('No userId available'));
-    }
-
-    console.log('✏️ Actualizando perfil del usuario:', userId);
-    return this.http.put(`${this.baseUrl}/user/profile/${userId}`, data, { 
-      headers: this.getAuthHeaders() 
-    });
+updateProfile(data: any): Observable<any> {
+  const userId = this.getUserId();
+  
+  if (!userId) {
+    console.error('❌ No hay userId disponible');
+    return throwError(() => new Error('No userId available'));
   }
+
+  console.log('✏️ Actualizando perfil del usuario:', userId);
+  
+  // ✅ URL correcta: /user/{userId} (sin /profile/)
+  return this.http.put(`${this.baseUrl}/user/${userId}`, data, { 
+    headers: this.getAuthHeaders() 
+  });
+}
 }

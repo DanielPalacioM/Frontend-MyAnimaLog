@@ -8,6 +8,7 @@
 .avatar-wrapper {
   position: relative;
   display: inline-block;
+  cursor: pointer;
 }
 
 .avatar-circle {
@@ -19,19 +20,54 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  
+  overflow: hidden;  // ✅ Recorta la imagen en círculo
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
 
   img {
-    width: 80%;
-    height: 80%;
-    object-fit: cover;
+    width: 100%;   // ✅ Cambiado de 80% a 100% para llenar el círculo
+    height: 100%;
+    object-fit: cover;  // ✅ Imagen redondeada sin deformarse
+    border-radius: 50%;
   }
 }
 
+// ✅ Icono de edición encima del avatar
+.edit-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: #000;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  transition: transform 0.2s ease;
+
+  ion-icon {
+    color: #fff;
+    font-size: 18px;
+  }
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
 
 .username {
-  margin-top: -15px;
+  margin-top: -5px;
   font-size: 18px;
   font-weight: 600;
   color: #fff;

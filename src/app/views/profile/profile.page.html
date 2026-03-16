@@ -12,11 +12,12 @@
 
     <!-- Avatar -->
     <app-avatar 
-      [imageUrl]="profileImage" 
-      [username]="username" 
-      [editable]="true"
-      (imageChange)="onImageChange($event)">
-    </app-avatar>
+  [imageUrl]="profileImage" 
+  [username]="username" 
+  [editable]="true"
+  (imageChange)="onImageChange($event)"
+  (imageRemove)="onImageRemove()">
+</app-avatar>
   </div>
 
   <!-- Card blanca con opciones -->
