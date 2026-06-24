@@ -1,0 +1,128 @@
+<ion-content [fullscreen]="true">
+
+  <!-- SIDEBAR OVERLAY -->
+  <div class="sidebar-backdrop" *ngIf="sidebarOpen" (click)="closeSidebar()"></div>
+  <div class="sidebar" [class.open]="sidebarOpen">
+    <div class="sidebar-header">
+      <img [src]="pet.imageUrl" alt="" class="sidebar-avatar" />
+      <div class="sidebar-user-info">
+        <p class="sidebar-name">Luisa Hernández</p>
+        <p class="sidebar-email">lhernandez@gmail.com</p>
+      </div>
+      <button class="sidebar-close" (click)="closeSidebar()">
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-menu">
+      <div class="sidebar-item" (click)="onBuscarMascota()">
+        <img src="assets/images/PetProfileSidebar/BuscarMascotaIcon.png" alt="" />
+        <span>Buscar mascota</span>
+      </div>
+      <div class="sidebar-item" (click)="onHome()">
+        <img src="assets/images/PetProfileSidebar/HomeIcon.png" alt="" />
+        <span>Home</span>
+      </div>
+      <div class="sidebar-item" (click)="onFiltrarVacunas()">
+        <img src="assets/images/PetProfileSidebar/FiltrarVacunasIcon.png" alt="" />
+        <span>Filtrar vacunas</span>
+      </div>
+      <div class="sidebar-item" (click)="onPersonasAcceso()">
+        <img src="assets/images/PetProfileSidebar/PersonasAccesoCompartidoIcon.png" alt="" />
+        <span>Ver personas con acceso compartido</span>
+      </div>
+      <div class="sidebar-item" (click)="onAgendarCita()">
+        <img src="assets/images/PetProfileSidebar/AgendarCitaIcon.png" alt="" />
+        <span>Agendar cita rápida</span>
+      </div>
+      <div class="sidebar-item" (click)="onEditarInfo()">
+        <img src="assets/images/PetProfileSidebar/EditarInfoIcon.png" alt="" />
+        <span>Editar información de mascota</span>
+      </div>
+      <div class="sidebar-item danger" (click)="onEliminarMascota()">
+        <img src="assets/images/PetProfileSidebar/EliminarMascotaIcon.png" alt="" />
+        <span>Eliminar mascota</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pet-container">
+
+    <!-- ZONA BLANCA: header + card de identidad -->
+    <div class="white-zone">
+
+      <!-- HEADER -->
+      <div class="pet-header">
+        <button class="menu-btn" (click)="toggleSidebar()">
+          <ion-icon name="menu-outline"></ion-icon>
+        </button>
+        <h1 class="pet-title">Pet profile</h1>
+        <div class="species-icon">
+          <img [src]="getSpeciesIcon()" alt="" />
+          <span>{{ pet.species === 'cat' ? 'Gato' : 'Perro' }}</span>
+        </div>
+      </div>
+
+      <!-- PET CARD -->
+      <div class="pet-card">
+        <div class="pet-avatar-wrap">
+          <img [src]="pet.imageUrl" alt="" class="pet-avatar" />
+        </div>
+        <p class="pet-name">{{ pet.name }}</p>
+        <p class="pet-breed">{{ pet.breed }} · {{ pet.age }} {{ pet.ageUnit }}</p>
+      </div>
+
+    </div>
+
+    <!-- ZONA NARANJA -->
+    <div class="orange-zone">
+
+      <app-pet-stats-card [stats]="petStats"></app-pet-stats-card>
+
+      <app-medical-history-card
+        [items]="historyItems"
+        (sectionSelected)="onHistorySection($event)"
+        (viewAll)="goToMedicalHistory()">
+      </app-medical-history-card>
+
+      <app-vaccine-card
+        [summary]="vaccineSummary"
+        (addVaccine)="goToVaccineLine()"
+        (viewTimeline)="goToVaccineLine()">
+      </app-vaccine-card>
+
+      <!-- ANUNCIOS -->
+      <div class="ads-section">
+        <div class="ad-card">
+          <img src="assets/images/ad-placeholder.png" alt="anuncio" class="ad-img" />
+        </div>
+      </div>
+
+      <!-- CALENDARIO DE CITAS -->
+      <div class="section">
+        <app-pet-calendar
+          [events]="calendarEvents"
+          [petName]="pet.name"
+          [petAvatarUrl]="pet.imageUrl"
+          (dateSelected)="onDateSelected($event)"
+          (editEvent)="onEditEvent($event)"
+          (deleteEvent)="onDeleteEvent($event)"
+          (addEvent)="onAddCalendarEvent()">
+        </app-pet-calendar>
+      </div>
+
+      <!-- DOCUMENTOS -->
+      <div class="section">
+        <app-documents-section
+          [documents]="documents"
+          (viewAll)="goToAllDocuments()"
+          (upload)="goToAddDocument()"
+          (docClick)="onDocClick($event)">
+        </app-documents-section>
+      </div>
+
+    </div>
+
+  </div>
+
+</ion-content>

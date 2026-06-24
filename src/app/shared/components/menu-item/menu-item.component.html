@@ -1,4 +1,10 @@
 <div class="menu-item" [class.logout]="isLogout" (click)="onClick()">
-  <img [src]="icon" alt="icon" class="menu-icon">
-  <span class="menu-label">{{ label }}</span>
+  <div class="menu-left">
+    <img [src]="icon" alt="icon" class="menu-icon" />
+    <span class="menu-label">{{ label }}</span>
+  </div>
+  <div class="menu-right">
+    <span class="suffix" *ngIf="suffix">{{ suffix }}</span>
+    <span class="arrow">→</span>
+  </div>
 </div>

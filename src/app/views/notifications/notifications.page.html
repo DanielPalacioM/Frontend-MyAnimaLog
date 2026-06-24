@@ -1,0 +1,40 @@
+<ion-content [fullscreen]="true">
+  <div class="notif-container">
+
+    <div class="notif-header">
+      <button class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <h1 class="notif-title">Notificaciones</h1>
+      <div class="header-actions">
+        <button class="mark-all-btn" (click)="markAllAsRead()">Mark all as read</button>
+        <button class="hide-btn" (click)="toggleHidden()">
+          {{ showHidden ? 'Ocultas' : 'Hide' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="notif-list">
+      <ng-container *ngIf="visibleNotifications.length > 0; else emptyState">
+        <app-notification-card
+          *ngFor="let notif of visibleNotifications"
+          [notification]="notif"
+          (accepted)="onAccepted($event)"
+          (rejected)="onRejected($event)"
+          (markRead)="onMarkRead($event)"
+          (hidden)="onHidden($event)"
+          (deleted)="onDeleted($event)"
+          (completed)="onCompleted($event)">
+        </app-notification-card>
+      </ng-container>
+
+      <ng-template #emptyState>
+        <div class="empty-state">
+          <ion-icon name="notifications-off-outline"></ion-icon>
+          <p>No tienes notificaciones</p>
+        </div>
+      </ng-template>
+    </div>
+
+  </div>
+</ion-content>

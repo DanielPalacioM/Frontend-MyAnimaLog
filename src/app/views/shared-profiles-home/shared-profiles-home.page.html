@@ -1,0 +1,184 @@
+<ion-content [fullscreen]="true">
+  <div class="sp-wrapper">
+
+    <!-- FONDO NARANJA -->
+    <div class="bg-naranja">
+      <img src="assets/images/SharedProfilesHome/FondoNaranja.png" alt="" />
+    </div>
+
+    <!-- CARD AZUL -->
+    <div class="card-azul">
+      <img src="assets/images/SharedProfilesHome/FondoAzul.png" class="bg-azul-img" alt="" />
+      <div class="card-azul-content">
+
+        <div class="sp-top-row">
+          <div class="sp-top-left">
+            <div class="sp-icon-row">
+              <div class="sp-icon-card">
+                <img src="assets/images/SharedProfilesHome/PerfilesCompartidosIcon.png" alt="" />
+              </div>
+              <span class="sp-label">Perfiles compartidos</span>
+            </div>
+            <p class="sp-greeting">Hola, {{ username }}</p>
+            <p class="sp-sub">Te gusto tenerte de vuelta</p>
+          </div>
+          <div class="sp-avatar">
+            <img [src]="userAvatar" alt="avatar" />
+          </div>
+        </div>
+
+        <p class="sp-section-label">Elige una sección</p>
+        <div class="sp-tabs-wrap">
+          <div class="sp-tabs">
+            <button class="sp-tab" [class.active]="activeTab === 'mis-mascotas'"
+              (click)="setTab('mis-mascotas')">Mis Mascotas</button>
+            <button class="sp-tab" [class.active]="activeTab === 'personas'"
+              (click)="setTab('personas')">Personas compartidas</button>
+            <button class="sp-tab" [class.active]="activeTab === 'a-mi-cuidado'"
+              (click)="setTab('a-mi-cuidado')">Mascotas a mi cuidado</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MINI DASHBOARD FLOTANTE -->
+    <div class="mini-dashboard-wrap">
+      <div class="mini-dashboard">
+        <p class="dashboard-title">
+          <span class="blue-text">Mini </span>
+          <span class="orange-text">Dashboard</span>
+        </p>
+        <div class="dashboard-stats">
+          <div class="stat-item orange">
+            <div class="stat-icon-wrap">
+              <img src="assets/images/SharedProfilesHome/MascotasDashboard.png" alt="" />
+            </div>
+            <div class="stat-text">
+              <span class="stat-num">{{ totalMascotas }}</span>
+              <span class="stat-label">Mascotas</span>
+            </div>
+          </div>
+          <div class="stat-item blue">
+            <div class="stat-icon-wrap">
+              <img src="assets/images/SharedProfilesHome/PersonasCompartidasDashboard.png" alt="" />
+            </div>
+            <div class="stat-text">
+              <span class="stat-num">{{ totalPersonas }}</span>
+              <span class="stat-label">Personas compartidas</span>
+            </div>
+          </div>
+          <div class="stat-item orange">
+            <div class="stat-icon-wrap">
+              <img src="assets/images/SharedProfilesHome/MascotasAMiCuidadoDashboard.png" alt="" />
+            </div>
+            <div class="stat-text">
+              <span class="stat-num">{{ totalAMiCuidado }}</span>
+              <span class="stat-label">Mascotas a mi cuidado</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div class="sp-below">
+      <div class="sp-content">
+
+        <ng-container *ngIf="activeTab === 'mis-mascotas'">
+          <button class="share-btn" (click)="onSharePet()">
+            Compartir perfil de mi mascota
+          </button>
+          <div class="pet-list">
+            <div class="pet-card" *ngFor="let pet of myPets">
+              <div class="pet-card-top">
+                <img [src]="pet.imageUrl" alt="" class="pet-img" />
+                <div class="pet-info">
+                  <p class="pet-name">{{ pet.name }}</p>
+                  <p class="pet-breed">{{ pet.breed }}</p>
+                  <div class="pet-stats">
+                    <div class="pstat">
+                      <span class="pstat-label">Edad</span>
+                      <span class="pstat-val">{{ pet.age }}</span>
+                    </div>
+                    <div class="pstat">
+                      <span class="pstat-label">Vacunas</span>
+                      <span class="pstat-val">{{ pet.vaccines }}</span>
+                    </div>
+                    <div class="pstat">
+                      <span class="pstat-label">Visitas al veterinario</span>
+                      <span class="pstat-val">{{ pet.vetVisits }}</span>
+                    </div>
+                    <div class="pstat">
+                      <span class="pstat-label">Peso</span>
+                      <span class="pstat-val">{{ pet.weight }} kg</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="pet-caregivers">
+                <div class="caregiver" *ngFor="let c of pet.caregivers">
+                  <img [src]="c.avatarUrl" alt="" />
+                  <span>{{ c.name }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="activeTab === 'personas'">
+          <div class="personas-grid">
+            <div class="persona-card" *ngFor="let p of sharedPersons">
+              <img [src]="p.avatarUrl" alt="" class="persona-avatar" />
+              <span class="persona-name">{{ p.name }}</span>
+              <span class="persona-role">{{ p.role }}</span>
+              <div class="persona-pets">
+                <img *ngFor="let pet of p.pets" [src]="pet.imageUrl" alt="" class="persona-pet-img" />
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="activeTab === 'a-mi-cuidado'">
+          <div class="pet-list">
+            <div class="pet-card" *ngFor="let pet of petsInCare">
+              <div class="pet-card-top">
+                <img [src]="pet.imageUrl" alt="" class="pet-img" />
+                <div class="pet-info">
+                  <p class="pet-name">{{ pet.name }}</p>
+                  <p class="pet-breed">{{ pet.breed }}</p>
+                  <div class="pet-stats">
+                    <div class="pstat">
+                      <span class="pstat-label">Edad</span>
+                      <span class="pstat-val">{{ pet.age }}</span>
+                    </div>
+                    <div class="pstat">
+                      <span class="pstat-label">Vacunas</span>
+                      <span class="pstat-val">{{ pet.vaccines }}</span>
+                    </div>
+                    <div class="pstat">
+                      <span class="pstat-label">Visitas al veterinario</span>
+                      <span class="pstat-val">{{ pet.vetVisits }}</span>
+                    </div>
+                    <div class="pstat">
+                      <span class="pstat-label">Peso</span>
+                      <span class="pstat-val">{{ pet.weight }} kg</span>
+                    </div>
+                  </div>
+                  <button class="ver-btn" (click)="onViewPet(pet.id)">Ver</button>
+                </div>
+              </div>
+              <div class="pet-owner">
+                <img [src]="pet.owner.avatarUrl" alt="" />
+                <span>{{ pet.owner.name }}</span>
+                <span class="owner-role">{{ pet.owner.role }}</span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+      </div>
+    </div>
+
+  </div>
+</ion-content>

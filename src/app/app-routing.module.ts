@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { RegisterPageModule } from './views/register/register.module';
 
 const routes: Routes = [
   {
@@ -28,10 +27,27 @@ const routes: Routes = [
   {
     path: 'recover-password',
     loadChildren: () => import('./views/recover-password/recover-password.module').then( m => m.RecoverPasswordPageModule)
-  },  {
+  },
+  {
     path: 'profile',
     loadChildren: () => import('./views/profile/profile.module').then( m => m.ProfilePageModule)
   },
+  {
+    path: 'notifications',
+    loadChildren: () => import('./views/notifications/notifications.module').then( m => m.NotificationsPageModule)
+  },
+  {
+    path: 'shared-profiles',
+    loadChildren: () => import('./views/shared-profiles/shared-profiles.module').then( m => m.SharedProfilesPageModule)
+  },
+  {
+    path: 'shared-profiles-home',
+    loadChildren: () => import('./views/shared-profiles-home/shared-profiles-home.module').then( m => m.SharedProfilesHomePageModule)
+  },  {
+    path: 'pet-profile',
+    loadChildren: () => import('./views/pet-profile/pet-profile.module').then( m => m.PetProfilePageModule)
+  },
+
 
   
 

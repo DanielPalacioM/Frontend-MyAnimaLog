@@ -8,13 +8,15 @@ import { ActionSheetController } from '@ionic/angular';
   standalone: false
 })
 export class AvatarComponent implements OnInit {
-  @Input() imageUrl: string = '../../../assets/images/ProfileImage.png';  
+  @Input() imageUrl: string = 'assets/images/Profile/ImageUser.png';
   @Input() username: string = 'Username';
   @Input() editable: boolean = true;
   @Output() imageChange = new EventEmitter<File>();
   @Output() imageRemove = new EventEmitter<void>();  // ✅ Nuevo evento
+  @Input() showUsername: boolean = true;
+  @Input() size: number = 130;
 
-  defaultImage: string = '../../../assets/images/ProfileImage.png';
+  defaultImage: string = 'assets/images/Profile/ImageUser.png';
   hasCustomImage: boolean = false;
 
   constructor(private actionSheetController: ActionSheetController) {}

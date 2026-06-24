@@ -1,0 +1,21 @@
+<div class="calendar-widget">
+  <div class="widget-header">
+    <ion-icon name="calendar-outline"></ion-icon>
+    <span>Próximas citas</span>
+  </div>
+
+  <div class="events-list" *ngIf="events.length > 0; else emptyState">
+    <div class="event-item" *ngFor="let event of events">
+      <div class="event-dot" [style.background]="getTypeColor(event.type)"></div>
+      <div class="event-info">
+        <p class="event-title">{{ event.title }}</p>
+        <p class="event-date">{{ event.date | date:'d MMM · h:mm a' }}</p>
+      </div>
+      <ion-icon [name]="getTypeIcon(event.type)" [style.color]="getTypeColor(event.type)"></ion-icon>
+    </div>
+  </div>
+
+  <ng-template #emptyState>
+    <p class="empty-text">No hay citas agendadas</p>
+  </ng-template>
+</div>

@@ -1,0 +1,32 @@
+<div class="vaccine-card">
+  <div class="card-header">
+    <p class="card-title">Vacunas</p>
+    <span class="line-life-tag" (click)="onViewTimeline()">Linea de vida →</span>
+  </div>
+
+  <div class="progress-row">
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="progressPercent"></div>
+    </div>
+    <span class="progress-count">{{ summary.appliedCount }}/{{ summary.totalCount }}</span>
+  </div>
+
+  <div class="next-vaccine" *ngIf="summary.nextVaccineName; else noNext">
+    <ion-icon name="time-outline"></ion-icon>
+    <div class="next-info">
+      <p class="next-title">Próxima: {{ summary.nextVaccineName }}</p>
+      <p class="next-date">
+        {{ summary.nextVaccineDate | date:'dd/MM/yyyy' }}
+        <span *ngIf="summary.daysUntilNext !== null"> · en {{ summary.daysUntilNext }} días</span>
+      </p>
+    </div>
+  </div>
+  <ng-template #noNext>
+    <p class="no-next-text">Sin vacunas pendientes por ahora</p>
+  </ng-template>
+
+  <div class="card-actions">
+    <button class="btn-secondary" (click)="onAdd()">Agregar</button>
+    <button class="btn-primary" (click)="onViewTimeline()">Ver vacunas</button>
+  </div>
+</div>

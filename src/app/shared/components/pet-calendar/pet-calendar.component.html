@@ -1,0 +1,161 @@
+<div class="cal-wrap">
+
+  <!-- HEADER -->
+  <div class="cal-header" *ngIf="petName">
+    <img *ngIf="petAvatarUrl" [src]="petAvatarUrl" [alt]="petName" class="cal-pet-avatar" />
+    <span class="cal-pet-name">{{ petName }} - eventos en el mes</span>
+    <span class="cal-event-count">{{ totalEventsThisMonth }}</span>
+    <button class="cal-add-btn" (click)="onAddEvent()">
+      <ion-icon name="add-outline"></ion-icon>
+    </button>
+  </div>
+
+  <!-- NAV MES -->
+  <div class="cal-nav">
+    <button (click)="prevMonth()"><ion-icon name="chevron-back-outline"></ion-icon></button>
+    <span class="cal-month-label">{{ monthNames[currentMonth] }}, {{ currentYear }}</span>
+    <button (click)="nextMonth()"><ion-icon name="chevron-forward-outline"></ion-icon></button>
+  </div>
+
+  <!-- DÍAS HEADER -->
+  <div class="cal-days-header">
+    <span *ngFor="let d of dayNames">{{ d }}</span>
+  </div>
+
+  <!-- SEMANAS -->
+  <div class="cal-week" *ngFor="let week of weeks">
+    <div class="cal-day"
+      *ngFor="let day of week"
+      [class.today]="isToday(day)"
+      [class.selected]="isSelected(day)"
+      [class.empty]="!day"
+      (click)="selectDate(day)">
+      <span class="day-num" *ngIf="day">{{ day.getDate() }}</span>
+      <div class="day-dots">
+        <ng-container *ngIf="day">
+          <span class="dot" *ngFor="let e of getDotsForDay(day)" [style.background]="e.color"></span>
+          <span class="more-dots" *ngIf="hasMoreEvents(day)">...</span>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOS LÍNEAS DIVISORAS -->
+  <div class="cal-divider-wrap">
+    <div class="cal-divider-line"></div>
+    <div class="cal-divider-line"></div>
+  </div>
+
+  <!-- BARRA TÍTULO + MENÚ -->
+  <div class="cal-section-bar">
+    <span class="day-events-title" *ngIf="!showAllEvents">
+      Hoy {{ selectedDateLabel }}, {{ currentYear }}
+    </span>
+    <span class="day-events-title" *ngIf="showAllEvents">
+      Todos Los Eventos · {{ monthNames[currentMonth] }}
+    </span>
+    <button class="cal-menu-btn" (click)="toggleShowAll()">
+      <ion-icon name="menu-outline"></ion-icon>
+    </button>
+  </div>
+
+  <!-- ZONA DE EVENTOS CON SCROLL FIJO -->
+  <div class="day-events-scroll">
+
+    <!-- VISTA: día seleccionado -->
+    <ng-container *ngIf="!showAllEvents">
+      <div class="event-card" *ngFor="let ev of selectedDayEvents"
+           [style.border-left-color]="ev.color"
+           (click)="openEventModal(ev)">
+        <div class="event-card-title-row">
+          <ion-icon [name]="getTypeIcon(ev.type)" class="event-card-icon" [style.color]="ev.color"></ion-icon>
+          <span class="event-card-title">{{ ev.title }}</span>
+        </div>
+        <p class="event-card-desc" *ngIf="ev.description">{{ ev.description }}</p>
+        <p class="event-card-time">{{ ev.time }}</p>
+        <div class="event-actions" (click)="$event.stopPropagation()">
+          <button class="action-btn edit" (click)="onEdit(ev, $event)"><ion-icon name="create-outline"></ion-icon></button>
+          <button class="action-btn delete" (click)="onDelete(ev, $event)"><ion-icon name="trash-outline"></ion-icon></button>
+        </div>
+      </div>
+      <p class="empty-events" *ngIf="selectedDayEvents.length === 0">Sin eventos este día</p>
+    </ng-container>
+
+    <!-- VISTA: todos los eventos del mes agrupados por fecha -->
+    <ng-container *ngIf="showAllEvents">
+      <ng-container *ngFor="let group of groupedMonthEvents">
+        <div class="events-date-label">{{ group.label }}</div>
+        <div class="event-card" *ngFor="let ev of group.events"
+             [style.border-left-color]="ev.color"
+             (click)="openEventModal(ev)">
+          <div class="event-card-title-row">
+            <ion-icon [name]="getTypeIcon(ev.type)" class="event-card-icon" [style.color]="ev.color"></ion-icon>
+            <span class="event-card-title">{{ ev.title }}</span>
+          </div>
+          <p class="event-card-desc" *ngIf="ev.description">{{ ev.description }}</p>
+          <p class="event-card-time">{{ ev.time }}</p>
+          <div class="event-actions" (click)="$event.stopPropagation()">
+            <button class="action-btn edit" (click)="onEdit(ev, $event)"><ion-icon name="create-outline"></ion-icon></button>
+            <button class="action-btn delete" (click)="onDelete(ev, $event)"><ion-icon name="trash-outline"></ion-icon></button>
+          </div>
+        </div>
+      </ng-container>
+      <p class="empty-events" *ngIf="monthEvents.length === 0">No hay eventos este mes</p>
+    </ng-container>
+
+  </div>
+
+</div>
+
+<!-- MODAL DETALLE EVENTO -->
+<div class="event-modal-backdrop" *ngIf="selectedEvent" (click)="closeEventModal()">
+  <div class="event-modal" (click)="$event.stopPropagation()">
+
+    <div class="event-modal-header" [style.border-left-color]="selectedEvent.color">
+      <ion-icon [name]="getTypeIcon(selectedEvent.type)" [style.color]="selectedEvent.color" class="modal-icon"></ion-icon>
+      <h3 class="modal-title">{{ selectedEvent.title }}</h3>
+      <button class="modal-close" (click)="closeEventModal()">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+
+    <div class="event-modal-body">
+
+      <div class="modal-cell" *ngIf="selectedEvent.description">
+        <span class="modal-cell-label">Descripción</span>
+        <span class="modal-cell-value">{{ selectedEvent.description }}</span>
+      </div>
+
+      <div class="modal-cell">
+        <span class="modal-cell-label">Hora</span>
+        <span class="modal-cell-value">{{ selectedEvent.time }}</span>
+      </div>
+
+      <div class="modal-cell" *ngIf="selectedEvent.intervalHours">
+        <span class="modal-cell-label">Se repite cada</span>
+        <span class="modal-cell-value">{{ selectedEvent.intervalHours }} horas</span>
+      </div>
+
+      <div class="modal-cell" *ngIf="selectedEvent.intervalHours">
+        <span class="modal-cell-label">Próxima dosis</span>
+        <span class="modal-cell-value modal-cell-highlight">{{ getNextDose(selectedEvent) }}</span>
+      </div>
+
+      <div class="modal-cell">
+        <span class="modal-cell-label">Fecha</span>
+        <span class="modal-cell-value">{{ formatDisplayDate(selectedEvent.date) }}</span>
+      </div>
+
+    </div>
+
+    <div class="event-modal-actions">
+      <button class="modal-btn edit" (click)="onEdit(selectedEvent, $event); closeEventModal()">
+        <ion-icon name="create-outline"></ion-icon> Editar
+      </button>
+      <button class="modal-btn delete" (click)="onDelete(selectedEvent, $event); closeEventModal()">
+        <ion-icon name="trash-outline"></ion-icon> Eliminar
+      </button>
+    </div>
+
+  </div>
+</div>

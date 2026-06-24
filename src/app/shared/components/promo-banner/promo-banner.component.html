@@ -1,0 +1,7 @@
+<div class="promo-banner" [style.background]="bgColor">
+  <div class="banner-text">
+    <p class="banner-title">{{ title }}</p>
+    <p class="banner-subtitle">{{ subtitle }}</p>
+  </div>
+  <img *ngIf="imageUrl" [src]="imageUrl" alt="banner" class="banner-image" />
+</div>

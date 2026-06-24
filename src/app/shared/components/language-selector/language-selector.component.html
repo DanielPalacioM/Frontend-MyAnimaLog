@@ -1,0 +1,21 @@
+<app-bottom-sheet
+  [isOpen]="isOpen"
+  title="Idioma / Language"
+  (closed)="close()">
+
+  <div class="lang-options">
+    <div class="lang-option"
+      [class.selected]="selectedLanguage === 'en'"
+      (click)="select('en')">
+      <span>🇺🇸 English</span>
+      <ion-icon name="checkmark-outline" *ngIf="selectedLanguage === 'en'"></ion-icon>
+    </div>
+    <div class="lang-option"
+      [class.selected]="selectedLanguage === 'es'"
+      (click)="select('es')">
+      <span>🇨🇴 Español</span>
+      <ion-icon name="checkmark-outline" *ngIf="selectedLanguage === 'es'"></ion-icon>
+    </div>
+  </div>
+
+</app-bottom-sheet>

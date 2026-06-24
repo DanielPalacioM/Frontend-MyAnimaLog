@@ -1,0 +1,39 @@
+<div class="docs-wrap">
+
+  <div class="docs-header">
+    <span class="docs-title">Documentos</span>
+    <div class="docs-actions">
+      <button class="docs-btn" (click)="onViewAll()">Ver docs</button>
+      <button class="docs-btn primary" (click)="onUpload()">Subir +</button>
+    </div>
+  </div>
+
+  <div class="docs-scroll">
+
+    <div class="doc-card" *ngFor="let doc of documents" (click)="onDocClick(doc)">
+      <div class="doc-preview">
+        <ng-container *ngIf="doc.type === 'pdf'">
+          <div class="doc-pdf-icon">
+            <ion-icon name="arrow-down-circle-outline" class="pdf-arrow"></ion-icon>
+            <span class="pdf-label">PDF</span>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="doc.type !== 'pdf'">
+          <ion-icon name="image-outline" class="img-icon"></ion-icon>
+        </ng-container>
+      </div>
+      <span class="doc-name">{{ doc.name }}</span>
+      <span class="doc-date">{{ doc.date }}</span>
+    </div>
+
+    <!-- CARD AGREGAR -->
+    <div class="doc-card add-card" (click)="onUpload()">
+      <div class="doc-preview add-preview">
+        <ion-icon name="add-outline"></ion-icon>
+      </div>
+      <span class="doc-name add-label">Agregar</span>
+    </div>
+
+  </div>
+
+</div>

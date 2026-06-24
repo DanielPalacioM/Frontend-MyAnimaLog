@@ -1,4 +1,217 @@
-<!-- Opción 1: Usar el método -->
-<ion-button (click)="goToProfile()">
-  Ir a Profile
-</ion-button>
+<ion-content [fullscreen]="true">
+  <div class="home-container">
+
+    <!-- TUTORIAL OVERLAY -->
+<div class="tutorial-overlay" *ngIf="isFirstTime">
+  <div class="tutorial-backdrop" (click)="nextTutorialStep()"></div>
+
+  <div class="tutorial-tip tip-vet" *ngIf="currentTutorialStep.key === 'vet'">
+    <div class="tip-bubble">{{ currentTutorialStep.text }}</div>
+    <div class="tip-arrow"></div>
+  </div>
+
+  <div class="tutorial-tip tip-shared" *ngIf="currentTutorialStep.key === 'shared'">
+    <div class="tip-bubble">{{ currentTutorialStep.text }}</div>
+    <div class="tip-arrow"></div>
+  </div>
+
+  <div class="tutorial-tip tip-add" *ngIf="currentTutorialStep.key === 'add'">
+    <div class="tip-bubble">{{ currentTutorialStep.text }}</div>
+    <div class="tip-arrow"></div>
+  </div>
+
+  <div class="tutorial-tip tip-calendar-quick" *ngIf="currentTutorialStep.key === 'calendar-quick'">
+    <div class="tip-bubble">{{ currentTutorialStep.text }}</div>
+    <div class="tip-arrow"></div>
+  </div>
+
+  <div class="tutorial-tip tip-maps" *ngIf="currentTutorialStep.key === 'maps'">
+    <div class="tip-bubble">{{ currentTutorialStep.text }}</div>
+    <div class="tip-arrow"></div>
+  </div>
+
+  <div class="tutorial-tip tip-calendar-card" *ngIf="currentTutorialStep.key === 'calendar-card'">
+    <div class="tip-bubble">{{ currentTutorialStep.text }}</div>
+    <div class="tip-arrow"></div>
+  </div>
+
+  <div class="tutorial-tip tip-vet-card" *ngIf="currentTutorialStep.key === 'vet-card'">
+    <div class="tip-bubble">{{ currentTutorialStep.text }}</div>
+    <div class="tip-arrow"></div>
+  </div>
+
+  <div class="tutorial-footer">
+    <div class="tutorial-dots">
+      <span *ngFor="let step of tutorialSteps; let i = index"
+        class="t-dot" [class.active]="i === tutorialStep">
+      </span>
+    </div>
+    <button class="tutorial-next" (click)="nextTutorialStep()">
+      {{ tutorialStep < totalSteps - 1 ? 'Siguiente →' : 'Entendido ✓' }}
+    </button>
+  </div>
+</div>
+
+    <!-- HEADER -->
+    <div class="home-header">
+      <div class="user-info" (click)="goToProfile()">
+        <img src="assets/images/Home_icons/ImageUser.png" alt="logo" class="app-logo" />
+        <span class="username">{{ username }}</span>
+      </div>
+      <div class="header-icons">
+        <div class="icon-card" (click)="navigate('/notifications')">
+          <img src="assets/images/Home_icons/NotificationIcon.png" alt="notifications" />
+        </div>
+        <div class="icon-card">
+          <img src="assets/images/Home_icons/IA icon.png" alt="IA" />
+        </div>
+        <div class="icon-card">
+          <img src="assets/images/Home_icons/AD blocker icon.png" alt="ad blocker" />
+        </div>
+      </div>
+    </div>
+
+    <!-- PROMO BANNER -->
+    <div class="promo-banner">
+      <img src="assets/images/Home_icons/logo app.png" alt="dog" class="promo-dog" />
+      <div class="promo-inner">
+        <div class="promo-ad-text">
+          <p>Don't forget to follow us on our networks</p>
+        </div>
+        <div class="promo-welcome-row">
+          <div class="promo-text-block">
+            <p class="welcome-line">Welcome To</p>
+            <div class="brand-name">
+              <span class="brand-myAnima">MyAnima</span>
+              <span class="brand-log-wrap">
+                <span class="brand-log">Log</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK ACCESS -->
+    <div class="quick-access">
+      <div class="quick-item"
+        [class.active]="activeQuickItem === 'vet'"
+        (click)="onQuickItemTap('vet', '/vet')">
+        <div class="quick-icon-wrap">
+          <img src="assets/images/Home_icons/VetIcon.png" alt="vet" />
+        </div>
+        <span>Vet</span>
+      </div>
+      <div class="quick-item"
+        [class.active]="activeQuickItem === 'shared'"
+        (click)="onQuickItemTap('shared', '/shared')">
+        <div class="quick-icon-wrap">
+          <img src="assets/images/Home_icons/SharedProfileIcon.png" alt="shared pet" />
+        </div>
+        <span>Shared pet</span>
+      </div>
+      <div class="quick-item"
+        [class.pulse]="showTutorial"
+        [class.active]="activeQuickItem === 'add'"
+        (click)="onAddPet()">
+        <div class="quick-icon-wrap add">
+          <img src="assets/images/Home_icons/addPet.png" alt="add pet" />
+        </div>
+        <span>Add pet</span>
+        <div class="tutorial-tooltip" *ngIf="showTutorial && !isFirstTime">
+          ¡Agrega tu mascota!
+        </div>
+      </div>
+      <div class="quick-item"
+        [class.active]="activeQuickItem === 'calendar'"
+        (click)="onQuickItemTap('calendar', '/calendar')">
+        <div class="quick-icon-wrap">
+          <img src="assets/images/Home_icons/CalendarIcon.png" alt="calendar" />
+        </div>
+        <span>Calendar</span>
+      </div>
+      <div class="quick-item"
+        [class.active]="activeQuickItem === 'maps'"
+        (click)="onQuickItemTap('maps', '/maps')">
+        <div class="quick-icon-wrap">
+          <img src="assets/images/Home_icons/UbicacionIcon.png" alt="maps" />
+        </div>
+        <span>Maps</span>
+      </div>
+    </div>
+
+    <!-- PET CARD — solo si hay mascotas -->
+    <ng-container *ngIf="hasPets">
+      <div class="section-header">
+        <div class="see-all-options">
+          <span (click)="onSeeAll()">see all</span>
+          <span (click)="navigate('/pets')">See pets</span>
+          <span (click)="navigate('/calendar')">See dates</span>
+        </div>
+      </div>
+
+      <div class="pet-swipe-container"
+        (swipeleft)="onSwipeLeft()"
+        (swiperight)="onSwipeRight()">
+        <div class="pet-detail-card">
+          <div class="pet-image-side">
+            <img [src]="currentPet.imageUrl" [alt]="currentPet.name" />
+          </div>
+          <div class="pet-info-side">
+            <p class="pet-name">{{ currentPet.name }}</p>
+            <p class="pet-breed">{{ currentPet.breed }}</p>
+          </div>
+          <ion-icon
+            name="chevron-forward-outline"
+            class="swipe-arrow"
+            *ngIf="pets.length > 1">
+          </ion-icon>
+        </div>
+
+        <div class="dots" *ngIf="pets.length > 1">
+          <span
+            *ngFor="let pet of pets; let i = index"
+            class="dot"
+            [class.active]="i === currentPetIndex">
+          </span>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- CALENDAR CARD -->
+    <div class="calendar-card">
+      <div class="card-content">
+        <p class="card-title">Calendar</p>
+        <div class="calendar-actions">
+          <button class="cal-btn" (click)="navigate('/calendar/add')">
+            Crear evento
+          </button>
+          <button class="cal-btn" (click)="navigate('/calendar')">
+            Ver eventos
+          </button>
+        </div>
+        <img src="assets/images/Home_icons/calendarIconDesing.png" alt="" class="cal-bg-icon" />
+      </div>
+      <img src="assets/images/Home_icons/calendarImage.png" class="calendar-side-img" alt="" />
+    </div>
+
+    <!-- VET ASSOCIATION CARD -->
+    <div class="vet-card">
+      <img src="assets/images/Home_icons/dalmataVet.png" class="dog-decoration" alt="" />
+      <div class="card-content">
+        <img src="assets/images/Home_icons/MyAnimaLogVetLogo.png" alt="MyAnimalogVet" class="vet-logo" />
+        <div class="vet-actions">
+          <button class="vet-btn" (click)="onAsociationVet()">
+            <img src="assets/images/Home_icons/AsociationVet.png" alt="" />
+            <span>Asociar veterinaria</span>
+          </button>
+          <button class="vet-btn" (click)="onFindVet()">
+            <img src="assets/images/Home_icons/UbiVet.png" alt="" />
+            <span>Buscar veterinaria</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

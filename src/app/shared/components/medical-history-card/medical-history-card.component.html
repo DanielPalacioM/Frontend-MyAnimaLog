@@ -1,0 +1,19 @@
+<div class="medical-history">
+  <div class="section-header">
+    <p class="section-title">Historial medico</p>
+    <button class="view-all-btn" (click)="onViewAll()">
+      Ver todo<ion-icon name="arrow-forward-outline"></ion-icon>
+    </button>
+  </div>
+
+  <div class="history-grid">
+    <button
+      class="history-item"
+      *ngFor="let item of items"
+      (click)="onSelect(item.section)">
+      <img [src]="item.icon" class="history-icon" alt="" />
+      <span class="item-label">{{ item.label }}</span>
+      <span class="item-count">{{ item.count }} {{ item.count === 1 ? 'Registro' : 'Registros' }}</span>
+    </button>
+  </div>
+</div>

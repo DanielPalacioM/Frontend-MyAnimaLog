@@ -1,0 +1,128 @@
+.notif-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #fff;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  position: relative;
+  transition: opacity 0.2s;
+
+  &:active { opacity: 0.9; }
+}
+
+.notif-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.notif-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+  font-family: 'Actor', sans-serif;
+}
+
+.notif-date {
+  font-size: 11px;
+  color: #888;
+  white-space: nowrap;
+  font-family: 'Actor', sans-serif;
+}
+
+.notif-message {
+  font-size: 12px;
+  color: #666;
+  margin: 0 0 8px;
+  font-family: 'Actor', sans-serif;
+  line-height: 1.4;
+}
+
+.notif-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+
+  .btn-reject {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: none;
+  background: #e53935;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+  }
+
+  .btn-accept {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: none;
+  background: #3B6D11;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+  }
+}
+
+.notif-menu-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.dots-btn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #888;
+  cursor: pointer;
+  padding: 0 4px;
+  letter-spacing: 1px;
+}
+
+.notif-menu {
+  position: absolute;
+  right: 0;
+  top: 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  z-index: 100;
+  min-width: 140px;
+  overflow: hidden;
+}
+
+.menu-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-family: 'Actor', sans-serif;
+  color: #1a1a2e;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover { background: #f5f5f5; }
+
+  &.danger {
+    color: #e53935;
+    ion-icon { color: #e53935; }
+  }
+
+  ion-icon { font-size: 16px; }
+}

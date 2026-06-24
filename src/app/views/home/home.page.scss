@@ -1,27 +1,532 @@
-#container {
-  text-align: center;
+.home-container {
+  padding: 16px;
+  background: #F3FFFB;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow: visible;
+}
 
+/* =========================
+   HEADER
+========================== */
+
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.username {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.header-icons {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-card {
+  width: 52px;
+  height: 52px;
+
+  background: white;
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.12),
+    0 4px 12px rgba(0,0,0,.08);
+
+  backdrop-filter: blur(12px);
+
+  img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+  }
+}
+
+/* ==========================
+   PROMO BANNER
+========================== */
+
+.promo-banner {
+  background: #f8b64c;
+  border-radius: 24px;
+  margin-top: 25px;
+  padding: 14px 14px 16px;
+  position: relative;
+  width: 100%;
+  min-height: 110px;
+  overflow: visible; // permite que el perro se salga
+}
+
+.promo-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.promo-ad-text {
+  background: #FDF0E5;
+  border-radius: 10px;
+  padding: 15px 12px;
+  width: fit-content;
+  max-width: 45%; // más angosta
+
+  p {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: #444;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.6;
+  }
+}
+
+.promo-welcome-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.promo-text-block {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.welcome-line {
+  margin: 0;
+  color: white;
+  font-size: 28px;
+  font-weight: 700;
+  font-family: 'Jua', sans-serif;
+  line-height: 1.2;
+}
+
+.brand-name {
+  display: flex;
+  align-items: center;
+}
+
+.brand-myAnima {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1a1a2e;
+  line-height: 1;
+  font-family: 'Jua', sans-serif;
+}
+
+.brand-log-wrap {
+  background: #3D254D;
+  border-radius: 8px;
+  padding: 2px 8px;
+  margin-left: 3px;
+}
+
+.brand-log {
+  font-size: 28px;
+  font-weight: 800;
+  color: white;
+  line-height: 1;
+  font-family: 'Jua', sans-serif;
+}
+
+.promo-dog {
+  position: absolute !important;
+  right: 10px !important;
+  bottom: 0px !important;
+  width: 180px !important;
+  height: auto !important;
+  object-fit: contain !important;
+  z-index: 2;
+  pointer-events: none;
+}
+/* ==========================
+   QUICK ACCESS
+========================== */
+
+.quick-access {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.quick-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+
+  span {
+    font-size: 11px;
+    color: #555;
+    text-align: center;
+  }
+}
+
+.quick-icon-wrap {
+  width: 52px;
+  height: 52px;
+
+  background: white;
+
+  border-radius: 12px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.12),
+    0 4px 12px rgba(0,0,0,.08);
+
+  backdrop-filter: blur(12px);
+
+  img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+  }
+}
+
+.quick-icon-wrap.add {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #f5a623;
+
+  img {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.tutorial-tooltip {
   position: absolute;
-  left: 0;
-  right: 0;
+  bottom: -30px;
+  background: #1a1a2e;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 166, 35, .6);
+  }
+
+  70% {
+    box-shadow: 0 0 0 12px rgba(245, 166, 35, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 166, 35, 0);
+  }
+}
+
+.quick-item.pulse .quick-icon-wrap.add {
+  animation: pulse 1.5s infinite;
+}
+
+/* ==========================
+   CALENDAR CARD
+========================== */
+
+.calendar-card {
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  min-height: 170px;
+  background: linear-gradient(135deg, #4037BE 0%, #17144d 100%);
+  border-radius: 20px;
+}
+
+.calendar-card .card-content {
+  width: 55%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  position: relative;
+}
+
+.card-title {
+  margin: 0 0 14px;
+  color: white;
+  font-size: 24px;
+  font-weight: 700;
+  font-family: 'Jua', sans-serif;
+  text-align: left;
+  font-style: italic;
+}
+
+.calendar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.cal-btn {
+  border: none;
+  background: white;
+  color: #1a1a2e;
+  border-radius: 10px 0 0 10px; // solo esquinas izquierdas redondeadas
+  padding: 10px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+}
+
+.cal-bg-icon {
+  position: absolute;
+  right: -30px;
   top: 50%;
   transform: translateY(-50%);
+  width: 100px;
+  height: auto;
+  opacity: 0.15;
+  z-index: 1;
+  pointer-events: none;
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+.calendar-side-img {
+  width: 45%;
+  min-height: 170px;
+  height: 100%;
+  object-fit: cover;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  display: block;
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
+/* ==========================
+   VET CARD
+========================== */
 
-  color: #8c8c8c;
+.vet-card {
+  position: relative;
+  overflow: hidden;
 
-  margin: 0;
+  background: #4037be;
+
+  border-radius: 20px;
+
+  min-height: 190px;
+
+  padding: 20px;
 }
 
-#container a {
-  text-decoration: none;
+.vet-logo {
+  height: 55px;
+  margin-bottom: 18px;
+}
+
+.vet-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.vet-btn {
+  width: 95px;
+  height: 85px;
+
+  background: white;
+
+  border: none;
+  border-radius: 14px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  gap: 6px;
+
+  img {
+    width: 26px;
+    height: 26px;
+  }
+
+  span {
+    color: #4037be;
+    font-size: 9px;
+    font-weight: 600;
+    text-align: center;
+  }
+}
+
+.dog-decoration {
+  position: absolute;
+
+  right: -10px;
+  bottom: -5px;
+
+  width: 145px;
+
+  object-fit: contain;
+}
+
+/* ==========================
+   RESPONSIVE
+========================== */
+
+@media (max-width: 390px) {
+
+  .brand-myAnima,
+  .brand-log {
+    font-size: 28px;
+  }
+
+  .promo-dog {
+    width: 120px;
+    height: 120px;
+  }
+
+  .calendar-side-img {
+    width: 45%;
+  }
+
+  .dog-decoration {
+    width: 120px;
+  }
+
+  .vet-btn {
+    width: 80px;
+    height: 75px;
+  }
+
+  // TUTORIAL OVERLAY
+.tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+}
+
+.tutorial-backdrop {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.65);
+}
+
+.tutorial-footer {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 10;
+}
+
+.tutorial-dots {
+  display: flex;
+  gap: 6px;
+
+  .t-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.4);
+    transition: background 0.3s;
+
+    &.active { background: #f5a623; }
+  }
+}
+
+.tutorial-next {
+  background: #f5a623;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 12px 32px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+  z-index: 10;
+  position: relative;
+}
+
+.tutorial-tip {
+  position: absolute;
+  z-index: 10;
+}
+
+.tip-bubble {
+  background: white;
+  color: #1a1a2e;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 10px;
+  max-width: 130px;
+  text-align: center;
+  font-family: 'Actor', sans-serif;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.tip-arrow {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid white;
+  margin: 0 auto;
+}
+
+// quick access
+.tip-vet           { top: 52%; left: 2%; }
+.tip-shared        { top: 52%; left: 20%; }
+.tip-add           { top: 48%; left: 50%; transform: translateX(-50%); }
+.tip-calendar-quick{ top: 52%; right: 18%; }
+.tip-maps          { top: 52%; right: 2%; }
+
+// cards
+.tip-calendar-card { top: 68%; left: 5%; }
+.tip-vet-card      { top: 82%; left: 5%; }
 }

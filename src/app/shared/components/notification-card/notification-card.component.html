@@ -1,0 +1,33 @@
+<div class="notif-card" [class.unread]="!notification.isRead" (click)="onMarkRead()">
+
+  <div class="notif-body">
+    <div class="notif-header">
+      <p class="notif-title">{{ notification.title }}</p>
+     <span class="notif-date">{{ getNotifDate() }}</span>    </div>
+    <p class="notif-message">{{ notification.message }}</p>
+
+    <div class="notif-actions" *ngIf="notification.actions === 'invitation'">
+      <button class="btn-reject" (click)="$event.stopPropagation(); onReject()">Cancelar</button>
+      <button class="btn-accept" (click)="$event.stopPropagation(); onAccept()">Aceptar</button>
+    </div>
+  </div>
+
+  <div class="notif-menu-wrap">
+    <button class="dots-btn" (click)="$event.stopPropagation(); toggleMenu()">...</button>
+    <div class="notif-menu" *ngIf="menuOpen">
+      <div class="menu-opt" (click)="$event.stopPropagation(); onHide()">
+        <ion-icon name="eye-off-outline"></ion-icon>
+        <span>Ocultar</span>
+      </div>
+      <div class="menu-opt danger" (click)="$event.stopPropagation(); onDelete()">
+        <ion-icon name="trash-outline"></ion-icon>
+        <span>Eliminar</span>
+      </div>
+      <div class="menu-opt" (click)="$event.stopPropagation(); onComplete()">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        <span>Completada</span>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,18 @@
+<ion-content [fullscreen]="true">
+  <div class="sp-container">
+
+    <button class="back-btn" (click)="goBack()">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+    </button>
+
+    <div class="empty-state">
+      <img src="assets/images/SPEmpty/SPEmptyImagen.png" alt="empty" class="empty-img" />
+      <h2 class="empty-title">¿No tienes mascotas compartidas?</h2>
+      <p class="empty-subtitle">Comienza a mejorar el cuidado de tu mascota con tus amigos, familia o pareja</p>
+      <button class="start-btn" (click)="onStartSharing()">
+        Empieza a compartir
+      </button>
+    </div>
+
+  </div>
+</ion-content>

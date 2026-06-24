@@ -1,0 +1,6 @@
+<div class="backdrop" *ngIf="isOpen" (click)="close()"></div>
+<div class="sheet" [class.open]="isOpen">
+  <div class="handle"></div>
+  <p class="sheet-title" *ngIf="title">{{ title }}</p>
+  <ng-content></ng-content>
+</div>

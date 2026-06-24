@@ -1,0 +1,144 @@
+.docs-wrap {
+  background: #fff;
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.docs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.docs-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+}
+
+.docs-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.docs-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+  background: #f0f0f0;
+  color: #1a1a2e;
+
+  &.primary {
+    background: #4037BE;
+    color: #fff;
+  }
+}
+
+// scroll horizontal para que los docs se vayan acumulando
+.docs-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+
+  &::-webkit-scrollbar { height: 0; }
+}
+
+// CARD DE DOCUMENTO
+.doc-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  width: 90px;
+  cursor: pointer;
+
+  &:active { opacity: 0.8; }
+}
+
+// fondo naranja suave para el preview
+.doc-preview {
+  width: 90px;
+  height: 90px;
+  background: #FFF0D6;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+// ícono PDF con flecha arriba + etiqueta PDF
+.doc-pdf-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+
+  .pdf-arrow {
+    font-size: 28px;
+    color: #FFB84F;
+  }
+
+  .pdf-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #FFB84F;
+    letter-spacing: 0.5px;
+  }
+}
+
+// ícono imagen
+.img-icon {
+  font-size: 32px;
+  color: #FFB84F;
+}
+
+.doc-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+  text-align: center;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-date {
+  font-size: 11px;
+  color: #FFB84F;
+  font-family: 'Actor', sans-serif;
+  font-weight: 600;
+}
+
+// CARD AGREGAR con borde punteado
+.add-card {
+  cursor: pointer;
+}
+
+.add-preview {
+  background: transparent;
+  border: 2px dashed #4037BE;
+  border-radius: 16px;
+
+  ion-icon {
+    font-size: 32px;
+    color: #4037BE;
+  }
+}
+
+.add-label {
+  color: #4037BE;
+  font-weight: 600;
+}
