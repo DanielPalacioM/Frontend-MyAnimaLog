@@ -1,0 +1,158 @@
+<ion-content [fullscreen]="true" class="at-content">
+  <div class="at-wrap">
+
+    <div class="at-header">
+      <button class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <h1 class="at-title">Tratamientos</h1>
+    </div>
+
+    <div class="pet-chip">
+      <img [src]="petAvatar" alt="" class="pet-av" />
+      <span class="pet-nm">{{ petName }}</span>
+    </div>
+
+    <div class="at-card">
+
+      <!-- DESCRIPCIÓN -->
+      <div class="field">
+        <label class="field-label">
+          <ion-icon name="clipboard-outline"></ion-icon>
+          Descripción del tratamiento
+        </label>
+        <div class="input-wrap">
+          <input type="text" class="field-input" placeholder="Gastritis leve, infección..." [(ngModel)]="description" />
+        </div>
+      </div>
+
+      <!-- FECHAS -->
+      <div class="row2">
+        <div class="field">
+          <label class="field-label">
+            <ion-icon name="calendar-outline"></ion-icon>
+            Inicio
+          </label>
+          <div class="input-wrap">
+            <input type="date" class="field-input" [(ngModel)]="startDate" />
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">
+            <ion-icon name="calendar-outline"></ion-icon>
+            Fin
+          </label>
+          <div class="input-wrap">
+            <input type="date" class="field-input" [(ngModel)]="endDate" />
+          </div>
+        </div>
+      </div>
+
+      <!-- MEDICAMENTOS -->
+      <div class="field">
+        <label class="field-label">
+          <ion-icon name="medical-outline"></ion-icon>
+          Medicamento
+        </label>
+
+        <div class="med-chip" *ngFor="let m of medications; let i = index">
+          <ion-icon name="medical-outline" class="med-icon"></ion-icon>
+          <div class="med-info">
+            <span class="med-name">{{ m.name }} {{ m.dose }}</span>
+            <span class="med-dose">{{ m.frequency }} · {{ m.route }}</span>
+          </div>
+          <button class="med-remove" (click)="removeMedication(i)">
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
+        </div>
+
+        <button class="add-med-btn" (click)="openMedModal()">
+          <ion-icon name="add-outline"></ion-icon>
+          Agregar medicamento
+        </button>
+      </div>
+
+      <!-- ESTADO -->
+      <div class="field">
+        <label class="field-label">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          Estado
+        </label>
+        <div class="chips-row">
+          <button
+            class="chip"
+            *ngFor="let s of statusOptions"
+            [class.active]="status === s.key"
+            (click)="setStatus(s.key)">
+            {{ s.label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- NOTAS -->
+      <div class="field">
+        <label class="field-label">
+          <ion-icon name="create-outline"></ion-icon>
+          Notas
+        </label>
+        <div class="input-wrap">
+          <textarea class="field-input field-textarea" rows="3" placeholder="Dieta blanda, seguimiento..." [(ngModel)]="notes"></textarea>
+        </div>
+      </div>
+
+      <div class="footer-btns">
+        <button class="btn-cancel" (click)="cancel()">Cancelar</button>
+        <button class="btn-save" (click)="save()">Guardar Tratamiento</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL MEDICAMENTO -->
+  <div class="modal-backdrop" *ngIf="showMedModal" (click)="closeMedModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <span class="modal-title">Agregar medicamento</span>
+        <button class="modal-close" (click)="closeMedModal()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="field">
+        <label class="field-label"><ion-icon name="medical-outline"></ion-icon> Nombre</label>
+        <div class="input-wrap">
+          <input type="text" class="field-input" placeholder="Omeprazol..." [(ngModel)]="newMedName" />
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label class="field-label"><ion-icon name="flask-outline"></ion-icon> Dosis</label>
+          <div class="input-wrap">
+            <input type="text" class="field-input" placeholder="20mg" [(ngModel)]="newMedDose" />
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label"><ion-icon name="time-outline"></ion-icon> Frecuencia</label>
+          <div class="input-wrap">
+            <input type="text" class="field-input" placeholder="c/12h" [(ngModel)]="newMedFrequency" />
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label"><ion-icon name="navigate-outline"></ion-icon> Vía</label>
+        <div class="input-wrap">
+          <input type="text" class="field-input" placeholder="Oral, inyectable..." [(ngModel)]="newMedRoute" />
+        </div>
+      </div>
+
+      <button class="btn-save" style="width:100%;margin-top:8px" (click)="addMedication()">
+        <ion-icon name="add-outline"></ion-icon> Agregar
+      </button>
+
+    </div>
+  </div>
+
+</ion-content>

@@ -1,0 +1,111 @@
+<div class="step-basic">
+
+  <!-- NOMBRE -->
+  <div class="field">
+    <label class="field-label">
+      <ion-icon name="create-outline" class="edit-icon" *ngIf="editMode"></ion-icon>
+      Nombre
+    </label>
+    <div class="input-wrap">
+      <ion-icon name="paw-outline" class="input-icon"></ion-icon>
+      <input
+        class="field-input"
+        type="text"
+        placeholder="Nombre de tu mascota"
+        [(ngModel)]="name"
+        (ngModelChange)="emit()" />
+    </div>
+  </div>
+
+  <!-- ESPECIE -->
+  <div class="field">
+    <label class="field-label">
+      <ion-icon name="create-outline" class="edit-icon" *ngIf="editMode"></ion-icon>
+      Especie
+    </label>
+    <div class="species-row">
+      <button
+        class="species-btn"
+        *ngFor="let sp of speciesList"
+        [class.active]="selectedSpecies === sp.key"
+        (click)="selectSpecies(sp.key)">
+        <span class="species-emoji">{{ sp.emoji }}</span>
+        <span>{{ sp.label }}</span>
+      </button>
+      <button
+        class="species-btn other-btn"
+        [class.active]="!['perro','gato','conejo'].includes(selectedSpecies) && selectedSpecies !== ''"
+        (click)="openOtherModal()">
+        <span>+ Otro</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- RAZA -->
+  <div class="field" *ngIf="selectedSpecies">
+    <label class="field-label">
+      <ion-icon name="create-outline" class="edit-icon" *ngIf="editMode"></ion-icon>
+      Raza
+    </label>
+    <div class="input-wrap">
+      <ion-icon name="search-outline" class="input-icon"></ion-icon>
+      <input
+        class="field-input"
+        type="text"
+        placeholder="Buscar raza..."
+        [(ngModel)]="breedSearch"
+        (ngModelChange)="onBreedInput()" />
+    </div>
+    <div class="breed-dropdown" *ngIf="showBreedDropdown">
+      <div
+        class="breed-option"
+        *ngFor="let b of filteredBreeds"
+        (click)="selectBreed(b)">
+        {{ b }}
+      </div>
+    </div>
+  </div>
+
+  <!-- FECHA DE NACIMIENTO -->
+  <div class="field">
+    <label class="field-label">
+      <ion-icon name="create-outline" class="edit-icon" *ngIf="editMode"></ion-icon>
+      Fecha de nacimiento / Edad
+    </label>
+    <div class="date-row">
+      <div class="input-wrap date-input">
+        <ion-icon name="calendar-outline" class="input-icon"></ion-icon>
+        <input
+          class="field-input"
+          type="date"
+          [(ngModel)]="birthDate"
+          (ngModelChange)="onBirthDateChange()" />
+      </div>
+      <div class="age-badge" *ngIf="ageMonths !== null">
+        {{ ageMonths }} meses
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL OTRO -->
+<div class="other-modal-backdrop" *ngIf="showOtherModal" (click)="closeOtherModal()">
+  <div class="other-modal" (click)="$event.stopPropagation()">
+    <div class="other-modal-header">
+      <span class="other-modal-title">Selecciona una especie</span>
+      <button class="other-modal-close" (click)="closeOtherModal()">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+    <div class="other-modal-list">
+      <div
+        class="other-modal-item"
+        *ngFor="let sp of otherSpecies"
+        (click)="selectOtherSpecies(sp)">
+        <span>{{ sp }}</span>
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </div>
+    </div>
+  </div>
+</div>

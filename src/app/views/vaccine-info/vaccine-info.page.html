@@ -1,0 +1,125 @@
+<ion-content [fullscreen]="true" class="info-content">
+  <div class="info-wrap">
+
+    <!-- HEADER NARANJA -->
+    <div class="info-header">
+      <button class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <h1 class="info-title">Info de la vacuna</h1>
+    </div>
+
+    <!-- HERO -->
+    <div class="info-hero">
+      <div class="hero-icon-wrap">
+        <img [src]="heroIcon" alt="" class="hero-icon" />
+      </div>
+      <h2 class="hero-name">{{ vaccine.title }}</h2>
+      <span class="hero-status" [style.background]="statusColor">{{ statusText }}</span>
+    </div>
+
+    <!-- CARD BLANCA -->
+    <div class="info-card">
+
+      <!-- DATOS -->
+      <h3 class="section-title">DATOS DE LA VACUNA</h3>
+
+      <div class="data-row">
+        <span class="data-label">Fecha de aplicación</span>
+        <span class="data-value">{{ vaccine.applicationDate }}</span>
+      </div>
+      <div class="data-divider"></div>
+
+      <div class="data-row">
+        <span class="data-label">Próxima dosis</span>
+        <span class="data-value highlight">{{ vaccine.nextDose }}</span>
+      </div>
+      <div class="data-divider"></div>
+
+      <div class="data-row">
+        <span class="data-label">N° Lote</span>
+        <span class="data-value">{{ vaccine.lotNumber }}</span>
+      </div>
+      <div class="data-divider"></div>
+
+      <div class="data-row">
+        <span class="data-label">Veterinaria</span>
+        <span class="data-value">{{ vaccine.vet }}</span>
+      </div>
+      <div class="data-divider"></div>
+
+      <div class="data-row">
+        <span class="data-label">Informació</span>
+        <span class="data-value">{{ vaccine.info }}</span>
+      </div>
+      <div class="data-divider"></div>
+
+      <!-- NOTAS -->
+      <div class="notes-card">
+        <h4 class="notes-title">Notas</h4>
+        <p class="notes-text">{{ vaccine.notes }}</p>
+      </div>
+
+      <!-- DOCUMENTO ADJUNTO -->
+      <h3 class="section-title">Documento adjunto</h3>
+
+      <div class="doc-card" *ngIf="vaccine.attachment">
+        <div class="doc-icon-wrap">
+          <ion-icon name="document-outline"></ion-icon>
+        </div>
+        <div class="doc-info">
+          <span class="doc-name">{{ vaccine.docName }}</span>
+          <span class="doc-size">{{ vaccine.docSize }}</span>
+        </div>
+        <button class="doc-btn eye-btn" (click)="toggleDoc()">
+          <ion-icon [name]="docVisible ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+        </button>
+        <button class="doc-btn download-btn" (click)="downloadDoc()">
+          <ion-icon name="download-outline"></ion-icon>
+        </button>
+      </div>
+
+      <button class="add-doc-btn">Agregar otro documento</button>
+
+      <!-- RECORDATORIO -->
+      <h3 class="section-title">Recordatorio</h3>
+
+      <div class="reminder-card">
+        <ion-icon name="notifications-outline" class="reminder-bell"></ion-icon>
+        <div class="reminder-info">
+          <span class="reminder-title">Vaccine_Due</span>
+          <span class="reminder-sub">Envío: {{ vaccine.appointmentDate }} - 1 día antes</span>
+        </div>
+        <ion-icon
+          [name]="vaccine.reminderActive ? 'toggle' : 'toggle-outline'"
+          class="toggle-icon"
+          [class.active]="vaccine.reminderActive"
+          (click)="toggleReminder()">
+        </ion-icon>
+      </div>
+
+      <!-- CITA -->
+      <div class="appointment-card" (click)="goToCalendar()">
+        <div class="apt-icon-wrap">
+          <img src="assets/images/AddVaccine/AgendarCitaIcon.png" alt="" class="apt-icon" />
+        </div>
+        <div class="apt-info">
+          <span class="apt-title">{{ vaccine.appointmentVet }}</span>
+          <span class="apt-sub">{{ vaccine.appointmentDate }} · Dr.pet</span>
+          <span class="apt-status">{{ vaccine.appointmentStatus }}</span>
+        </div>
+        <span class="apt-ver">Ver</span>
+      </div>
+
+      <!-- BOTONES -->
+      <div class="info-footer">
+        <button class="btn-edit" (click)="edit()">Editar</button>
+        <button class="btn-delete" (click)="delete()">Eliminar</button>
+      </div>
+
+    </div>
+  </div>
+
+  <app-tab-bar activeTab="pet-profile"></app-tab-bar>
+
+</ion-content>

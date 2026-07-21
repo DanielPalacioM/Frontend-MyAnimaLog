@@ -1,0 +1,184 @@
+<ion-content [fullscreen]="true" class="al-content">
+  <div class="al-wrap">
+
+    <div class="al-header">
+      <button class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <h1 class="al-title">Laboratorio</h1>
+    </div>
+
+    <div class="pet-chip">
+      <img [src]="petAvatar" alt="" class="pet-av" />
+      <span class="pet-nm">{{ petName }}</span>
+    </div>
+
+    <div class="al-card">
+
+      <!-- TABS TIPO EXAMEN -->
+      <div class="exam-tabs">
+        <button
+          class="exam-tab"
+          *ngFor="let t of examTypes"
+          [class.active]="selectedExamType === t"
+          (click)="selectExamType(t)">
+          {{ t }}
+        </button>
+      </div>
+
+      <!-- NOMBRE DEL EXAMEN -->
+      <div class="field">
+        <label class="field-label">
+          <ion-icon name="flask-outline"></ion-icon>
+          Nombre del examen
+        </label>
+        <div class="input-wrap">
+          <input type="text" class="field-input" placeholder="Hemograma completo..." [(ngModel)]="examName" />
+        </div>
+      </div>
+
+      <!-- FECHA -->
+      <div class="field">
+        <label class="field-label">
+          <ion-icon name="calendar-outline"></ion-icon>
+          Fecha del examen
+        </label>
+        <div class="input-wrap">
+          <input type="date" class="field-input" [(ngModel)]="examDate" />
+        </div>
+      </div>
+
+      <!-- RESULTADO + RANGO -->
+      <div class="row2">
+        <div class="field">
+          <label class="field-label">
+            <ion-icon name="analytics-outline"></ion-icon>
+            Resultado
+          </label>
+          <div class="input-wrap">
+            <input type="text" class="field-input" placeholder="6.2 mill/µL" [(ngModel)]="result" />
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">
+            <ion-icon name="swap-horizontal-outline"></ion-icon>
+            Rango normal
+          </label>
+          <div class="input-wrap">
+            <input type="text" class="field-input" placeholder="5.5–8.5" [(ngModel)]="normalRange" />
+          </div>
+        </div>
+      </div>
+
+      <!-- ¿NORMAL? -->
+      <div class="field">
+        <label class="field-label">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          ¿Resultado normal?
+        </label>
+        <div class="chips-row">
+          <button class="chip" [class.active-green]="isNormal === true" (click)="setNormal(true)">Normal</button>
+          <button class="chip" [class.active-red]="isNormal === false" (click)="setNormal(false)">Anormal</button>
+        </div>
+      </div>
+
+      <!-- RESULTADO VISUAL -->
+      <div class="result-strip" *ngIf="isNormal !== null" [class.rs-normal]="isNormal" [class.rs-abnormal]="!isNormal">
+        <ion-icon [name]="isNormal ? 'checkmark-circle-outline' : 'alert-outline'"></ion-icon>
+        <span>{{ isNormal ? 'Resultado dentro del rango esperado' : 'Resultado fuera del rango normal' }}</span>
+        <span class="rs-badge" [class.normal]="isNormal" [class.abnormal]="!isNormal">
+          {{ isNormal ? 'Normal' : 'Anormal' }}
+        </span>
+      </div>
+
+      <!-- VALORES ADICIONALES -->
+      <div class="field" *ngIf="labValues.length > 0">
+        <label class="field-label">
+          <ion-icon name="list-outline"></ion-icon>
+          Valores del examen
+        </label>
+        <div class="lab-cells">
+          <div class="lab-cell" *ngFor="let v of labValues; let i = index" [class.abnormal-cell]="!v.isNormal">
+            <span class="lc-num" [class.red]="!v.isNormal">{{ v.value }}</span>
+            <span class="lc-lbl">{{ v.label }}</span>
+            <span class="lc-range">{{ v.normalRange }}</span>
+            <button class="lc-remove" (click)="removeValue(i)">
+              <ion-icon name="close-outline"></ion-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button class="add-value-btn" (click)="openValueModal()">
+        <ion-icon name="add-outline"></ion-icon>
+        Agregar valor
+      </button>
+
+      <!-- NOTAS -->
+      <div class="field">
+        <label class="field-label">
+          <ion-icon name="create-outline"></ion-icon>
+          Notas
+        </label>
+        <div class="input-wrap">
+          <textarea class="field-input field-textarea" rows="3" placeholder="Segundo mensaje: valores normales..." [(ngModel)]="notes"></textarea>
+        </div>
+      </div>
+
+      <div class="footer-btns">
+        <button class="btn-cancel" (click)="cancel()">Cancelar</button>
+        <button class="btn-save" (click)="save()">Guardar Examen</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL AGREGAR VALOR -->
+  <div class="modal-backdrop" *ngIf="showValueModal" (click)="closeValueModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <span class="modal-title">Agregar valor</span>
+        <button class="modal-close" (click)="closeValueModal()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="field">
+        <label class="field-label"><ion-icon name="tag-outline"></ion-icon> Nombre</label>
+        <div class="input-wrap">
+          <input type="text" class="field-input" placeholder="Glóbulos, Plaquetas..." [(ngModel)]="newValueLabel" />
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label class="field-label"><ion-icon name="analytics-outline"></ion-icon> Valor</label>
+          <div class="input-wrap">
+            <input type="text" class="field-input" placeholder="6.2" [(ngModel)]="newValueValue" />
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label"><ion-icon name="swap-horizontal-outline"></ion-icon> Rango</label>
+          <div class="input-wrap">
+            <input type="text" class="field-input" placeholder="5.5–8.5" [(ngModel)]="newValueRange" />
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label"><ion-icon name="checkmark-circle-outline"></ion-icon> ¿Normal?</label>
+        <div class="chips-row">
+          <button class="chip" [class.active-green]="newValueIsNormal === true" (click)="newValueIsNormal = true">Normal</button>
+          <button class="chip" [class.active-red]="newValueIsNormal === false" (click)="newValueIsNormal = false">Anormal</button>
+        </div>
+      </div>
+
+      <button class="btn-save" style="width:100%;margin-top:8px" (click)="addValue()">
+        <ion-icon name="add-outline"></ion-icon> Agregar
+      </button>
+
+    </div>
+  </div>
+
+</ion-content>

@@ -1,6 +1,11 @@
 <ion-content [fullscreen]="true">
   <div class="sp-wrapper">
 
+    <!-- BOTÓN ATRÁS -->
+    <button class="back-btn" (click)="goBack()">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+    </button>
+
     <!-- FONDO NARANJA -->
     <div class="bg-naranja">
       <img src="assets/images/SharedProfilesHome/FondoNaranja.png" alt="" />
@@ -30,11 +35,14 @@
         <p class="sp-section-label">Elige una sección</p>
         <div class="sp-tabs-wrap">
           <div class="sp-tabs">
-            <button class="sp-tab" [class.active]="activeTab === 'mis-mascotas'"
+            <button class="sp-tab"
+              [class.active]="activeTab === 'mis-mascotas'"
               (click)="setTab('mis-mascotas')">Mis Mascotas</button>
-            <button class="sp-tab" [class.active]="activeTab === 'personas'"
+            <button class="sp-tab"
+              [class.active]="activeTab === 'personas'"
               (click)="setTab('personas')">Personas compartidas</button>
-            <button class="sp-tab" [class.active]="activeTab === 'a-mi-cuidado'"
+            <button class="sp-tab"
+              [class.active]="activeTab === 'a-mi-cuidado'"
               (click)="setTab('a-mi-cuidado')">Mascotas a mi cuidado</button>
           </div>
         </div>
@@ -85,6 +93,7 @@
     <div class="sp-below">
       <div class="sp-content">
 
+        <!-- TAB: MIS MASCOTAS -->
         <ng-container *ngIf="activeTab === 'mis-mascotas'">
           <button class="share-btn" (click)="onSharePet()">
             Compartir perfil de mi mascota
@@ -126,6 +135,7 @@
           </div>
         </ng-container>
 
+        <!-- TAB: PERSONAS COMPARTIDAS -->
         <ng-container *ngIf="activeTab === 'personas'">
           <div class="personas-grid">
             <div class="persona-card" *ngFor="let p of sharedPersons">
@@ -133,12 +143,15 @@
               <span class="persona-name">{{ p.name }}</span>
               <span class="persona-role">{{ p.role }}</span>
               <div class="persona-pets">
-                <img *ngFor="let pet of p.pets" [src]="pet.imageUrl" alt="" class="persona-pet-img" />
+                <img *ngFor="let pet of p.pets"
+                  [src]="pet.imageUrl" alt=""
+                  class="persona-pet-img" />
               </div>
             </div>
           </div>
         </ng-container>
 
+        <!-- TAB: MASCOTAS A MI CUIDADO -->
         <ng-container *ngIf="activeTab === 'a-mi-cuidado'">
           <div class="pet-list">
             <div class="pet-card" *ngFor="let pet of petsInCare">
@@ -181,4 +194,8 @@
     </div>
 
   </div>
+
+  <!-- FOOTER BAR -->
+  <app-tab-bar activeTab="shared-profile"></app-tab-bar>
+
 </ion-content>

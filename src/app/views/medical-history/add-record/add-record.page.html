@@ -1,0 +1,32 @@
+<ion-content [fullscreen]="true" class="ar-content">
+  <div class="ar-wrap">
+
+    <div class="ar-header">
+      <button class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <h1 class="ar-title">Historial médico</h1>
+    </div>
+
+    <!-- card naranja grande -->
+    <div class="ar-orange-card">
+      <p class="ar-label">Seleccione la sección a registrar</p>
+
+      <div class="cat-list">
+        <div class="cat-card"
+          *ngFor="let c of categories"
+          (click)="selectCategory(c.key, c.route)">
+          <div class="cat-icon">
+            <img [src]="c.icon" alt="" />
+          </div>
+          <div class="cat-info">
+            <span class="cat-title">{{ c.title }}</span>
+            <span class="cat-desc">{{ c.desc }}</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="cat-arrow"></ion-icon>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

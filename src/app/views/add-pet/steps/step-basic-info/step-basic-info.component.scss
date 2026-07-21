@@ -1,0 +1,223 @@
+.step-basic {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+// CAMPO
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.field-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+}
+
+.input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #fff;
+  transition: border-color 0.2s;
+
+  &:focus-within {
+    border-color: #4037BE;
+  }
+
+  .input-icon {
+    font-size: 18px;
+    color: #4037BE;
+    flex-shrink: 0;
+  }
+
+  .field-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+    background: transparent;
+
+    &::placeholder { color: #bbb; }
+  }
+}
+
+// ESPECIES
+.species-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.species-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #e0e0e0;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  .species-emoji { font-size: 16px; }
+
+  &.active {
+    background: #4037BE;
+    border-color: #4037BE;
+    color: #fff;
+  }
+}
+
+.other-btn {
+  border-style: dashed;
+}
+
+// DROPDOWN RAZA
+.breed-dropdown {
+  background: #fff;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.breed-option {
+  padding: 12px 14px;
+  font-size: 13px;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.15s;
+
+  &:last-child { border-bottom: none; }
+  &:active { background: #f5f5ff; }
+}
+
+// FECHA
+.date-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.date-input {
+  flex: 1;
+}
+
+.age-badge {
+  background: #4037BE;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Actor', sans-serif;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+// MODAL OTRO
+.other-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 300;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.other-modal {
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-width: 480px;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.other-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 12px;
+  border-bottom: 1px solid #f0f0f0;
+
+  .other-modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+  }
+
+  .other-modal-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+
+    ion-icon { font-size: 22px; color: #888; }
+  }
+}
+
+.other-modal-list {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.other-modal-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f5f5f5;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  span {
+    font-size: 14px;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+    font-weight: 500;
+  }
+
+  ion-icon {
+    font-size: 16px;
+    color: #bbb;
+  }
+
+  &:active { background: #f5f5ff; }
+  &:last-child { border-bottom: none; }
+}
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.edit-icon {
+  font-size: 13px;
+  color: #e74c3c;
+}

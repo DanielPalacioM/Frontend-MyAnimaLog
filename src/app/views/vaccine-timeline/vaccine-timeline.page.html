@@ -1,0 +1,77 @@
+<ion-content [fullscreen]="true" class="timeline-content">
+  <div class="timeline-wrap">
+
+    <!-- HEADER -->
+    <div class="timeline-header">
+      <button class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <h1 class="timeline-title">Línea de vida de la vacuna</h1>
+    </div>
+
+    <!-- CARD BLANCA -->
+    <div class="timeline-card-wrap">
+
+      <!-- RESUMEN -->
+      <div class="summary-row">
+        <span class="summary-text">
+          <strong>{{ appliedCount }} aplicadas</strong> ·
+          <strong>{{ pendingCount }} pendientes</strong> ·
+          <strong>{{ lateCount }} retrasada</strong>
+        </span>
+      </div>
+
+      <!-- BARRA DE PROGRESO -->
+      <div class="progress-bar-wrap">
+        <div class="progress-bar">
+          <div class="progress-fill applied"   [style.width.%]="(appliedCount / totalCount) * 100"></div>
+          <div class="progress-fill late"      [style.width.%]="(lateCount / totalCount) * 100"></div>
+          <div class="progress-fill pending"   [style.width.%]="(pendingCount / totalCount) * 100"></div>
+        </div>
+      </div>
+
+      <!-- LEYENDA -->
+      <div class="legend-row">
+        <div class="legend-item">
+          <span class="legend-dot applied"></span>
+          <span>Aplicada</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot late"></span>
+          <span>Retrasada</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot pending"></span>
+          <span>Pendiente</span>
+        </div>
+      </div>
+
+      <!-- SELECTOR DE AÑO -->
+      <div class="year-selector">
+        <button
+          class="year-btn"
+          *ngFor="let y of years"
+          [class.active]="selectedYear === y"
+          (click)="selectedYear = y">
+          {{ y }}
+        </button>
+      </div>
+
+      <!-- LÍNEA DE TIEMPO -->
+      <div class="timeline-list">
+        <app-vaccine-timeline-card
+          *ngFor="let v of filteredVaccines; let last = last"
+          [vaccine]="v"
+          [isLast]="last"
+          (open)="onOpenVaccine($event)">
+        </app-vaccine-timeline-card>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <app-tab-bar activeTab="pet-profile"></app-tab-bar>
+
+</ion-content>

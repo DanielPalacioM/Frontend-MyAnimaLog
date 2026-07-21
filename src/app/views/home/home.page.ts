@@ -109,7 +109,7 @@ export class HomePage implements OnInit {
     this.activeQuickItem = 'add';
     setTimeout(() => {
       this.activeQuickItem = null;
-      this.router.navigate(['/pets/add']);
+      this.router.navigate(['/add-pet']);
     }, 300);
   }
 

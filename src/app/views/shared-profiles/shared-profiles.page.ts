@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -7,15 +7,22 @@ import { Router } from '@angular/router';
   styleUrls: ['./shared-profiles.page.scss'],
   standalone: false
 })
-export class SharedProfilesPage {
+export class SharedProfilesPage implements OnInit {
 
   constructor(private router: Router) {}
 
+  ngOnInit() {
+    if (localStorage.getItem('sharedProfilesVisited') === 'true') {
+      this.router.navigate(['/shared-profiles-home']);
+    }
+  }
+
   goBack() {
-    this.router.navigate(['/profile']);
+    this.router.navigate(['/home']);
   }
 
   onStartSharing() {
-    // TODO: abrir flow de compartir mascota
+    localStorage.setItem('sharedProfilesVisited', 'true');
+    this.router.navigate(['/shared-profiles-home']);
   }
 }

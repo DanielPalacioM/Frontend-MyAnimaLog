@@ -10,14 +10,14 @@
         <p class="sidebar-email">lhernandez@gmail.com</p>
       </div>
       <button class="sidebar-close" (click)="closeSidebar()">
-        <ion-icon name="chevron-forward-outline"></ion-icon>
+        <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
     </div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-menu">
       <div class="sidebar-item" (click)="onBuscarMascota()">
-        <img src="assets/images/PetProfileSidebar/BuscarMascotaIcon.png" alt="" />
-        <span>Buscar mascota</span>
+        <img src="assets/images/PetProfileSidebar/boton-agregar.png" alt="" />
+        <span>Agregar Mascota</span>
       </div>
       <div class="sidebar-item" (click)="onHome()">
         <img src="assets/images/PetProfileSidebar/HomeIcon.png" alt="" />
@@ -42,6 +42,17 @@
       <div class="sidebar-item danger" (click)="onEliminarMascota()">
         <img src="assets/images/PetProfileSidebar/EliminarMascotaIcon.png" alt="" />
         <span>Eliminar mascota</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMAR ELIMINAR -->
+  <div class="confirm-backdrop" *ngIf="showDeleteConfirm">
+    <div class="confirm-modal">
+      <p class="confirm-text">¿Estás seguro de eliminar a esta mascota?</p>
+      <div class="confirm-actions">
+        <button class="confirm-btn cancel" (click)="cancelDelete()">Cancelar</button>
+        <button class="confirm-btn accept" (click)="confirmDelete()">Aceptar</button>
       </div>
     </div>
   </div>

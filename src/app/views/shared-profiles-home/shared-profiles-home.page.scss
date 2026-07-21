@@ -5,10 +5,28 @@ ion-content {
 .sp-wrapper {
   position: relative;
   min-height: 100%;
+  padding-bottom: 70px;
+}
+
+// ── BOTÓN ATRÁS ──
+.back-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+
+  ion-icon {
+    font-size: 26px;
+    color: #fff;
+  }
 }
 
 .bg-naranja {
-  position: fixed;
+  position: absolute; // absolute en vez de fixed para permitir scroll
   top: 0;
   left: 0;
   width: 100%;
@@ -30,7 +48,7 @@ ion-content {
   border-radius: 0 0 40px 40px;
   overflow: hidden;
   z-index: 2;
-  padding: 20px 8px 80px;
+  padding: 60px 8px 80px; // más padding top para dar espacio al back-btn
 }
 
 .bg-azul-img {
@@ -168,7 +186,7 @@ ion-content {
   }
 }
 
-// DASHBOARD FLOTANTE
+// ── DASHBOARD FLOTANTE ──
 .mini-dashboard-wrap {
   position: relative;
   z-index: 5;
@@ -179,7 +197,7 @@ ion-content {
 .mini-dashboard {
   background: white;
   border-radius: 20px;
-  padding: 16px;
+  padding: 16px 16px 24px; // más padding abajo
   box-shadow: 0 4px 16px rgba(0,0,0,0.12);
 }
 
@@ -253,10 +271,11 @@ ion-content {
   }
 }
 
+// ── CONTENIDO ──
 .sp-below {
   position: relative;
   z-index: 1;
-  padding: 16px 8px 16px;
+  padding: 16px 8px;
 }
 
 .sp-content {

@@ -1,0 +1,202 @@
+<ion-content [fullscreen]="true" class="vaccine-content">
+  <div class="vaccine-wrap">
+
+    <!-- HEADER — naranja -->
+    <div class="vaccine-header">
+      <button class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <h1 class="vaccine-title">Registrar vacuna</h1>
+    </div>
+
+    <!-- PET CHIP — naranja -->
+    <div class="pet-chip">
+      <img [src]="petAvatar" alt="" class="pet-chip-avatar" />
+      <span class="pet-chip-name">{{ petName }} - {{ petAge }}</span>
+    </div>
+
+    <!-- CARD BLANCA -->
+    <div class="vaccine-card">
+
+      <!-- TIPO DE VACUNA -->
+<div class="field">
+  <label class="field-label">
+    <ion-icon name="create-outline" class="edit-icon"></ion-icon>
+    Tipo de vacuna
+  </label>
+  <div class="input-wrap" (click)="showVaccineDropdown = !showVaccineDropdown">
+    <div class="icon-circle">
+      <img src="assets/images/AddVaccine/TipoVacuna.png" alt="" class="field-img-icon-sm" />
+    </div>
+    <span class="select-value" [class.placeholder]="!vaccineType">
+      {{ vaccineType || 'Seleccionar...' }}
+    </span>
+    <ion-icon name="chevron-down-outline" style="color:#4037BE; font-size:16px;"></ion-icon>
+  </div>
+  <div class="dropdown" *ngIf="showVaccineDropdown">
+    <div class="dropdown-option" *ngFor="let t of vaccineTypes" (click)="selectVaccineType(t)">
+      {{ t }}
+    </div>
+  </div>
+</div>
+
+      <!-- DESCRIPCIÓN -->
+      <div class="field">
+        <label class="field-label">
+          <ion-icon name="create-outline" class="edit-icon"></ion-icon>
+          Descripción
+        </label>
+        <div class="textarea-wrap">
+          <textarea
+            class="field-textarea"
+            placeholder="Observaciones, Reacciones"
+            [(ngModel)]="description"
+            rows="3">
+          </textarea>
+        </div>
+      </div>
+
+      <!-- FECHA APLICADA + LOT ID -->
+      <div class="field">
+        <label class="field-label">
+          <ion-icon name="create-outline" class="edit-icon"></ion-icon>
+          Fecha aplicada
+          <span class="lot-label">LOT ID</span>
+        </label>
+        <div class="date-lot-row">
+  <div class="input-wrap date-wrap">
+    <img src="assets/images/AddVaccine/CalendarioIcon.png" alt="" class="field-img-icon orange" />
+    <input class="field-input" type="date" [(ngModel)]="appliedDate" (ngModelChange)="onDateChange()" />
+  </div>
+  <div class="input-wrap lot-wrap">
+    <input class="field-input lot-input" type="text" placeholder="PV-001..." [(ngModel)]="lotId" />
+  </div>
+</div>
+      </div>
+
+      <!-- PRÓXIMA DOSIS -->
+      <div class="field">
+        <label class="field-label">
+          <ion-icon name="create-outline" class="edit-icon"></ion-icon>
+          Próxima dosis (Auto)
+        </label>
+        <div class="input-wrap next-dose-wrap">
+          <img src="assets/images/AddPet/ProximaDosisIcon.png" alt="" class="field-img-icon" />
+          <span class="next-dose-value" [class.placeholder]="!nextDoseDate">
+            {{ nextDoseDate || 'Se calcula al ingresar fecha' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- ADJUNTAR -->
+      <div class="field">
+        <label class="field-label">
+          <ion-icon name="create-outline" class="edit-icon"></ion-icon>
+          Adjuntar carné / Comprobante
+        </label>
+
+        <div class="attached-file" *ngIf="attachedFileName">
+          <div class="attached-icon">
+            <ion-icon name="document-outline"></ion-icon>
+          </div>
+          <div class="attached-info">
+            <span class="attached-name">{{ attachedFileName }}</span>
+            <span class="attached-size">{{ attachedFileSize }}</span>
+          </div>
+          <button class="attached-remove" (click)="removeFile()">
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
+        </div>
+
+        <div class="upload-actions">
+          <label class="upload-btn">
+            <ion-icon name="camera-outline"></ion-icon>
+            <span>Foto</span>
+            <input type="file" accept="image/*" capture="environment" class="hidden-input" (change)="onFileSelected($event, 'foto')" />
+          </label>
+          <label class="upload-btn">
+            <ion-icon name="images-outline"></ion-icon>
+            <span>Galería</span>
+            <input type="file" accept="image/*" class="hidden-input" (change)="onFileSelected($event, 'galeria')" />
+          </label>
+          <label class="upload-btn">
+            <ion-icon name="cloud-upload-outline"></ion-icon>
+            <span>PDF</span>
+            <input type="file" accept=".pdf" class="hidden-input" (change)="onFileSelected($event, 'pdf')" />
+          </label>
+        </div>
+      </div>
+
+      <!-- AGENDAR PRÓXIMA CITA -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <ion-icon name="create-outline" class="edit-icon"></ion-icon>
+          <span class="section-card-title">Agendar próxima cita</span>
+          <span class="section-card-sub">Appoiment</span>
+          <ion-icon
+            [name]="scheduleAppointment ? 'toggle' : 'toggle-outline'"
+            class="toggle-icon"
+            [class.active]="scheduleAppointment"
+            (click)="scheduleAppointment = !scheduleAppointment">
+          </ion-icon>
+        </div>
+
+        <div class="appointment-detail" *ngIf="scheduleAppointment">
+          <div class="detail-row">
+            <span class="detail-label">Veterinaria</span>
+            <div class="vet-chip">
+  <div class="vet-chip-icon-wrap">
+    <img src="assets/images/AddPet/AsociarVeterinariaIcon.png" alt="" class="vet-chip-icon" />
+  </div>
+  <div>
+    <p class="vet-chip-name">{{ vetName }}</p>
+    <p class="vet-chip-sub">Asociada</p>
+  </div>
+</div>
+          </div>
+
+          <div class="detail-row">
+            <span class="detail-label">Fecha sugerida</span>
+            <div class="input-wrap">
+              <img src="assets/images/AddVaccine/AgendarCitaIcon.png" alt="" class="field-img-icon orange" />
+              <input class="field-input" type="date" [(ngModel)]="suggestedDate" />
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <span class="detail-label">Motivo (AUTO)</span>
+            <div class="input-wrap disabled-wrap">
+              <img src="assets/images/AddVaccine/Motivo.png" alt="" class="field-img-icon" />
+              <span class="disabled-text">{{ motivo || 'Refuerzo Parvovirus' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECORDATORIO -->
+      <div class="reminder-card">
+        <ion-icon name="notifications-outline" class="reminder-icon"></ion-icon>
+        <div class="reminder-info">
+          <span class="reminder-title">Recordatorio activo</span>
+          <span class="reminder-sub">VACONE_DUE 15 ene 2025 1 día antes</span>
+        </div>
+        <ion-icon
+          [name]="reminderActive ? 'toggle' : 'toggle-outline'"
+          class="toggle-icon"
+          [class.active]="reminderActive"
+          (click)="reminderActive = !reminderActive">
+        </ion-icon>
+      </div>
+
+      <!-- BOTONES -->
+      <div class="vaccine-footer">
+        <button class="btn-primary" (click)="save()">Guardar vacuna + cita</button>
+        <div class="footer-secondary">
+          <button class="btn-secondary" (click)="cancel()">Cancelar</button>
+          <button class="btn-danger" (click)="delete()">Eliminar</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</ion-content>

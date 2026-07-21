@@ -1,0 +1,544 @@
+.vaccine-content {
+  --background: #FFB84F;
+}
+
+.vaccine-wrap {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+// HEADER
+.vaccine-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 52px 16px 12px;
+  background: #FFB84F;
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+
+  ion-icon { font-size: 24px; color: #1a1a2e; }
+}
+
+.vaccine-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+  font-family: 'Actor', sans-serif;
+}
+
+// PET CHIP
+.pet-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 10px 16px;
+  margin: 0 16px 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.pet-chip-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #FFB84F;
+}
+
+.pet-chip-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+}
+
+// CARD BLANCA
+.vaccine-card {
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  padding: 24px 16px 40px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// CAMPOS
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #4037BE;
+  font-family: 'Actor', sans-serif;
+  flex-wrap: nowrap;
+  width: 100%;
+
+  .lot-label {
+    margin-left: auto;
+    color: #1a1a2e;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+}
+
+.edit-icon {
+  font-size: 13px;
+  color: #4037BE;
+  flex-shrink: 0;
+}
+
+.input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1.5px solid #4037BE;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #fff;
+
+  .field-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+    background: transparent;
+    min-width: 0;
+
+    &::placeholder { color: #bbb; }
+  }
+}
+
+.field-img-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+
+  &.orange {
+    filter: invert(74%) sepia(60%) saturate(800%) hue-rotate(340deg) brightness(105%);
+  }
+}
+
+.select-value {
+  font-size: 14px;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+  flex: 1;
+
+  &.placeholder { color: #bbb; }
+}
+
+.textarea-wrap {
+  border: 1.5px solid #4037BE;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #fff;
+
+  .field-textarea {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+    background: transparent;
+    resize: none;
+    box-sizing: border-box;
+
+    &::placeholder { color: #bbb; }
+  }
+}
+
+// FECHA + LOT
+.date-lot-row {
+  display: flex;
+  gap: 10px;
+}
+
+.date-wrap { flex: 1.2; }
+.lot-wrap  { flex: 1; }
+.lot-input { color: #bbb; }
+
+// PRÓXIMA DOSIS
+.next-dose-wrap {
+  background: #EEF0FF;
+  border-color: #4037BE;
+}
+
+.next-dose-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+  text-transform: uppercase;
+
+  &.placeholder {
+    color: #bbb;
+    font-weight: 400;
+    text-transform: none;
+  }
+}
+
+// DROPDOWN
+.dropdown {
+  background: #fff;
+  border: 1.5px solid #4037BE;
+  border-radius: 12px;
+  overflow-y: auto;
+  max-height: 160px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.dropdown-option {
+  padding: 11px 14px;
+  font-size: 13px;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+
+  &:last-child { border-bottom: none; }
+  &:active { background: #f5f5ff; }
+}
+
+// ADJUNTAR
+.attached-file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #FFF5E6;
+  border: 1.5px solid #FFB84F;
+  border-radius: 12px;
+  padding: 12px 14px;
+
+  .attached-icon {
+    width: 36px;
+    height: 36px;
+    background: #FFB84F;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon { font-size: 20px; color: #fff; }
+  }
+
+  .attached-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .attached-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1a1a2e;
+      font-family: 'Actor', sans-serif;
+    }
+
+    .attached-size {
+      font-size: 11px;
+      color: #888;
+      font-family: 'Actor', sans-serif;
+    }
+  }
+
+  .attached-remove {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+
+    ion-icon { font-size: 20px; color: #e74c3c; }
+  }
+}
+
+.upload-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.upload-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  background: #4037BE;
+  color: #fff;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+
+  ion-icon { font-size: 16px; }
+}
+
+.hidden-input { display: none; }
+
+// AGENDAR CITA
+.section-card {
+  background: #fff;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.section-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .section-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #4037BE;
+    font-family: 'Actor', sans-serif;
+    flex: 1;
+  }
+
+  .section-card-sub {
+    font-size: 11px;
+    color: #888;
+    font-family: 'Actor', sans-serif;
+  }
+}
+
+.toggle-icon {
+  font-size: 32px;
+  color: #ccc;
+  cursor: pointer;
+
+  &.active { color: #4037BE; }
+}
+
+.appointment-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #DBE9FF;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.detail-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .detail-label {
+    font-size: 12px;
+    color: #888;
+    font-family: 'Actor', sans-serif;
+  }
+}
+
+// VET CHIP — fondo azul claro + círculo morado
+.vet-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px 12px;
+
+  .vet-chip-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #4037BE;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    .vet-chip-icon {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      filter: brightness(0) invert(1);
+    }
+  }
+
+  .vet-chip-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+    margin: 0;
+  }
+
+  .vet-chip-sub {
+    font-size: 11px;
+    color: #888;
+    font-family: 'Actor', sans-serif;
+    margin: 0;
+  }
+}
+
+.disabled-wrap {
+  background: #f5f5f5;
+  border-color: #e0e0e0;
+}
+
+.disabled-text {
+  color: #888;
+  font-size: 14px;
+  font-family: 'Actor', sans-serif;
+}
+
+// RECORDATORIO — fondo azul claro
+.reminder-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #d6e9ff;
+  border: none;
+  border-radius: 16px;
+  padding: 14px 16px;
+
+  .reminder-icon {
+    font-size: 24px;
+    color: #FFB84F;
+    flex-shrink: 0;
+  }
+
+  .reminder-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .reminder-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1a1a2e;
+      font-family: 'Actor', sans-serif;
+    }
+
+    .reminder-sub {
+      font-size: 10px;
+      color: #888;
+      font-family: 'Actor', sans-serif;
+    }
+  }
+}
+
+// FOOTER
+.vaccine-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 16px;
+  background: #4037BE;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+}
+
+.footer-secondary {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-secondary {
+  flex: 1;
+  padding: 14px;
+  background: #fff;
+  color: #1a1a2e;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+}
+
+.btn-danger {
+  flex: 1;
+  padding: 14px;
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+}
+
+// CÍRCULO MORADO para íconos
+.icon-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #4037BE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.field-img-icon-sm {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+// LOT ID — proporciones fijas
+.date-lot-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.date-wrap {
+  flex: 0 0 58%;  // ← tamaño fijo 58%
+  min-width: 0;
+}
+
+.lot-wrap {
+  flex: 0 0 38%;  // ← tamaño fijo 38%
+  min-width: 0;
+
+  .field-input {
+    width: 100%;
+    min-width: 0;
+  }
+}

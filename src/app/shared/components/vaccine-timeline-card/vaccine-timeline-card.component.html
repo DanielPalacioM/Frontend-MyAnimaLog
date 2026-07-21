@@ -1,0 +1,99 @@
+<div class="timeline-row" [class.last]="isLast">
+
+  <!-- LÍNEA + DOT -->
+  <div class="timeline-col">
+
+    <div class="timeline-dot" [ngClass]="vaccine.status">
+
+      <!-- SUGERIDA: círculo interior gris + borde punteado -->
+      <ng-container *ngIf="vaccine.status === 'suggested'">
+        <div class="dot-inner">
+          <img src="assets/images/LineaVidaVacuna/Sugerida.png" alt="" class="dot-icon" />
+        </div>
+      </ng-container>
+
+      <!-- APLICADA -->
+      <img
+        *ngIf="vaccine.status === 'applied'"
+        src="assets/images/LineaVidaVacuna/Aplicada.png"
+        alt="" class="dot-icon" />
+
+      <!-- RETRASADA -->
+      <img
+        *ngIf="vaccine.status === 'late'"
+        src="assets/images/LineaVidaVacuna/retrasada.png"
+        alt="" class="dot-icon" />
+
+      <!-- EN ESPERA -->
+      <img
+        *ngIf="vaccine.status === 'pending'"
+        src="assets/images/LineaVidaVacuna/EnEspera.png"
+        alt="" class="dot-icon" />
+
+    </div>
+
+    <div class="timeline-line" *ngIf="!isLast"></div>
+
+  </div>
+
+  <!-- CARD -->
+  <div class="vaccine-card" [style.background]="backgroundColor" [ngClass]="vaccine.status">
+
+    <!-- HEADER -->
+    <div class="card-header">
+      <h3 class="card-title">{{ vaccine.title }}</h3>
+      <span class="status-chip" [ngClass]="vaccine.status">{{ statusText }}</span>
+      <button class="expand-btn" (click)="onOpen()">
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </button>
+    </div>
+
+    <!-- FECHA + VET + LOTE -->
+    <p class="card-meta" *ngIf="vaccine.applicationDate || vaccine.dueDate">
+      <ion-icon name="calendar-outline"></ion-icon>
+      {{ vaccine.applicationDate || vaccine.dueDate }}
+      <span *ngIf="vaccine.veterinary"> · {{ vaccine.veterinary }}</span>
+    </p>
+
+    <p class="card-meta" *ngIf="vaccine.batch">
+      <ion-icon name="pricetag-outline"></ion-icon>
+      {{ vaccine.batch }}
+    </p>
+
+    <!-- FOOTER: carnet + cita -->
+    <div class="card-footer-row" *ngIf="vaccine.status !== 'suggested'">
+
+      <!-- tiene documento -->
+      <div class="footer-chip doc" *ngIf="vaccine.attachment">
+        <ion-icon name="document-text-outline"></ion-icon>
+        <span>Carnet.pdf</span>
+      </div>
+
+      <!-- no tiene documento -->
+      <button class="footer-action-btn" *ngIf="!vaccine.attachment">
+        Subir
+      </button>
+
+      <!-- cita agendada -->
+      <div class="footer-chip cita" *ngIf="vaccine.appointment">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <span>Cita {{ vaccine.applicationDate || vaccine.dueDate }}</span>
+      </div>
+
+      <!-- sin cita -->
+      <ng-container *ngIf="!vaccine.appointment">
+        <span class="no-cita-text">Sin agendar cita</span>
+        <button class="footer-action-btn">Agendar cita</button>
+      </ng-container>
+
+    </div>
+
+    <!-- SUGERIDA: texto + botón -->
+    <div class="suggested-body" *ngIf="vaccine.status === 'suggested'">
+      <p class="suggested-text">Recomendada para 6 meses - no registrada</p>
+      <button class="add-vaccine-btn">Agregar vacuna</button>
+    </div>
+
+  </div>
+
+</div>

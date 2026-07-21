@@ -1,0 +1,271 @@
+.at-content { --background: #FFB84F; }
+
+.at-wrap {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.at-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 52px 14px 10px;
+  background: #FFB84F;
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  ion-icon { font-size: 24px; color: #1a1a2e; }
+}
+
+.at-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: #1a1a2e;
+  margin: 0;
+  font-family: 'Actor', sans-serif;
+}
+
+.pet-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 9px 14px;
+  margin: 0 14px 10px;
+
+  .pet-av {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #FFB84F;
+  }
+
+  .pet-nm {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+  }
+}
+
+.at-card {
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  flex: 1;
+  padding: 20px 14px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #4037BE;
+  font-family: 'Actor', sans-serif;
+
+  ion-icon { font-size: 14px; flex-shrink: 0; }
+}
+
+.input-wrap {
+  border: 1.5px solid #c5c1f5;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fff;
+  transition: border-color .2s;
+
+  &:focus-within { border-color: #4037BE; }
+}
+
+.field-input {
+  border: none;
+  outline: none;
+  font-size: 13px;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+  background: transparent;
+  width: 100%;
+
+  &::placeholder { color: #bbb; }
+}
+
+.field-textarea { resize: none; }
+
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+// MEDICAMENTOS
+.med-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #EEF0FF;
+  border-radius: 10px;
+  padding: 10px 12px;
+
+  .med-icon { font-size: 18px; color: #4037BE; flex-shrink: 0; }
+
+  .med-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .med-name { font-size: 13px; font-weight: 500; color: #4037BE; font-family: 'Actor', sans-serif; }
+    .med-dose { font-size: 11px; color: #888; font-family: 'Actor', sans-serif; }
+  }
+
+  .med-remove {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    ion-icon { font-size: 18px; color: #e74c3c; }
+  }
+}
+
+.add-med-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1.5px dashed #4037BE;
+  background: transparent;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 13px;
+  color: #4037BE;
+  font-weight: 500;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+  width: 100%;
+
+  ion-icon { font-size: 16px; }
+}
+
+// CHIPS ESTADO
+.chips-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 1.5px solid #e0e0e0;
+  background: #f5f5f5;
+  font-size: 12px;
+  font-weight: 500;
+  color: #888;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+  transition: all .2s;
+
+  &.active {
+    background: #4037BE;
+    border-color: #4037BE;
+    color: #fff;
+  }
+}
+
+// FOOTER
+.footer-btns {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn-cancel {
+  flex: 1;
+  padding: 13px;
+  background: #f0f0f0;
+  color: #1a1a2e;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+}
+
+.btn-save {
+  flex: 2;
+  padding: 13px;
+  background: #4037BE;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+// MODAL
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal-card {
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-width: 480px;
+  padding: 20px 16px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+
+  .modal-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+  }
+
+  .modal-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    ion-icon { font-size: 22px; color: #888; }
+  }
+}

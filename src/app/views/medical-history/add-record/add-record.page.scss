@@ -1,0 +1,130 @@
+.ar-content { --background: #fff; }
+
+.ar-wrap {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.ar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 52px 14px 16px;
+  background: #fff;
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  ion-icon { font-size: 24px; color: #1a1a2e; }
+}
+
+.ar-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: #1a1a2e;
+  margin: 0;
+  font-family: 'Actor', sans-serif;
+}
+
+// ── card naranja grande que envuelve todo ──
+.ar-orange-card {
+  background: #FFB84F;
+  border-radius: 20px 20px 0 0; // solo redondeado arriba
+  margin: 0; // sin margen lateral
+  padding: 16px 14px 48px; // más padding abajo
+  flex: 1; // ocupa todo el espacio restante
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ar-label {
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Actor', sans-serif;
+  text-align: center;
+  background: rgba(255,255,255,0.35);
+  border-radius: 10px;
+  padding: 10px;
+  color: #1a1a2e;
+}
+
+.cat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+// ── cards blancas adentro, borde morado ──
+.cat-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  border: 2px solid #4037BE;
+  border-left: 6px solid #4037BE;
+  border-bottom: 6px solid #4037BE; // saliente abajo
+  border-radius: 14px;
+  padding: 20px 14px;
+  min-height: 80px;
+  cursor: pointer;
+  transition: transform 0.15s;
+
+  &:active { transform: scale(0.98); }
+}
+
+.cat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; // antes 10px, más separación entre cards
+}
+
+.cat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #4037BE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+  }
+}
+
+.cat-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cat-title {
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Actor', sans-serif;
+  color: #4037BE;
+}
+
+.cat-desc {
+  font-size: 12px;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+  line-height: 1.4;
+}
+
+.cat-arrow {
+  font-size: 20px;
+  color: #4037BE;
+  flex-shrink: 0;
+}

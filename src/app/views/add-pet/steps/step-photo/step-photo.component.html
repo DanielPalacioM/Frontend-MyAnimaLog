@@ -1,0 +1,43 @@
+<div class="step-photo">
+
+  <div class="photo-zone">
+
+    <ng-container *ngIf="!photo">
+      <div class="photo-circle-placeholder">
+        <img src="assets/images/AddPet/FotoMascotaIcon.png" alt="" />
+        <div class="edit-badge" *ngIf="editMode">
+          <ion-icon name="create-outline"></ion-icon>
+        </div>
+      </div>
+      <p class="photo-placeholder-text">Foto de la mascota</p>
+      <p class="photo-placeholder-sub">Toca para subir o tomar foto</p>
+    </ng-container>
+
+    <ng-container *ngIf="photo">
+      <div class="photo-circle-preview">
+        <img [src]="photo" alt="foto mascota" class="photo-preview" />
+        <div class="edit-badge" *ngIf="editMode">
+          <ion-icon name="create-outline"></ion-icon>
+        </div>
+        <button class="photo-change-btn" (click)="photo = null; photoChange.emit('')">
+          <ion-icon name="close-circle-outline"></ion-icon>
+        </button>
+      </div>
+    </ng-container>
+
+  </div>
+
+  <div class="photo-actions">
+    <button class="photo-btn" (click)="onCameraClick()">
+      <ion-icon name="camera-outline"></ion-icon>
+      <span>Cámara</span>
+    </button>
+
+    <label class="photo-btn gallery-label">
+      <ion-icon name="images-outline"></ion-icon>
+      <span>Galería</span>
+      <input type="file" accept="image/*" class="file-input-hidden" (change)="onGalleryClick($event)" />
+    </label>
+  </div>
+
+</div>

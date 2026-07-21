@@ -1,0 +1,148 @@
+.timeline-content {
+  --background: #FFB84F;
+}
+
+.timeline-wrap {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 80px;
+}
+
+// HEADER
+.timeline-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 52px 16px 16px;
+  background: #FFB84F;
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+
+  ion-icon { font-size: 24px; color: #1a1a2e; }
+}
+
+.timeline-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+  font-family: 'Actor', sans-serif;
+  line-height: 1.2;
+}
+
+// CARD BLANCA
+.timeline-card-wrap {
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  padding: 20px 16px 32px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// RESUMEN
+.summary-row {
+  text-align: center;
+
+  .summary-text {
+    font-size: 13px;
+    color: #555;
+    font-family: 'Actor', sans-serif;
+
+    strong { color: #1a1a2e; }
+  }
+}
+
+// BARRA PROGRESO
+.progress-bar-wrap {
+  padding: 0 4px;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+}
+
+.progress-fill {
+  height: 100%;
+  transition: width 0.4s;
+
+  &.applied { background: #4037BE; }
+  &.late    { background: #e74c3c; }
+  &.pending { background: #FFB84F; }
+}
+
+// LEYENDA
+.legend-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #555;
+  font-family: 'Actor', sans-serif;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &.applied { background: #4037BE; }
+  &.late    { background: #e74c3c; }
+  &.pending { background: #FFB84F; }
+}
+
+// SELECTOR AÑO
+.year-selector {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+
+  &::-webkit-scrollbar { height: 0; }
+}
+
+.year-btn {
+  padding: 8px 20px;
+  border-radius: 20px;
+  border: 1.5px solid #e0e0e0;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #888;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+
+  &.active {
+    background: #4037BE;
+    border-color: #4037BE;
+    color: #fff;
+  }
+}
+
+// LISTA
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+}

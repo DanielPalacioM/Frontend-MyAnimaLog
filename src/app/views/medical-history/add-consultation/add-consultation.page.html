@@ -1,0 +1,96 @@
+<ion-content [fullscreen]="true" class="ac-content">
+  <div class="ac-wrap">
+
+    <div class="ac-header">
+      <button class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <h1 class="ac-title">Consultas</h1>
+    </div>
+
+    <div class="pet-chip">
+      <img [src]="petAvatar" alt="" class="pet-av" />
+      <span class="pet-nm">{{ petName }}</span>
+    </div>
+
+    <div class="ac-card">
+
+      <div class="field">
+        <label class="field-label">
+          <ion-icon name="calendar-outline"></ion-icon>
+          Fecha de visita
+        </label>
+        <div class="input-wrap">
+          <input type="date" class="field-input" [(ngModel)]="visitDate" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">
+          <ion-icon name="business-outline"></ion-icon>
+          Veterinaria
+        </label>
+        <div class="input-wrap">
+          <input type="text" class="field-input" placeholder="Dr.pet - Cartagena" [(ngModel)]="vet" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">
+          <ion-icon name="clipboard-outline"></ion-icon>
+          Motivo de la visita
+        </label>
+        <div class="input-wrap">
+          <input type="text" class="field-input" placeholder="Revisión rutinaria, vacuna..." [(ngModel)]="reason" />
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label class="field-label">
+            <ion-icon name="thermometer-outline"></ion-icon>
+            Temperatura
+          </label>
+          <div class="input-wrap">
+            <input type="text" class="field-input" placeholder="38.5°C" [(ngModel)]="temperature" />
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">
+            <ion-icon name="barbell-outline"></ion-icon>
+            Peso
+          </label>
+          <div class="input-wrap">
+            <input type="text" class="field-input" placeholder="4.0 kg" [(ngModel)]="weight" />
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">
+          <ion-icon name="medical-outline"></ion-icon>
+          Diagnóstico
+        </label>
+        <div class="input-wrap">
+          <input type="text" class="field-input" placeholder="Gastritis leve..." [(ngModel)]="diagnosis" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">
+          <ion-icon name="create-outline"></ion-icon>
+          Notas
+        </label>
+        <div class="input-wrap">
+          <textarea class="field-input field-textarea" rows="3" placeholder="Observaciones adicionales..." [(ngModel)]="notes"></textarea>
+        </div>
+      </div>
+
+      <div class="footer-btns">
+        <button class="btn-cancel" (click)="cancel()">Cancelar</button>
+        <button class="btn-save" (click)="save()">Guardar consulta</button>
+      </div>
+
+    </div>
+  </div>
+</ion-content>

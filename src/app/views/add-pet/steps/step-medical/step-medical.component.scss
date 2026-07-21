@@ -1,0 +1,312 @@
+.step-medical {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+// NOTA OPCIONAL
+.optional-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #FFF8EC;
+  border: 1px solid #FFB84F;
+  border-radius: 12px;
+  padding: 12px 14px;
+
+  ion-icon {
+    font-size: 18px;
+    color: #FFB84F;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  span {
+    flex: 1;
+    font-size: 12px;
+    color: #7a5c00;
+    font-family: 'Actor', sans-serif;
+    line-height: 1.4;
+  }
+
+  .note-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+
+    ion-icon { font-size: 18px; color: #aaa; }
+  }
+}
+
+// CARD MÉDICA
+.medical-card {
+  background: #f8f8ff;
+  border: 1.5px solid #e8e8f5;
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+
+  &:active { border-color: #4037BE; }
+  &.clickable:active { border-color: #4037BE; }
+}
+
+.medical-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .card-icon {
+    font-size: 22px;
+    color: #4037BE;
+    flex-shrink: 0;
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+    flex: 1;
+  }
+}
+
+.card-sub {
+  font-size: 11px;
+  color: #888;
+  margin: 0;
+  font-family: 'Actor', sans-serif;
+  padding-left: 32px;
+}
+
+// CAMPOS VACUNA
+.card-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-row {
+  display: flex;
+  gap: 8px;
+}
+
+.select-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fff;
+  cursor: pointer;
+
+  .select-arrow {
+    font-size: 16px;
+    color: #4037BE;
+    flex-shrink: 0;
+  }
+
+  .select-value {
+    font-size: 13px;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+
+    &.placeholder { color: #bbb; }
+  }
+}
+
+.input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fff;
+
+  .input-icon {
+    font-size: 16px;
+    color: #4037BE;
+    flex-shrink: 0;
+  }
+
+  .field-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+    background: transparent;
+    min-width: 0;
+  }
+}
+
+// DROPDOWN VACUNA
+.vaccine-dropdown {
+  background: #fff;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 12px;
+  overflow-y: auto;
+  max-height: 160px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.vaccine-option {
+  padding: 11px 14px;
+  font-size: 13px;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+
+  &:last-child { border-bottom: none; }
+  &:active { background: #f5f5ff; }
+}
+
+// PRÓXIMA VACUNA
+.next-vaccine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+
+  ion-icon {
+    font-size: 16px;
+    color: #4037BE;
+    flex-shrink: 0;
+  }
+
+  span {
+    font-size: 12px;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+
+    strong { color: #4037BE; }
+  }
+
+  &.placeholder-next span { color: #bbb; }
+  &.placeholder-next ion-icon { color: #ccc; }
+}
+
+// ARCHIVO SELECCIONADO
+.file-selected {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+
+  ion-icon {
+    font-size: 18px;
+    color: #4037BE;
+    flex-shrink: 0;
+  }
+
+  span {
+    flex: 1;
+    font-size: 12px;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .file-remove {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+
+    ion-icon { font-size: 18px; color: #e74c3c; }
+  }
+}
+
+.hidden-input { display: none; }
+
+// VETERINARIA
+.vet-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vet-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+  margin: 0;
+}
+
+.vet-card {
+  cursor: pointer;
+
+  .medical-card-header {
+    align-items: flex-start;
+  }
+
+  .vet-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .vet-arrow {
+    font-size: 20px;
+    color: #4037BE;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+}
+
+.card-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-arrow {
+  font-size: 20px;
+  color: #4037BE;
+  flex-shrink: 0;
+}
+
+.vet-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+} 
+
+.card-img-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.next-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+

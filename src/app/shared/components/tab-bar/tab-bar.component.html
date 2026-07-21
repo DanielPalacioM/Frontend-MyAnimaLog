@@ -1,26 +1,18 @@
 <div class="tab-bar">
-  <div class="tab-item" [class.active]="isActive('/home')" (click)="goTo('/home')">
-    <img src="../../../assets/images/HomeIcon.png" alt="home" class="tab-icon">
-    <span>Home</span>
-  </div>
+  <div
+    class="tab-item"
+    *ngFor="let tab of tabs"
+    [class.active]="isActive(tab)"
+    (click)="goTo(tab.route)">
 
-  <div class="tab-item" [class.active]="isActive('/forum')" (click)="goTo('/forum')">
-    <img src="../../../assets/images/Forum.png" alt="forum" class="tab-icon">
-    <span>Forum</span>
-  </div>
+    <div class="tab-icon-wrap">
+      <img
+        class="tab-icon"
+        [src]="'assets/images/footer-bar/' + tab.icon"
+        [alt]="tab.label" />
+    </div>
 
-  <div class="tab-item" [class.active]="isActive('/pets')" (click)="goTo('/pets')">
-    <img src="../../../assets/images/PetsIcon.png" alt="pets" class="tab-icon">
-    <span>Pets</span>
-  </div>
+    <span class="tab-label">{{ tab.label }}</span>
 
-  <div class="tab-item" [class.active]="isActive('/health')" (click)="goTo('/health')">
-    <img src="../../../assets/images/HealtIcon.png" alt="health" class="tab-icon">
-    <span>Health</span>
-  </div>
-
-  <div class="tab-item" [class.active]="isActive('/profile')" (click)="goTo('/profile')">
-    <img src="../../../assets/images/petProfile.png" alt="profile" class="tab-icon">
-    <span>Pet Profile</span>
   </div>
 </div>

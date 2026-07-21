@@ -1,0 +1,376 @@
+.mh-content { --background: #FFB84F; }
+
+.mh-wrap {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 80px;
+}
+
+.mh-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 52px 14px 10px;
+  background: #FFB84F;
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  ion-icon { font-size: 24px; color: #1a1a2e; }
+}
+
+.mh-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: #1a1a2e;
+  margin: 0;
+  font-family: 'Actor', sans-serif;
+}
+
+.pet-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 9px 14px;
+  margin: 0 14px 10px;
+
+  .pet-av {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #FFB84F;
+  }
+
+  .pet-nm {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+  }
+}
+
+// TABS
+.tabs-wrap {
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 12px 12px 0;
+}
+
+.tabs-row {
+  display: flex;
+  gap: 3px;
+  background: #F0F0F8;
+  border-radius: 10px;
+  padding: 3px;
+}
+
+// TABS — inactivo solo texto, activo con ícono + texto
+.tab {
+  flex: 1;
+  padding: 7px 2px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-size: 10px;
+  font-weight: 500;
+  color: #888;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-family: 'Actor', sans-serif;
+
+  .tab-icon { display: none; } // oculto cuando inactivo
+
+  &.active {
+    background: #4037BE;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(64,55,190,.3);
+
+    .tab-icon {
+      display: block; // visible cuando activo
+      filter: brightness(0) invert(1);
+    }
+  }
+}
+
+.tab-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: grayscale(1) opacity(.5);
+  transition: filter .2s;
+}
+
+// CARD BLANCA
+.mh-card {
+  background: #fff;
+  flex: 1;
+  padding: 12px 12px 20px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeUp .2s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// RECORD CARD — borde izquierdo destacado
+.record-card {
+  background: #fff;
+  border: 1.5px solid #e0e0e0;
+  border-left: 4px solid #4037BE; // borde izquierdo morado por defecto
+  border-radius: 12px;
+  padding: 11px 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
+  &.dimmed { opacity: .65; }
+
+  // consultas
+  &.border-blue { border-left-color: #4037BE; }
+
+  // lab normal
+  &.border-green { border-left-color: #2e7d32; }
+
+  // lab anormal / cirugía
+  &.border-red {
+    border-left-color: #c2185b;
+    background: #FFF5F5; // fondo rojo muy claro
+  }
+
+  // tratamiento
+  &.border-orange { border-left-color: #e65100; }
+}
+
+.rc-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+// RC-ICON — cirugía también morado
+.rc-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  img { width: 18px; height: 18px; object-fit: contain; filter: brightness(0) invert(1); }
+
+  &.blue   { background: #4037BE; }
+  &.orange { background: #e65100; }
+  &.red    { background: #4037BE; } // ← cambiado a morado
+  &.green  { background: #2e7d32; }
+}
+
+.rc-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+
+  .rc-title { font-size: 13px; font-weight: 500; color: #1a1a2e; font-family: 'Actor', sans-serif; }
+  .rc-sub   { font-size: 10px; color: #888; font-family: 'Actor', sans-serif; }
+}
+
+.rc-divider { height: 0.5px; background: #e0e0e0; }
+
+.rc-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+
+  .rl { font-size: 11px; color: #888; font-family: 'Actor', sans-serif; }
+  .rv {
+    font-size: 11px; font-weight: 500; color: #1a1a2e; font-family: 'Actor', sans-serif;
+    &.blue  { color: #4037BE; }
+    &.green { color: #1b5e20; }
+  }
+}
+
+// BADGES
+.badge {
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+  font-family: 'Actor', sans-serif;
+
+  &.bg  { background: #E8F5E9; color: #1b5e20; }
+  &.bb  { background: #EEF0FF; color: #4037BE; }
+  &.bo  { background: #FFF5E6; color: #e65100; }
+  &.br  { background: #FFEBEE; color: #b71c1c; }
+  &.bgy { background: #F5F5F5; color: #555; }
+}
+
+// TAGS
+.tag-row { display: flex; gap: 5px; flex-wrap: wrap; }
+
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 500;
+  font-family: 'Actor', sans-serif;
+
+  ion-icon { font-size: 11px; }
+
+  &.blue   { background: #EEF0FF; color: #4037BE; }
+  &.orange { background: #FFF5E6; color: #e65100; }
+}
+
+// PROGRESO
+.prog-wrap { display: flex; flex-direction: column; gap: 3px; }
+
+.prog-bar {
+  height: 5px;
+  background: #e8e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.prog-fill {
+  height: 100%;
+  background: #4037BE;
+  border-radius: 3px;
+  transition: width .5s ease;
+}
+
+.prog-lbl { font-size: 10px; color: #888; font-family: 'Actor', sans-serif; }
+
+// MEDICAMENTO
+.med-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #EEF0FF;
+  border-radius: 8px;
+  padding: 7px 10px;
+
+  .med-icon { font-size: 16px; color: #4037BE; flex-shrink: 0; }
+
+  .med-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+
+    .med-name { font-size: 12px; font-weight: 500; color: #4037BE; font-family: 'Actor', sans-serif; }
+    .med-dose { font-size: 10px; color: #888; font-family: 'Actor', sans-serif; }
+  }
+}
+
+// LAB
+.result-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Actor', sans-serif;
+
+  ion-icon { font-size: 15px; flex-shrink: 0; }
+
+  &.rs-normal   { background: #E8F5E9; color: #1b5e20; ion-icon { color: #1b5e20; } }
+  &.rs-abnormal { background: #FFEBEE; color: #b71c1c; ion-icon { color: #b71c1c; } }
+}
+
+.lab-cells {
+  display: flex;
+  gap: 5px;
+}
+
+.lab-cell {
+  flex: 1;
+  background: #fff;
+  border: 0.5px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 7px 4px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+
+  .lc-num   { font-size: 13px; font-weight: 500; color: #4037BE; font-family: 'Actor', sans-serif; }
+  .lc-lbl   { font-size: 9px; color: #888; font-family: 'Actor', sans-serif; }
+  .lc-range { font-size: 9px; color: #aaa; font-family: 'Actor', sans-serif; }
+}
+
+// TIMELINE CIRUGÍA
+.timeline-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.tl-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon { font-size: 12px; color: #fff; }
+
+  &.done    { background: #4037BE; }
+  &.pending { background: #FFB84F; }
+}
+
+.tl-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+
+  .tl-t { font-size: 12px; font-weight: 500; color: #1a1a2e; font-family: 'Actor', sans-serif; }
+  .tl-s { font-size: 10px; color: #888; font-family: 'Actor', sans-serif; }
+}
+
+// ADD BTN
+.add-btn {
+  border: 1.5px dashed #4037BE;
+  background: transparent;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 12px;
+  color: #4037BE;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-family: 'Actor', sans-serif;
+
+  ion-icon { font-size: 16px; }
+}

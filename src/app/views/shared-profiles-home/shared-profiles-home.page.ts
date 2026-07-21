@@ -95,6 +95,6 @@ export class SharedProfilesHomePage implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/profile']);
+    history.back();
   }
 }

@@ -1,0 +1,105 @@
+<div class="step-medical">
+
+  <!-- NOTA OPCIONAL -->
+  <div class="optional-note" *ngIf="showOptionalNote">
+    <ion-icon name="information-circle-outline"></ion-icon>
+    <span>Puedes completar este campo después desde el perfil de la mascota</span>
+    <button class="note-close" (click)="showOptionalNote = false">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+  </div>
+
+  <!-- VACUNA -->
+<div class="medical-card" (click)="goToRegisterVaccine()">
+  <div class="medical-card-header">
+    <img src="assets/images/AddPet/VacunaIcon.png" alt="" class="card-img-icon" />
+    <div class="card-text">
+      <span class="card-title">Agregar vacuna</span>
+    </div>
+    <ion-icon name="arrow-forward-outline" class="card-arrow"></ion-icon>
+  </div>
+</div>
+
+    <div class="card-fields">
+      <div class="field-row">
+        <div class="select-wrap" (click)="toggleVaccineDropdown()">
+          <ion-icon name="chevron-down-outline" class="select-arrow"></ion-icon>
+          <span class="select-value" [class.placeholder]="!selectedVaccineType">
+            {{ selectedVaccineType || 'Tipo vacuna' }}
+          </span>
+        </div>
+        <div class="input-wrap">
+          <ion-icon name="calendar-outline" class="input-icon"></ion-icon>
+          <input
+            class="field-input"
+            type="date"
+            [(ngModel)]="vaccineDate"
+            (ngModelChange)="onVaccineDateChange()" />
+        </div>
+      </div>
+
+      <div class="vaccine-dropdown" *ngIf="showVaccineTypeDropdown">
+        <div class="vaccine-option" *ngFor="let t of vaccineTypes" (click)="selectVaccineType(t)">
+          {{ t }}
+        </div>
+      </div>
+
+      <div class="next-vaccine" *ngIf="nextVaccineDate">
+        <img src="assets/images/AddPet/ProximaDosisIcon.png" alt="" class="next-icon" />
+        <span>Próxima: <strong>{{ nextVaccineDate }}</strong></span>
+      </div>
+      <div class="next-vaccine placeholder-next" *ngIf="!nextVaccineDate">
+        <img src="assets/images/AddPet/ProximaDosisIcon.png" alt="" class="next-icon" />
+        <span>Próxima calculada automáticamente</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBIR DOCUMENTO -->
+  <div class="medical-card" (click)="openFileInput()">
+    <div class="medical-card-header">
+      <img src="assets/images/AddPet/SubirDocIcon.png" alt="" class="card-img-icon" />
+      <div class="card-text">
+        <span class="card-title">Subir documento</span>
+        <p class="card-sub">Historial médico, petDocument, resultados médicos</p>
+      </div>
+    </div>
+
+    <div class="file-selected" *ngIf="selectedFileName" (click)="$event.stopPropagation()">
+      <ion-icon name="document-attach-outline"></ion-icon>
+      <span>{{ selectedFileName }}</span>
+      <button class="file-remove" (click)="$event.stopPropagation(); removeFile()">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+
+    <input #fileInput type="file" accept=".pdf,image/*" class="hidden-input" (change)="onFileChange($event)" />
+  </div>
+
+  <!-- AGENDAR PRIMERA CITA -->
+  <div class="medical-card" (click)="agendarCita()">
+    <div class="medical-card-header">
+      <img src="assets/images/AddPet/AgendarCitaIcon.png" alt="" class="card-img-icon" />
+      <div class="card-text">
+        <span class="card-title">Agendar primera cita</span>
+        <p class="card-sub">Appointment</p>
+      </div>
+      <ion-icon name="arrow-forward-outline" class="card-arrow"></ion-icon>
+    </div>
+  </div>
+
+  <!-- VETERINARIA ASOCIADA -->
+  <div class="vet-section">
+    <p class="vet-section-title">Veterinaria asociada</p>
+    <div class="medical-card" (click)="asociarVeterinaria()">
+      <div class="medical-card-header">
+        <img src="assets/images/AddPet/AsociarVeterinariaIcon.png" alt="" class="card-img-icon" />
+        <div class="vet-info">
+          <span class="card-title">Asociar veterinaria</span>
+          <p class="card-sub">Encuentra y conecta con veterinarias locales que usen MyAnimalog</p>
+        </div>
+        <ion-icon name="arrow-forward-outline" class="card-arrow"></ion-icon>
+      </div>
+    </div>
+  </div>
+

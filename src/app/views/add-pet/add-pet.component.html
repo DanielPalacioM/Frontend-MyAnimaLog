@@ -1,0 +1,63 @@
+<ion-content [fullscreen]="true" class="add-pet-content">
+
+  <div class="add-pet-wrap">
+
+    <!-- HEADER -->
+    <div class="add-pet-header">
+      <button class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <h1 class="add-pet-title">{{ isEditMode ? 'Editar perfil' : 'Agregar mascota' }}</h1>
+    </div>
+
+    <!-- STEPPER -->
+    <div class="stepper">
+      <div class="step-item" *ngFor="let s of [1,2,3]" [class.done]="currentStep > s" [class.active]="currentStep === s">
+        <div class="step-circle">
+          <ion-icon name="checkmark-outline" *ngIf="currentStep > s"></ion-icon>
+          <span *ngIf="currentStep <= s">{{ s }}</span>
+        </div>
+        <span class="step-label">{{ s === 1 ? 'Foto' : s === 2 ? 'Info básica' : 'Médico' }}</span>
+      </div>
+    </div>
+
+    <!-- CONTENIDO POR PASO -->
+    <div class="step-content">
+
+      <app-step-photo
+        *ngIf="currentStep === 1"
+        [photo]="petForm.photo"
+        [editMode]="isEditMode"
+        (photoChange)="onStepDataChange({ photo: $event })">
+      </app-step-photo>
+
+      <app-step-basic-info
+        *ngIf="currentStep === 2"
+        [data]="petForm"
+        [editMode]="isEditMode"
+        (dataChange)="onStepDataChange($event)">
+      </app-step-basic-info>
+
+      <app-step-medical
+        *ngIf="currentStep === 3"
+        [data]="petForm"
+        [editMode]="isEditMode"
+        (dataChange)="onStepDataChange($event)">
+      </app-step-medical>
+
+    </div>
+
+    <!-- BOTONES -->
+    <div class="add-pet-footer">
+      <button class="btn-primary" (click)="currentStep < totalSteps ? goNext() : savePet()" [disabled]="!canProceed()">
+        {{ currentStep < totalSteps ? 'Siguiente' : (isEditMode ? 'Actualizar' : 'Guardar mascota') }}
+      </button>
+      <div class="footer-secondary" *ngIf="currentStep === totalSteps && !isEditMode">
+        <button class="btn-secondary" (click)="goBack()">Después</button>
+        <button class="btn-danger" (click)="cancel()">Cancelar</button>
+      </div>
+    </div>
+
+  </div>
+
+</ion-content>

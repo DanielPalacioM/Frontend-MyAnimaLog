@@ -17,6 +17,8 @@ interface Pet {
   gender: string;
   species: 'cat' | 'dog';
   imageUrl: string;
+  
+  
 }
 
 interface PetStats {
@@ -24,6 +26,7 @@ interface PetStats {
   weight: string;
   gender: string;
   height: string;
+  
 }
 
 @Component({
@@ -36,6 +39,7 @@ export class PetProfilePage implements OnInit {
 
   sidebarOpen = false;
   selectedDate: string | null = null;
+  showDeleteConfirm = false;
 
   pet: Pet = {
     id: '1',
@@ -147,9 +151,18 @@ export class PetProfilePage implements OnInit {
   }
 
   onEliminarMascota(): void {
-    this.closeSidebar();
-    this.router.navigate(['/pets', this.pet.id, 'delete']);
-  }
+  this.closeSidebar();
+  this.showDeleteConfirm = true;
+}
+
+  cancelDelete(): void {
+  this.showDeleteConfirm = false;
+}
+
+confirmDelete(): void {
+  this.showDeleteConfirm = false;
+  this.router.navigate(['/pets', this.pet.id, 'delete']);
+}
 
   // ── Header ──
   getSpeciesIcon(): string {

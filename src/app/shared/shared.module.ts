@@ -23,6 +23,7 @@ import { MedicalHistoryCardComponent } from './components/medical-history-card/m
 import { PetStatsCardComponent } from './components/pet-stats-card/pet-stats-card.component';
 import { VaccineCardComponent } from './components/vaccine-card/vaccine-card.component';
 import { DocumentsSectionComponent } from './components/documents-section/documents-section.component';
+import { VaccineTimelineCardComponent } from './components/vaccine-timeline-card/vaccine-timeline-card.component';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import { DocumentsSectionComponent } from './components/documents-section/docume
     MedicalHistoryCardComponent,
     PetStatsCardComponent,
     VaccineCardComponent,
-    DocumentsSectionComponent
+    DocumentsSectionComponent,
+    VaccineTimelineCardComponent
   ],
   imports: [
     CommonModule,
@@ -70,7 +72,8 @@ import { DocumentsSectionComponent } from './components/documents-section/docume
     MedicalHistoryCardComponent,
     PetStatsCardComponent,
     VaccineCardComponent,
-    DocumentsSectionComponent
+    DocumentsSectionComponent,
+    VaccineTimelineCardComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
