@@ -29,7 +29,17 @@ export class LoginPage implements AfterViewInit {
     this.waitForGoogle();
   }
 
-  // ✅ Espera a que el SDK cargue correctamente
+  // ✅ Se ejecuta cada vez que la página vuelve a mostrarse (Ionic)
+  ionViewWillEnter() {
+    this.email = '';
+    this.password = '';
+
+    const btnDiv = document.getElementById('googleButtonDiv');
+    if (btnDiv) btnDiv.innerHTML = '';
+
+    this.waitForGoogle();
+  }
+
   waitForGoogle() {
     const interval = setInterval(() => {
       if (window.google?.accounts?.id) {
@@ -39,24 +49,42 @@ export class LoginPage implements AfterViewInit {
     }, 100);
   }
 
-  // ✅ Inicializa Google con el callback correcto
   initializeGoogle() {
     window.google.accounts.id.initialize({
       client_id: '197571675834-sf7vdbok5ubm1qk63gfgp31mvn8srhen.apps.googleusercontent.com',
-      callback: (response: any) => this.handleGoogleLogin(response)  // ✅ Callback configurado
+      callback: (response: any) => this.handleGoogleLogin(response),
+      auto_select: false,
+      cancel_on_tap_outside: true
     });
 
-    console.log('✅ Google inicializado correctamente');
+    window.google.accounts.id.renderButton(
+      document.getElementById('googleButtonDiv'),
+      {
+        type: 'icon',
+        theme: 'outline',
+        size: 'large',
+        shape: 'circle'
+      }
+    );
+
+    console.log('✅ Google Identity inicializado');
   }
 
   togglePassword() {
     this.passwordVisible = !this.passwordVisible;
   }
 
-  // ✅ Login local (email + password)
   onLogin() {
+    this.email = this.email.trim();
+
     if (!this.email || !this.password) {
-      console.log('⚠️ Por favor completa todos los campos');
+      alert('Por favor completa todos los campos.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.email)) {
+      alert('Ingresa un correo electrónico válido.');
       return;
     }
 
@@ -71,49 +99,57 @@ export class LoginPage implements AfterViewInit {
         this.router.navigate(['/home']);
       },
       error: (err: any) => {
-        console.error('❌ Credenciales inválidas', err);
+        console.error(err);
+        switch (err.status) {
+          case 400:
+            alert('Verifica que el correo y la contraseña sean válidos.');
+            break;
+          case 401:
+            alert('Correo o contraseña incorrectos.');
+            break;
+          case 403:
+            alert('Tu cuenta no tiene permisos para iniciar sesión.');
+            break;
+          case 404:
+            alert('No existe una cuenta asociada a ese correo.');
+            break;
+          case 500:
+            alert('Ocurrió un error en el servidor. Intenta nuevamente.');
+            break;
+          default:
+            if (err.error?.message) {
+              alert(err.error.message);
+            } else {
+              alert('No fue posible iniciar sesión.');
+            }
+        }
       }
     });
   }
 
-  // ✅ Abre el prompt de Google
-  loginWithGoogle() {
-    if (!window.google?.accounts?.id) {
-      console.error('❌ Google SDK no cargado');
-      return;
-    }
-
-    console.log('🔵 Abriendo prompt de Google...');
-
-    window.google.accounts.id.prompt((notification: any) => {
-      if (notification.isNotDisplayed()) {
-        console.warn('⚠️ Prompt no mostrado:', notification.getNotDisplayedReason());
-      }
-      if (notification.isSkippedMoment()) {
-        console.warn('⚠️ Prompt omitido:', notification.getSkippedReason());
-      }
-    });
-  }
-
-  // ✅ Callback que recibe el idToken de Google
   handleGoogleLogin(response: any) {
-    const idToken = response?.credential;
+    console.log('========================');
+    console.log('RESPUESTA GOOGLE');
+    console.log(response);
+    console.log('credential:', response?.credential);
+    console.log('========================');
 
+    const idToken = response?.credential;
     if (!idToken) {
-      console.error('❌ No se recibió idToken de Google');
+      console.error('❌ No se recibió ID Token');
       return;
     }
+    console.log('✅ ID Token recibido');
+    console.log(idToken);
 
-    console.log('✅ Token recibido de Google, enviando al backend...');
-
-    // ✅ Envía el idToken al backend
     this.authservice.loginWithGoogle(idToken).subscribe({
       next: (res: any) => {
-        console.log('✅ Login con Google exitoso:', res);
+        console.log('✅ Login con Google exitoso', res);
         this.router.navigate(['/home']);
       },
       error: (err) => {
-        console.error('❌ Error en backend al autenticar con Google:', err);
+        console.error('❌ Error backend:', err);
+        console.error('Respuesta:', err.error);
       }
     });
   }

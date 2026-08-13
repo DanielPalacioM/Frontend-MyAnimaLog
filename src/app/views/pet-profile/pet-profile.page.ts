@@ -1,32 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PetService, Pet as PetModel } from 'src/app/services/PetService/pet';
+import { ProfileService } from 'src/app/services/ProfileService/profile';
 
 import { MedicalHistorySection, MedicalHistorySummary } from '../../shared/components/medical-history-card/medical-history-card.component';
 import { VaccineSummary } from '../../shared/components/vaccine-card/vaccine-card.component';
 import { CalendarEvent } from '../../shared/components/pet-calendar/pet-calendar.component';
 import { PetDocument } from '../../shared/components/documents-section/documents-section.component';
 
-interface Pet {
-  id: string;
-  name: string;
-  breed: string;
-  age: number;
-  ageUnit: string;
-  weight: number;
-  height: number;
-  gender: string;
-  species: 'cat' | 'dog';
-  imageUrl: string;
-  
-  
-}
-
 interface PetStats {
   age: string;
   weight: string;
   gender: string;
   height: string;
-  
 }
 
 @Component({
@@ -40,90 +26,150 @@ export class PetProfilePage implements OnInit {
   sidebarOpen = false;
   selectedDate: string | null = null;
   showDeleteConfirm = false;
+  loading = true;
+  loadError = false;
 
-  pet: Pet = {
-    id: '1',
-    name: 'Juan',
-    breed: 'Siamés',
-    age: 5,
-    ageUnit: 'meses',
-    weight: 40,
-    height: 60,
-    gender: 'Macho',
-    species: 'cat',
-    imageUrl: 'assets/images/Profile/cat-juan.png',
-  };
+  pet: PetModel | null = null;
+
+  // Usuario logueado, para el sidebar
+  userName = '';
+  userEmail = '';
+  userAvatar = 'assets/images/default-avatar.png';
 
   petStats: PetStats = {
-    age: '5 meses',
-    weight: '40 kg',
-    gender: 'Macho',
-    height: '60 cm',
+    age: '—',
+    weight: 'No registrado',
+    gender: '—',
+    height: 'No registrado',
   };
 
+  // TODO: reemplazar por datos reales cuando exista el servicio de historial médico
   historyItems: MedicalHistorySummary[] = [
-    { section: 'visits',     label: 'Visitas veterinarias', count: 12, icon: 'assets/images/PetProfiile/VisitasVeterinariasIcon.png' },
-    { section: 'treatments', label: 'Tratamientos',         count: 3,  icon: 'assets/images/PetProfiile/TratamientosIcon.png' },
-    { section: 'lab',        label: 'Lab',                  count: 3,  icon: 'assets/images/PetProfiile/LabIcon.png' },
-    { section: 'surgeries',  label: 'Cirugías',             count: 1,  icon: 'assets/images/PetProfiile/CirugiasIcon.png' },
+    { section: 'visits',     label: 'Visitas veterinarias', count: 0, icon: 'assets/images/PetProfiile/VisitasVeterinariasIcon.png' },
+    { section: 'treatments', label: 'Tratamientos',         count: 0, icon: 'assets/images/PetProfiile/TratamientosIcon.png' },
+    { section: 'lab',        label: 'Lab',                  count: 0, icon: 'assets/images/PetProfiile/LabIcon.png' },
+    { section: 'surgeries',  label: 'Cirugías',             count: 0, icon: 'assets/images/PetProfiile/CirugiasIcon.png' },
   ];
 
-  vaccineSummary: VaccineSummary = {
-    appliedCount: 5,
-    totalCount: 8,
-    nextVaccineName: 'Moquillo',
-    nextVaccineDate: new Date(2026, 5, 20),
-    daysUntilNext: 12,
-  };
+  // TODO: reemplazar por datos reales cuando exista el servicio de vacunas
+  vaccineSummary: VaccineSummary | null = null; // null = "no hay vacunas registradas"
 
-  calendarEvents: CalendarEvent[] = [
-    {
-      id: 'e1',
-      title: 'Medicamento - 1 cápsula de omeprazol 20 mg',
-      description: '1 cápsula de omeprazol 20 mg',
-      date: '2026-06-03',
-      time: '10:40',
-      type: 'medicine',
-      color: '#FFB84F',
-      intervalHours: 8
-    },
-    {
-      id: 'e2',
-      title: 'Control veterinario',
-      description: 'Revisión general anual',
-      date: '2026-06-03',
-      time: '16:00',
-      type: 'vet',
-      color: '#4037BE'
-    },
-    {
-      id: 'e3',
-      title: 'Vacuna antirrábica',
-      description: 'Refuerzo anual obligatorio',
-      date: '2026-06-10',
-      time: '09:00',
-      type: 'vaccine',
-      color: '#1a7a4a'
-    },
-  ];
+  calendarEvents: CalendarEvent[] = []; // TODO: cargar desde servicio de calendario cuando exista
 
-  documents: PetDocument[] = [
-    { id: 'd1', name: 'Sangre.pdf', type: 'pdf',   date: 'Ene 2026' },
-    { id: 'd2', name: 'Rayos',      type: 'image', date: 'May 2026' },
-  ];
+  documents: PetDocument[] = []; // TODO: cargar desde servicio de documentos cuando exista
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private petService: PetService,
+    private profileService: ProfileService
+  ) {}
 
   ngOnInit(): void {
+    this.loadUserData();
+
     const petId = this.route.snapshot.paramMap.get('id');
-    // TODO: cargar datos reales con PetsService.getById(petId)
+    if (!petId) {
+      this.loadError = true;
+      this.loading = false;
+      return;
+    }
+    this.loadPet(petId);
+  }
+
+  ionViewWillEnter() {
+  const petId = this.route.snapshot.paramMap.get('id');
+  if (petId) {
+    this.loadPet(petId);
+  }
+  this.loadUserData();
+}
+
+  private loadUserData(): void {
+    this.profileService.getProfile().subscribe({
+      next: (profile) => {
+        this.userName = profile.username || '';
+        this.userEmail = profile.email || '';
+        if (profile.profileImageUrl) {
+          this.userAvatar = profile.profileImageUrl;
+        }
+      },
+      error: (err) => {
+        console.error('❌ Error cargando datos del usuario:', err);
+      }
+    });
+  }
+
+  private loadPet(id: string): void {
+    this.loading = true;
+    this.petService.getPetById(id).subscribe({
+      next: (pet) => {
+        this.pet = pet;
+        this.petStats = this.buildStats(pet);
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('❌ Error cargando mascota:', err);
+        this.loadError = true;
+        this.loading = false;
+      }
+    });
+  }
+
+  private buildStats(pet: PetModel): PetStats {
+    return {
+      age: this.formatAge(pet.ageMonths, pet.birthDate),
+      weight: pet.weight != null ? `${pet.weight} kg` : 'No registrado',      gender: pet.sex || '—',
+      height: pet.height != null ? `${pet.height} cm` : 'No registrado',    };
+  }
+
+  private formatAge(ageMonths: number | null, birthDate: string): string {
+    if (ageMonths !== null && ageMonths !== undefined) {
+      if (ageMonths < 12) return `${ageMonths} meses`;
+      const years = Math.floor(ageMonths / 12);
+      const months = ageMonths % 12;
+      return months > 0 ? `${years} años ${months} meses` : `${years} años`;
+    }
+    if (birthDate) {
+      const birth = new Date(birthDate);
+      const now = new Date();
+      const months = (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
+      return months < 12 ? `${months} meses` : `${Math.floor(months / 12)} años`;
+    }
+    return '—';
+  }
+
+  // ── Fallback de ícono/color por especie y sexo (igual que en Home) ──
+  getPetIconFallback(species: string | undefined): string {
+    const speciesMap: { [key: string]: string } = {
+      'perro': '🐶',
+      'gato': '🐱',
+      'loro': '🦜',
+      'ave': '🦜',
+      'conejo': '🐰',
+      'hamster': '🐹',
+      'pez': '🐠',
+      'reptil': '🦎',
+    };
+    const key = (species || '').toLowerCase().trim();
+    return speciesMap[key] || '🐾';
+  }
+
+  getSexColor(sex: string | undefined): string {
+    const s = (sex || '').toLowerCase().trim();
+    if (s === 'macho' || s === 'male') return '#4A90E2'; // azul
+    if (s === 'hembra' || s === 'female') return '#FF8FB1'; // rosa
+    return '#CCCCCC'; // neutro si no hay dato
   }
 
   // ── Sidebar ──
   toggleSidebar(): void { this.sidebarOpen = !this.sidebarOpen; }
   closeSidebar(): void  { this.sidebarOpen = false; }
 
-  onBuscarMascota(): void {}
+  onBuscarMascota(): void {
+    this.closeSidebar();
+    this.router.navigate(['/add-pet']);
+  }
 
   onHome(): void {
     this.closeSidebar();
@@ -132,56 +178,60 @@ export class PetProfilePage implements OnInit {
 
   onFiltrarVacunas(): void {
     this.closeSidebar();
+    if (!this.pet) return;
     this.router.navigate(['/pets', this.pet.id, 'vaccines'], { queryParams: { filter: true } });
   }
 
   onPersonasAcceso(): void {
     this.closeSidebar();
+    if (!this.pet) return;
     this.router.navigate(['/shared-profiles'], { queryParams: { petId: this.pet.id } });
   }
 
   onAgendarCita(): void {
     this.closeSidebar();
+    if (!this.pet) return;
     this.router.navigate(['/calendar/add'], { queryParams: { petId: this.pet.id } });
   }
 
   onEditarInfo(): void {
     this.closeSidebar();
+    if (!this.pet) return;
     this.router.navigate(['/pets', this.pet.id, 'edit']);
   }
 
   onEliminarMascota(): void {
-  this.closeSidebar();
-  this.showDeleteConfirm = true;
-}
+    this.closeSidebar();
+    this.showDeleteConfirm = true;
+  }
 
   cancelDelete(): void {
-  this.showDeleteConfirm = false;
-}
+    this.showDeleteConfirm = false;
+  }
 
-confirmDelete(): void {
-  this.showDeleteConfirm = false;
-  this.router.navigate(['/pets', this.pet.id, 'delete']);
-}
-
-  // ── Header ──
-  getSpeciesIcon(): string {
-    return this.pet.species === 'cat'
-      ? 'assets/images/PetProfiile/CatIcon.png'
-      : 'assets/images/PetProfiile/DogIcon.png';
+  confirmDelete(): void {
+    this.showDeleteConfirm = false;
+    if (!this.pet) return;
+    this.petService.deletePet(this.pet.id).subscribe({
+      next: () => this.router.navigate(['/home']),
+      error: (err) => console.error('❌ Error eliminando mascota:', err)
+    });
   }
 
   // ── Historial médico ──
   onHistorySection(section: MedicalHistorySection): void {
+    if (!this.pet) return;
     this.router.navigate(['/pets', this.pet.id, 'medical-history', section]);
   }
 
   goToMedicalHistory(): void {
+    if (!this.pet) return;
     this.router.navigate(['/pets', this.pet.id, 'medical-history']);
   }
 
   // ── Vacunas ──
   goToVaccineLine(): void {
+    if (!this.pet) return;
     this.router.navigate(['/pets', this.pet.id, 'vaccines']);
   }
 
@@ -199,20 +249,22 @@ confirmDelete(): void {
   }
 
   onAddCalendarEvent(): void {
+    if (!this.pet) return;
     this.router.navigate(['/calendar/add'], { queryParams: { petId: this.pet.id } });
   }
 
   // ── Documentos ──
   goToAllDocuments(): void {
+    if (!this.pet) return;
     this.router.navigate(['/pets', this.pet.id, 'documents']);
   }
 
   goToAddDocument(): void {
+    if (!this.pet) return;
     this.router.navigate(['/pets', this.pet.id, 'documents', 'upload']);
   }
 
   onDocClick(doc: PetDocument): void {
     console.log('doc clicked', doc);
-    // TODO: abrir visor o detalle del documento
   }
 }

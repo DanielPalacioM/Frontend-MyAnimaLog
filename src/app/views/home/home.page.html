@@ -53,9 +53,12 @@
 </div>
 
     <!-- HEADER -->
-    <div class="home-header">
+    <div class="home-header" >
       <div class="user-info" (click)="goToProfile()">
-        <img src="assets/images/Home_icons/ImageUser.png" alt="logo" class="app-logo" />
+        <img
+           [src]="userAvatar || 'assets/images/Home/ImageUser.png'"
+           class="user-avatar"
+           alt="User">
         <span class="username">{{ username }}</span>
       </div>
       <div class="header-icons">
@@ -141,42 +144,84 @@
     </div>
 
     <!-- PET CARD — solo si hay mascotas -->
-    <ng-container *ngIf="hasPets">
-      <div class="section-header">
-        <div class="see-all-options">
-          <span (click)="onSeeAll()">see all</span>
-          <span (click)="navigate('/pets')">See pets</span>
-          <span (click)="navigate('/calendar')">See dates</span>
-        </div>
+<ng-container *ngIf="hasPets">
+  
+<div class="pet-swipe-container" #swipeContainer
+   (touchstart)="onTouchStart($event)"
+   (touchmove)="onTouchMove($event)"
+   (touchend)="onTouchEnd($event)"
+   (mousedown)="onMouseDown($event)"
+   (mousemove)="onMouseMove($event)"
+   (mouseup)="onMouseUp($event)"
+   (mouseleave)="onMouseUp($event)">
+
+  <div class="pet-carousel-track"
+    [style.transform]="'translateX(calc(-100% + ' + currentTranslateX + '%))'"
+    [style.transition]="cardTransition">
+
+    <!-- Card anterior (se asoma al arrastrar a la derecha) -->
+    <div class="pet-detail-card">
+      <div class="pet-image-side" [style.background-color]="!pets[prevPetIndex].imageUrl ? getSexColor(pets[prevPetIndex].sex) : null">
+        <img *ngIf="pets[prevPetIndex].imageUrl" [src]="pets[prevPetIndex].imageUrl" [alt]="pets[prevPetIndex].name" />
+        <span *ngIf="!pets[prevPetIndex].imageUrl" class="species-fallback-icon">{{ getPetIconFallback(pets[prevPetIndex].species) }}</span>
       </div>
+      <div class="pet-info-side">
+        <p class="pet-name">{{ pets[prevPetIndex].name }}</p>
+        <p class="pet-breed">{{ pets[prevPetIndex].breed }} - {{ pets[prevPetIndex].species }}</p>
+      </div>
+    </div>
 
-      <div class="pet-swipe-container"
-        (swipeleft)="onSwipeLeft()"
-        (swiperight)="onSwipeRight()">
-        <div class="pet-detail-card">
-          <div class="pet-image-side">
-            <img [src]="currentPet.imageUrl" [alt]="currentPet.name" />
-          </div>
-          <div class="pet-info-side">
-            <p class="pet-name">{{ currentPet.name }}</p>
-            <p class="pet-breed">{{ currentPet.breed }}</p>
-          </div>
-          <ion-icon
-            name="chevron-forward-outline"
-            class="swipe-arrow"
-            *ngIf="pets.length > 1">
-          </ion-icon>
-        </div>
-
-        <div class="dots" *ngIf="pets.length > 1">
-          <span
-            *ngFor="let pet of pets; let i = index"
-            class="dot"
-            [class.active]="i === currentPetIndex">
+    <!-- Card actual -->
+    <div class="pet-detail-card" (click)="onPetCardTap()">
+      <div class="pet-image-side" [style.background-color]="!currentPet.imageUrl ? getSexColor(currentPet.sex) : null">
+        <img *ngIf="currentPet.imageUrl" [src]="currentPet.imageUrl" [alt]="currentPet.name" />
+        <span *ngIf="!currentPet.imageUrl" class="species-fallback-icon">{{ getPetIconFallback(currentPet.species) }}</span>
+      </div>
+      <div class="pet-info-side">
+        <p class="pet-name">{{ currentPet.name }}</p>
+        <p class="pet-breed">{{ currentPet.breed }} - {{ currentPet.species }}</p>
+        <p class="pet-birthdate" *ngIf="currentPet.birthDate">{{ currentPet.birthDate | date:'dd/MM/yyyy' }}</p>
+        <p class="pet-sex" *ngIf="currentPet.sex">Sexo: {{ currentPet.sex }}</p>
+        <div class="pet-shared" *ngIf="currentPet.sharedWith?.length">
+          Tambien lo cuida:
+          <span *ngFor="let s of currentPet.sharedWith.slice(0,3)" class="shared-avatar">
+            <img [src]="s.avatarUrl" alt="shared" />
           </span>
+          <span *ngIf="currentPet.sharedWith.length > 3" class="shared-count">+{{ currentPet.sharedWith.length - 3 }}</span>
         </div>
       </div>
-    </ng-container>
+      <ion-icon
+        name="chevron-forward-outline"
+        class="swipe-arrow"
+        *ngIf="pets.length > 1"
+        (click)="onArrowTap(); $event.stopPropagation()">
+      </ion-icon>
+    </div>
+
+    <!-- Card siguiente (se asoma al arrastrar a la izquierda) -->
+    <div class="pet-detail-card">
+      <div class="pet-image-side" [style.background-color]="!pets[nextPetIndex].imageUrl ? getSexColor(pets[nextPetIndex].sex) : null">
+        <img *ngIf="pets[nextPetIndex].imageUrl" [src]="pets[nextPetIndex].imageUrl" [alt]="pets[nextPetIndex].name" />
+        <span *ngIf="!pets[nextPetIndex].imageUrl" class="species-fallback-icon">{{ getPetIconFallback(pets[nextPetIndex].species) }}</span>
+      </div>
+      <div class="pet-info-side">
+        <p class="pet-name">{{ pets[nextPetIndex].name }}</p>
+        <p class="pet-breed">{{ pets[nextPetIndex].breed }} - {{ pets[nextPetIndex].species }}</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="dots" *ngIf="pets.length > 1">
+    <span
+      *ngFor="let pet of pets; let i = index"
+      class="dot"
+      [class.active]="i === currentPetIndex">
+    </span>
+  </div>
+</div>
+  
+</ng-container>
 
     <!-- CALENDAR CARD -->
     <div class="calendar-card">

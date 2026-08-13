@@ -30,11 +30,15 @@ export class ProfilePage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.loadUserFromToken();
-    this.loadProfileImageFromStorage();
-    this.selectedLanguage = localStorage.getItem('language') || 'en';
-    this.currentTheme = localStorage.getItem('theme') || 'light';
+
+  this.selectedLanguage = localStorage.getItem('language') || 'en';
+  this.currentTheme = localStorage.getItem('theme') || 'light';
+}
+
+ ionViewWillEnter() {
+    this.loadProfile();
   }
+
 
   loadUserFromToken() {
     const token = this.authService.getToken();
@@ -57,20 +61,31 @@ export class ProfilePage implements OnInit {
   }
 
   loadProfile() {
-    this.profileService.getProfile().subscribe({
-      next: (data) => {
-        if (data.username) this.username = data.username;
-        if (data.email) this.email = data.email;
-        if (data.profileImage) {
-          this.profileImage = data.profileImage;
-          localStorage.setItem('profileImage', data.profileImage);
-        }
-      },
-      error: (error) => {
-        console.error('❌ Error al cargar perfil:', error);
-      }
-    });
-  }
+  this.profileService.getProfile().subscribe({
+    next: (profile) => {
+
+      console.log("✅ Perfil recibido:", profile);
+
+      this.username = profile.username;
+      this.email = profile.email;
+
+      console.log("USERNAME COMPONENT:", this.username);
+      console.log("EMAIL COMPONENT:", this.email);
+
+     if (profile.profileImageUrl) {
+  this.profileImage = profile.profileImageUrl;
+  localStorage.setItem('profileImage', profile.profileImageUrl);
+} else {
+  this.profileImage = 'assets/images/Profile/ImageUser.png';
+}
+
+    },
+
+    error: (err) => {
+      console.error("❌ Error obteniendo perfil", err);
+    }
+  });
+}
 
   onImageChange(file: File) {
     this.profileService.uploadProfileImage(file).subscribe({
@@ -100,17 +115,25 @@ export class ProfilePage implements OnInit {
   }
 
   async goToUpdateProfile() {
-    const modal = await this.modalController.create({
-      component: UpdateUsernameModalComponent,
-      componentProps: { currentUsername: this.username },
-      cssClass: 'transparent-modal'
-    });
-    await modal.present();
-    const { data } = await modal.onWillDismiss();
-    if (data?.updated) {
-      this.username = data.newUsername;
-    }
+  const modal = await this.modalController.create({
+    component: UpdateUsernameModalComponent,
+    componentProps: {
+      currentUsername: this.username,
+      profileImage: this.profileImage
+    },
+    cssClass: 'transparent-modal'
+  });
+
+  await modal.present();
+
+  const { data } = await modal.onWillDismiss();
+
+  if (data?.updated) {
+    this.username = data.newUsername;
+    this.profileImage = data.profileImage;
+    this.loadProfile();
   }
+}
 
   // language
   goToLanguage()  { this.showLanguage = true; }

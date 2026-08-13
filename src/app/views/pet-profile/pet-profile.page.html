@@ -4,10 +4,10 @@
   <div class="sidebar-backdrop" *ngIf="sidebarOpen" (click)="closeSidebar()"></div>
   <div class="sidebar" [class.open]="sidebarOpen">
     <div class="sidebar-header">
-      <img [src]="pet.imageUrl" alt="" class="sidebar-avatar" />
+      <img [src]="userAvatar" alt="" class="sidebar-avatar" />
       <div class="sidebar-user-info">
-        <p class="sidebar-name">Luisa Hernández</p>
-        <p class="sidebar-email">lhernandez@gmail.com</p>
+        <p class="sidebar-name">{{ userName }}</p>
+        <p class="sidebar-email">{{ userEmail }}</p>
       </div>
       <button class="sidebar-close" (click)="closeSidebar()">
         <ion-icon name="chevron-back-outline"></ion-icon>
@@ -57,7 +57,19 @@
     </div>
   </div>
 
-  <div class="pet-container">
+  <!-- ESTADO DE CARGA -->
+  <div class="loading-state" *ngIf="loading">
+    <p>Cargando mascota...</p>
+  </div>
+
+  <!-- ESTADO DE ERROR -->
+  <div class="error-state" *ngIf="!loading && loadError">
+    <p>No se pudo cargar la información de esta mascota.</p>
+    <button (click)="onHome()">Volver al inicio</button>
+  </div>
+
+  <!-- CONTENIDO REAL -->
+  <div class="pet-container" *ngIf="!loading && !loadError && pet">
 
     <!-- ZONA BLANCA: header + card de identidad -->
     <div class="white-zone">
@@ -69,18 +81,19 @@
         </button>
         <h1 class="pet-title">Pet profile</h1>
         <div class="species-icon">
-          <img [src]="getSpeciesIcon()" alt="" />
-          <span>{{ pet.species === 'cat' ? 'Gato' : 'Perro' }}</span>
+          <span class="species-emoji-small">{{ getPetIconFallback(pet.species) }}</span>
+          <span>{{ pet.species }}</span>
         </div>
       </div>
 
       <!-- PET CARD -->
       <div class="pet-card">
-        <div class="pet-avatar-wrap">
-          <img [src]="pet.imageUrl" alt="" class="pet-avatar" />
+        <div class="pet-avatar-wrap" [style.background-color]="!pet.imageUrl ? getSexColor(pet.sex) : null">
+          <img *ngIf="pet.imageUrl" [src]="pet.imageUrl" alt="" class="pet-avatar" />
+          <span *ngIf="!pet.imageUrl" class="pet-avatar-fallback">{{ getPetIconFallback(pet.species) }}</span>
         </div>
         <p class="pet-name">{{ pet.name }}</p>
-        <p class="pet-breed">{{ pet.breed }} · {{ pet.age }} {{ pet.ageUnit }}</p>
+        <p class="pet-breed">{{ pet.breed }} · {{ petStats.age }}</p>
       </div>
 
     </div>
@@ -96,11 +109,18 @@
         (viewAll)="goToMedicalHistory()">
       </app-medical-history-card>
 
+      <!-- VACUNAS: mensaje si no hay ninguna registrada -->
       <app-vaccine-card
+        *ngIf="vaccineSummary"
         [summary]="vaccineSummary"
         (addVaccine)="goToVaccineLine()"
         (viewTimeline)="goToVaccineLine()">
       </app-vaccine-card>
+
+      <div class="empty-card" *ngIf="!vaccineSummary">
+        <p>No hay vacunas registradas.</p>
+        <button (click)="goToVaccineLine()">Registrar vacuna</button>
+      </div>
 
       <!-- ANUNCIOS -->
       <div class="ads-section">
@@ -114,8 +134,7 @@
         <app-pet-calendar
           [events]="calendarEvents"
           [petName]="pet.name"
-          [petAvatarUrl]="pet.imageUrl"
-          (dateSelected)="onDateSelected($event)"
+          [petAvatarUrl]="pet.imageUrl || ''"          (dateSelected)="onDateSelected($event)"
           (editEvent)="onEditEvent($event)"
           (deleteEvent)="onDeleteEvent($event)"
           (addEvent)="onAddCalendarEvent()">

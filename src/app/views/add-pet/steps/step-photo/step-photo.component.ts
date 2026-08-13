@@ -9,7 +9,8 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 export class StepPhotoComponent {
   @Input() photo: string | null = null;
   @Input() editMode = false;
-  @Output() photoChange = new EventEmitter<string>();
+  @Output() photoChange = new EventEmitter<string | null>();
+  @Output() photoRemoved = new EventEmitter<void>(); // 👈 nuevo: avisa al padre que debe borrar la foto en el backend
 
   onCameraClick() {
     console.log('abrir cámara');
@@ -21,9 +22,17 @@ export class StepPhotoComponent {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      this.photo = reader.result as string;
-      this.photoChange.emit(this.photo);
+      this.photoChange.emit(reader.result as string);
     };
     reader.readAsDataURL(file);
+  }
+
+  onRemovePhoto() {
+    this.photoChange.emit(null);
+    this.photoRemoved.emit(); // el padre decide si debe llamar al backend
+  }
+
+  onSkip() {
+    this.photoChange.emit(null);
   }
 }

@@ -1,39 +1,51 @@
 <div class="modal-backdrop" (click)="closeModal()"></div>
 
 <div class="modal-content" (click)="$event.stopPropagation()">
-  
-  <!-- Header -->
+
   <div class="modal-header">
-    <h2>Update Username</h2>
-    <button class="close-btn" (click)="closeModal()">
-      <ion-icon name="close"></ion-icon>
-    </button>
-  </div>
 
-  <!-- Body -->
-  <div class="modal-body">
-    <p class="description">Choose a new username for your account</p>
+    <button class="back-btn" (click)="closeModal()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+    </button>
+
     
-    <div class="input-container">
-      <label>New Username</label>
-      <input 
-        type="text" 
-        [(ngModel)]="newUsername"
-        placeholder="Enter new username"
-        maxlength="20"
-        (keyup.enter)="saveUsername()">
-      <span class="char-count">{{ newUsername.length }}/20</span>
-    </div>
+
+</div>
+
+  <!-- Título -->
+  <h1 class="title">Edit Profile</h1>
+
+  <!-- Avatar -->
+  <div class="avatar-container">
+    <app-avatar
+      [imageUrl]="profileImage"
+      [username]="newUsername"
+      [editable]="true"
+      [showUsername]="false"
+      (imageChange)="onImageChange($event)"
+      (imageRemove)="onImageRemove()">
+    </app-avatar>
   </div>
 
-  <!-- Footer -->
-  <div class="modal-footer">
-    <button class="btn-cancel" (click)="closeModal()">
-      Cancel
-    </button>
+  <!-- Card -->
+  <div class="card">
+
+    <div class="input-container">
+      <label>Username</label>
+
+      <input
+        type="text"
+        [(ngModel)]="newUsername"
+        maxlength="20"
+        placeholder="Enter username"
+        (keyup.enter)="saveUsername()">
+
+    </div>
+
     <button class="btn-save" (click)="saveUsername()">
-      Save Changes
+      Save
     </button>
+
   </div>
 
 </div>

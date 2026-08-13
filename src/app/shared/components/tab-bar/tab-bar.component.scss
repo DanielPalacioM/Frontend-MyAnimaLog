@@ -4,7 +4,7 @@
   justify-content: space-around;
   background: #fff;
   border-top: 1px solid #f0f0f0;
-  padding: 8px 0 20px;
+  padding: 10px 0 28px; // 👈 más padding abajo
   position: fixed;
   bottom: 0;
   left: 0;
@@ -29,18 +29,16 @@
 .tab-icon-wrap {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  // 👈 sin background circular
 }
 
 .tab-icon {
   width: 24px;
   height: 24px;
   object-fit: contain;
-  // filtro gris para inactivo
   filter: grayscale(100%) opacity(0.4);
   transition: filter 0.2s;
 }
@@ -59,11 +57,12 @@
 .tab-item.active {
 
   .tab-icon-wrap {
-    background: #EEF0FF; // círculo morado claro detrás
+    background: none; // 👈 sin círculo
   }
 
   .tab-icon {
-    filter: none; // color original
+    // 👈 tinte morado aproximado vía filtro CSS (funciona bien con íconos monocromáticos/oscuros)
+    filter: brightness(0) saturate(100%) invert(20%) sepia(75%) saturate(2476%) hue-rotate(230deg) brightness(90%) contrast(95%);
   }
 
   .tab-label {

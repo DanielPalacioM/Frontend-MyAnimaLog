@@ -187,3 +187,39 @@ ion-content {
   border-radius: 1%;
   object-fit: cover;
 }
+
+.gmail-btn-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.gmail-btn-wrapper .gmail-btn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; // el clic pasa hacia el iframe de abajo
+  z-index: 1;
+}
+
+.google-real-btn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.01;  // ⚠️ NUNCA display:none ni visibility:hidden aquí
+  z-index: 2;
+  overflow: hidden;
+}
+
+// El iframe que Google mete adentro, forzarlo a llenar el contenedor
+.google-real-btn iframe {
+  width: 100% !important;
+  height: 100% !important;
+}

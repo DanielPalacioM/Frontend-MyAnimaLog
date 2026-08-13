@@ -25,10 +25,10 @@
     <div class="step-content">
 
       <app-step-photo
-        *ngIf="currentStep === 1"
-        [photo]="petForm.photo"
-        [editMode]="isEditMode"
-        (photoChange)="onStepDataChange({ photo: $event })">
+      [photo]="petForm.photo"
+      [editMode]="isEditMode"
+      (photoChange)="onStepDataChange({ photo: $event })"
+      (photoRemoved)="onPhotoRemoved()">
       </app-step-photo>
 
       <app-step-basic-info

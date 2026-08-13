@@ -41,13 +41,24 @@ export class StepBasicInfoComponent implements OnInit {
   showOtherModal = false;
   birthDate = '';
   ageMonths: number | null = null;
+  sex: 'MALE' | 'FEMALE' | '' = '';
+  weightKg: number | null = null;
+  heightCm: number | null = null;
 
   ngOnInit() {
-    this.name          = this.data.name       || '';
-    this.selectedSpecies = this.data.species  || '';
-    this.breedSearch   = this.data.breed      || '';
-    this.birthDate     = this.data.birthDate  || '';
-    this.ageMonths     = this.data.ageMonths  || null;
+    this.name           = this.data.name       || '';
+    this.selectedSpecies = this.data.species   || '';
+    this.breedSearch    = this.data.breed      || '';
+    this.birthDate      = this.data.birthDate  || '';
+    this.ageMonths      = this.data.ageMonths  || null;
+    this.sex            = this.data.sex        || '';
+    this.weightKg        = (this.data as any).weightKg ?? null;
+    this.heightCm        = (this.data as any).heightCm ?? null;
+  }
+
+  selectSex(value: 'MALE' | 'FEMALE') {
+    this.sex = value;
+    this.emit();
   }
 
   selectSpecies(key: string) {
@@ -109,6 +120,9 @@ export class StepBasicInfoComponent implements OnInit {
       breed:     this.breedSearch,
       birthDate: this.birthDate,
       ageMonths: this.ageMonths,
-    });
+      sex:       this.sex,
+      weightKg:   this.weightKg,
+      heightCm:   this.heightCm,
+    } as Partial<PetForm>);
   }
 }

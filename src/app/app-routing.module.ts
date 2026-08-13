@@ -45,9 +45,9 @@ const routes: Routes = [
     loadChildren: () => import('./views/shared-profiles-home/shared-profiles-home.module').then( m => m.SharedProfilesHomePageModule)
   },
   {
-    path: 'pet-profile',
-    loadChildren: () => import('./views/pet-profile/pet-profile.module').then( m => m.PetProfilePageModule)
-  },
+  path: 'pet-profile/:id',
+  loadChildren: () => import('./views/pet-profile/pet-profile.module').then( m => m.PetProfilePageModule)
+},
   {
   path: 'add-pet',
   loadChildren: () => import('./views/add-pet/add-pet-module').then(m => m.AddPetModule)
@@ -71,7 +71,8 @@ loadChildren: () => import('./views/vaccine-timeline/vaccine-timeline-module').t
   {
     path: 'vaccine-info',
     loadChildren: () => import('./views/vaccine-info/vaccine-info.module').then( m => m.VaccineInfoPageModule)
-  },  {
+  },
+  {
     path: 'medical-history',
     loadChildren: () => import('./views/medical-history/medical-history/medical-history.module').then( m => m.MedicalHistoryPageModule)
   },

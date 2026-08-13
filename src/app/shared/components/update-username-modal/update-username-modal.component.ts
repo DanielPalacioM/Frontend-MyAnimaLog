@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ModalController, LoadingController, AlertController } from '@ionic/angular';
 import { ProfileService } from 'src/app/services/ProfileService/profile';
 
@@ -8,9 +8,16 @@ import { ProfileService } from 'src/app/services/ProfileService/profile';
   styleUrls: ['./update-username-modal.component.scss'],
   standalone: false
 })
-export class UpdateUsernameModalComponent {
+export class UpdateUsernameModalComponent implements OnInit {
+
   @Input() currentUsername: string = '';
+  @Input() profileImage: string = 'assets/images/Profile/ImageUser.png';
+
   newUsername: string = '';
+
+
+  imageChanged: boolean = false;
+
 
   constructor(
     private modalController: ModalController,
@@ -19,8 +26,7 @@ export class UpdateUsernameModalComponent {
     private alertController: AlertController
   ) {}
 
-  ngOnInit() {
-    // Inicializa con el username actual
+  ngOnInit(): void {
     this.newUsername = this.currentUsername;
   }
 
@@ -28,65 +34,145 @@ export class UpdateUsernameModalComponent {
     await this.modalController.dismiss();
   }
 
-  async saveUsername() {
-    // Validaciones
-    if (!this.newUsername || this.newUsername.trim() === '') {
-      await this.showAlert('Error', 'Username cannot be empty');
-      return;
-    }
+  onImageChange(file: File) {
 
-    if (this.newUsername === this.currentUsername) {
-      await this.showAlert('Info', 'No changes detected');
-      return;
-    }
-
-    if (this.newUsername.length < 3) {
-      await this.showAlert('Error', 'Username must be at least 3 characters');
-      return;
-    }
-
-    // Mostrar loading
-    const loading = await this.loadingController.create({
-      message: 'Updating username...',
-      spinner: 'crescent',
-      cssClass: 'custom-loading'
-    });
-    await loading.present();
-
-    // Llamar al servicio
-    this.profileService.updateProfile({ username: this.newUsername }).subscribe({
-      next: async (response) => {
-        await loading.dismiss();
-        console.log('✅ Username actualizado:', response);
-        
-        // Cerrar modal y devolver el nuevo username
-        await this.modalController.dismiss({
-          updated: true,
-          newUsername: this.newUsername
-        });
-      },
-      error: async (error) => {
-        await loading.dismiss();
-        console.error('❌ Error al actualizar username:', error);
-        
-        let errorMessage = 'Failed to update username. Please try again.';
-        
-        if (error.status === 409) {
-          errorMessage = 'This username is already taken.';
-        }
-        
-        await this.showAlert('Error', errorMessage);
+  this.imageChanged = true;
+  // Vista previa inmediata
+  const reader = new FileReader();
+  reader.onload = (e: any) => {
+    this.profileImage = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  // Subir inmediatamente al backend
+  this.profileService.uploadProfileImage(file).subscribe({
+    next: (response) => {
+      if (response.imageUrl) {
+        this.profileImage = response.imageUrl;
+        localStorage.setItem(
+          'profileImage',
+          response.imageUrl
+        );
       }
-    });
+    },
+    error: (err) => {
+      console.error(err);
+    }
+  });
+}
+
+
+  onImageRemove() {
+
+  this.imageChanged = true;
+  this.profileService.removeProfileImage().subscribe({
+    next: () => {
+      this.profileImage =
+        'assets/images/Profile/ImageUser.png';
+      localStorage.removeItem('profileImage');
+    },
+    error: (err) => {
+      console.error(err);
+    }
+  });
+
+}
+
+  async saveUsername() {
+
+  const usernameChanged =
+    this.newUsername.trim() !== this.currentUsername;
+
+  // No hubo ningún cambio
+  if (!usernameChanged && !this.imageChanged) {
+
+    await this.showAlert(
+      'Info',
+      'No changes detected'
+    );
+
+    return;
+
   }
+
+  // Validar username únicamente si cambió
+  if (usernameChanged) {
+
+    if (!this.newUsername.trim()) {
+
+      await this.showAlert(
+        'Error',
+        'Username cannot be empty'
+      );
+
+      return;
+
+    }
+
+    if (this.newUsername.trim().length < 3) {
+
+      await this.showAlert(
+        'Error',
+        'Username must be at least 3 characters'
+      );
+
+      return;
+
+    }
+
+  }
+
+  const loading = await this.loadingController.create({
+    message: 'Updating...',
+    spinner: 'crescent'
+  });
+
+  await loading.present();
+
+  try {
+
+    // Actualizar username únicamente si cambió
+    if (usernameChanged) {
+
+      await this.profileService
+        .updateProfile({
+          username: this.newUsername.trim()
+        })
+        .toPromise();
+
+    }
+
+    await loading.dismiss();
+    this.imageChanged = false;
+    await this.modalController.dismiss({
+      updated: true,
+      newUsername: this.newUsername.trim(),
+      profileImage: this.profileImage
+    });
+  } catch (error: any) {
+    await loading.dismiss();
+    let message = 'Failed to update profile';
+    if (error.status === 409) {
+      message = 'Username already exists';
+    }
+    await this.showAlert(
+      'Error',
+      message
+    );
+  }
+}
 
   async showAlert(header: string, message: string) {
+
     const alert = await this.alertController.create({
-      header: header,
-      message: message,
-      cssClass: 'custom-alert',
+
+      header,
+      message,
       buttons: ['OK']
+
     });
+
     await alert.present();
+
   }
+
 }

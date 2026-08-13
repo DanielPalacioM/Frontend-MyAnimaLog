@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { AuthService } from '../authServices/auth';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProfileService {
-  private baseUrl = 'http://localhost:8080';
-
+  private baseUrl = environment.apiUrl;
   constructor(
     private http: HttpClient,
     private authService: AuthService
@@ -80,17 +80,20 @@ uploadProfileImage(file: File): Observable<any> {
   // ✅ Actualizar perfil
 updateProfile(data: any): Observable<any> {
   const userId = this.getUserId();
-  
-  if (!userId) {
-    console.error('❌ No hay userId disponible');
-    return throwError(() => new Error('No userId available'));
-  }
+  const token = this.authService.getToken();
 
-  console.log('✏️ Actualizando perfil del usuario:', userId);
-  
-  // ✅ URL correcta: /user/{userId} (sin /profile/)
-  return this.http.put(`${this.baseUrl}/user/${userId}`, data, { 
-    headers: this.getAuthHeaders() 
-  });
+  console.log("USER ID:", userId);
+  console.log("TOKEN:", token);
+  console.log("DATA:", data);
+
+  return this.http.put(
+    `${this.baseUrl}/user/${userId}`,
+    data,
+    {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${token}`
+      })
+    }
+  );
 }
 }

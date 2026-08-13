@@ -1,180 +1,249 @@
-// Backdrop difuminado
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  z-index: 9998;
-  animation: fadeIn 0.3s ease;
+.modal-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
 }
 
-// Contenedor del modal
-.modal-content {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 90%;
-  max-width: 400px;
-  background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-  z-index: 9999;
-  animation: slideUp 0.3s ease;
-  overflow: hidden;
+/* =========================
+   CONTENEDOR
+========================= */
+
+.modal-content{
+
+    position:fixed;
+    inset:0;
+
+    background:#FFB84F;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    overflow-y:auto;
+
 }
 
-// Header
-.modal-header {
-  padding: 20px;
-  border-bottom: 1px solid #f0f0f0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  
-  h2 {
-    font-size: 20px;
-    font-weight: 700;
-    color: #000;
-    margin: 0;
-  }
-  
-  .close-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    ion-icon {
-      font-size: 24px;
-      color: #666;
-    }
-    
-    &:hover ion-icon {
-      color: #000;
-    }
-  }
+/* =========================
+   HEADER
+========================= */
+
+.modal-header{
+
+    width:100%;
+
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+
+    padding:25px 20px 0;
+
+    box-sizing:border-box;
+
 }
 
-// Body
-.modal-body {
-  padding: 30px 20px;
-  
-  .description {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  
-  .input-container {
-    position: relative;
-    
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 8px;
-    }
-    
-    input {
-      width: 100%;
-      padding: 14px 16px;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      font-size: 15px;
-      color: #000;
-      outline: none;
-      transition: all 0.2s ease;
-      
-      &:focus {
-        border-color: #FFB84F;
-      }
-      
-      &::placeholder {
-        color: #aaa;
-      }
-    }
-    
-    .char-count {
-      position: absolute;
-      right: 16px;
-      bottom: -24px;
-      font-size: 12px;
-      color: #999;
-    }
-  }
+.back-btn{
+
+    width:40px;
+    height:40px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:none;
+    border:none;
+
+    cursor:pointer;
+
 }
 
-// Footer
-.modal-footer {
-  padding: 20px;
-  border-top: 1px solid #f0f0f0;
-  display: flex;
-  gap: 12px;
-  
-  button {
-    flex: 1;
-    padding: 14px;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-  
-  .btn-cancel {
-    background: #f5f5f5;
-    color: #666;
-    
-    &:hover {
-      background: #e0e0e0;
-    }
-    
-    &:active {
-      transform: scale(0.98);
-    }
-  }
-  
-  .btn-save {
-    background: #FFB84F;
-    color: #fff;
-    
-    &:hover {
-      opacity: 0.9;
-    }
-    
-    &:active {
-      transform: scale(0.98);
-    }
-  }
+.back-btn ion-icon{
+
+    font-size:30px;
+    color:#1A1A2E;
+
 }
 
-// Animaciones
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+/* =========================
+   TITULO
+========================= */
+
+.title{
+
+    margin-top:10px;
+    margin-bottom:35px;
+
+    color:#fff;
+
+    font-size:42px;
+    font-weight:700;
+
+    font-family:'Actor',sans-serif;
+
+    text-align:center;
+
 }
 
-@keyframes slideUp {
-  from {
-    transform: translate(-50%, -45%);
-    opacity: 0;
-  }
-  to {
-    transform: translate(-50%, -50%);
-    opacity: 1;
-  }
+/* =========================
+   AVATAR
+========================= */
+
+.avatar-container{
+
+    margin-bottom:40px;
+
+}
+
+/* =========================
+   CARD
+========================= */
+
+.card{
+
+    width:90%;
+    max-width:420px;
+
+    background:#fff;
+
+    border-radius:35px;
+
+    padding:28px;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    box-sizing:border-box;
+
+    margin-bottom:40px;
+
+}
+
+/* =========================
+   INPUT
+========================= */
+
+.input-container{
+
+    width:100%;
+
+}
+
+.input-container label{
+
+    display:block;
+
+    margin-bottom:10px;
+
+    color:#111;
+
+    font-size:14px;
+    font-weight:600;
+
+    font-family:'Actor',sans-serif;
+
+}
+
+.input-container input{
+
+    width:100%;
+    height:58px;
+
+    background:#fff !important;
+    color:#1A1A2E !important;
+
+    border:1.5px solid #D8D8D8;
+
+    border-radius:35px;
+
+    padding:0 20px;
+
+    font-size:20px;
+
+    outline:none;
+
+    box-sizing:border-box;
+
+    font-family:'Actor',sans-serif;
+
+    -webkit-appearance:none;
+    appearance:none;
+
+}
+
+.input-container input::placeholder{
+
+    color:#9B9B9B;
+
+}
+
+.input-container input:focus{
+
+    border-color:#FFB84F;
+
+}
+
+.input-container input:-webkit-autofill{
+
+    -webkit-box-shadow:0 0 0 1000px #fff inset;
+    -webkit-text-fill-color:#1A1A2E;
+
+}
+
+/* =========================
+   BOTON
+========================= */
+
+.btn-save{
+
+    margin-top:35px;
+
+    width:150px;
+    height:52px;
+
+    border:none;
+
+    border-radius:30px;
+
+    background:#FF1E1E;
+
+    color:#fff;
+
+    font-size:18px;
+    font-weight:700;
+
+    font-family:'Actor',sans-serif;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.btn-save:hover{
+
+    transform:scale(1.04);
+
+}
+
+.btn-save:active{
+
+    transform:scale(.96);
+
+}
+
+/* =========================
+   SCROLL
+========================= */
+
+.modal-content::-webkit-scrollbar{
+
+    display:none;
+
+}
+
+.modal-content{
+
+    scrollbar-width:none;
+
 }

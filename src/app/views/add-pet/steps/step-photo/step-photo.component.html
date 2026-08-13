@@ -19,7 +19,7 @@
         <div class="edit-badge" *ngIf="editMode">
           <ion-icon name="create-outline"></ion-icon>
         </div>
-        <button class="photo-change-btn" (click)="photo = null; photoChange.emit('')">
+        <button class="photo-change-btn" (click)="onRemovePhoto()">
           <ion-icon name="close-circle-outline"></ion-icon>
         </button>
       </div>

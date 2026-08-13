@@ -50,19 +50,18 @@
       <div class="divider"><span>Or Sign With</span></div>
 
       <div class="socials">
-        <!-- Gmail - Tu botón personalizado -->
-        <button type="button" class="gmail-btn" (click)="loginWithGoogle()">
-          <img src="../../../assets/images/google.png" alt="gm" />
-        </button>
+  <div class="gmail-btn-wrapper">
+    <button type="button" class="gmail-btn" tabindex="-1">
+      <img src="../../../assets/images/google.png" alt="gm" />
+    </button>
 
-        <!-- 🔥 Botón invisible de Google (se clickea programáticamente) -->
-        <div id="googleButtonDiv" style="display: none;"></div>
+    <div id="googleButtonDiv" class="google-real-btn"></div>
+  </div>
 
-        <!-- Logo de la app que lleva al registro -->
-        <button type="button" class="register-btn" (click)="goToRegister()">
-          <img src="../../../assets/images/logo app.png" alt="dog icon" />
-        </button>
-      </div>
+  <button type="button" class="register-btn" (click)="goToRegister()">
+    <img src="../../../assets/images/logo app.png" alt="dog icon" />
+  </button>
+</div>
     </form>
   </div>
 </ion-content>

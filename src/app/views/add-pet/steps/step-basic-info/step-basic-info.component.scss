@@ -19,6 +19,15 @@
   font-family: 'Actor', sans-serif;
 }
 
+.field-row {
+  display: flex;
+  gap: 12px;
+
+  .field {
+    flex: 1;
+  }
+}
+
 .input-wrap {
   display: flex;
   align-items: center;

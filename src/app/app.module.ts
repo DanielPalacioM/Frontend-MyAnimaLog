@@ -6,7 +6,9 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { BypassTunnelInterceptor } from './interceptors/bypass-tunnel.interceptor';
+import { AuthInterceptor } from './interceptors/auth.interceptors';
 
 @NgModule({
   declarations: [AppComponent, ],
@@ -16,7 +18,19 @@ import { HttpClientModule } from '@angular/common/http';
     AppRoutingModule,
     HttpClientModule // 👈 AQUÍ
   ],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  providers: [
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: BypassTunnelInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,   // 👈 nuevo bloque
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

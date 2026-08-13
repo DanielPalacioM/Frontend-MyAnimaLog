@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { ActionSheetController } from '@ionic/angular';
 
 @Component({
@@ -7,7 +7,7 @@ import { ActionSheetController } from '@ionic/angular';
   styleUrls: ['./avatar.component.scss'],
   standalone: false
 })
-export class AvatarComponent implements OnInit {
+export class AvatarComponent implements OnInit, OnChanges {
   @Input() imageUrl: string = 'assets/images/Profile/ImageUser.png';
   @Input() username: string = 'Username';
   @Input() editable: boolean = true;
@@ -22,13 +22,24 @@ export class AvatarComponent implements OnInit {
   constructor(private actionSheetController: ActionSheetController) {}
 
   ngOnInit() {
-    // ✅ Verifica si hay imagen guardada en localStorage
-    const savedImage = localStorage.getItem('profileImage');
-    if (savedImage) {
-      this.imageUrl = savedImage;
-      this.hasCustomImage = true;
-    }
+
+  this.hasCustomImage =
+    !!this.imageUrl &&
+    this.imageUrl !== this.defaultImage;
+
+}
+
+  ngOnChanges(changes: SimpleChanges): void {
+
+  if (changes['imageUrl']) {
+
+    this.hasCustomImage =
+      !!this.imageUrl &&
+      this.imageUrl !== this.defaultImage;
+
   }
+
+}
 
   // ✅ Lógica al hacer clic en el avatar o en el icono de edición
   async onAvatarClick() {
@@ -79,7 +90,6 @@ export class AvatarComponent implements OnInit {
   removeImage() {
     this.imageUrl = this.defaultImage;
     this.hasCustomImage = false;
-    localStorage.removeItem('profileImage');
     this.imageRemove.emit();
     console.log('🗑️ Imagen eliminada');
   }
@@ -101,9 +111,7 @@ export class AvatarComponent implements OnInit {
       reader.onload = (e: any) => {
         this.imageUrl = e.target.result;
         this.hasCustomImage = true;
-        // ✅ Guarda en localStorage para persistencia
-        localStorage.setItem('profileImage', e.target.result);
-        console.log('💾 Imagen guardada en localStorage');
+        
       };
       reader.readAsDataURL(file);
 

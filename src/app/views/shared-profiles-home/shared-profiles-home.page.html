@@ -25,7 +25,7 @@
               <span class="sp-label">Perfiles compartidos</span>
             </div>
             <p class="sp-greeting">Hola, {{ username }}</p>
-            <p class="sp-sub">Te gusto tenerte de vuelta</p>
+            <p class="sp-sub">Que gusto tenerte de vuelta</p>
           </div>
           <div class="sp-avatar">
             <img [src]="userAvatar" alt="avatar" />
@@ -94,101 +94,169 @@
       <div class="sp-content">
 
         <!-- TAB: MIS MASCOTAS -->
-        <ng-container *ngIf="activeTab === 'mis-mascotas'">
-          <button class="share-btn" (click)="onSharePet()">
-            Compartir perfil de mi mascota
-          </button>
-          <div class="pet-list">
-            <div class="pet-card" *ngFor="let pet of myPets">
-              <div class="pet-card-top">
-                <img [src]="pet.imageUrl" alt="" class="pet-img" />
-                <div class="pet-info">
-                  <p class="pet-name">{{ pet.name }}</p>
-                  <p class="pet-breed">{{ pet.breed }}</p>
-                  <div class="pet-stats">
-                    <div class="pstat">
-                      <span class="pstat-label">Edad</span>
-                      <span class="pstat-val">{{ pet.age }}</span>
-                    </div>
-                    <div class="pstat">
-                      <span class="pstat-label">Vacunas</span>
-                      <span class="pstat-val">{{ pet.vaccines }}</span>
-                    </div>
-                    <div class="pstat">
-                      <span class="pstat-label">Visitas al veterinario</span>
-                      <span class="pstat-val">{{ pet.vetVisits }}</span>
-                    </div>
-                    <div class="pstat">
-                      <span class="pstat-label">Peso</span>
-                      <span class="pstat-val">{{ pet.weight }} kg</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="pet-caregivers">
-                <div class="caregiver" *ngFor="let c of pet.caregivers">
-                  <img [src]="c.avatarUrl" alt="" />
-                  <span>{{ c.name }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ng-container>
+<ng-container *ngIf="activeTab === 'mis-mascotas'">
+  <button class="share-btn" (click)="onSharePet()">
+    Compartir perfil de mi mascota
+  </button>
+
+  <div class="pet-list" *ngIf="myPets.length > 0">
+    <div class="pet-card" *ngFor="let pet of myPets">
+      <div class="pet-card-top">
+        <img *ngIf="pet.imageUrl" [src]="pet.imageUrl" alt=""
+             class="pet-avatar"
+             [style.border]="'3px solid ' + getSexColor(pet.sex)" />
+        <div *ngIf="!pet.imageUrl"
+             class="pet-avatar pet-avatar-fallback"
+             [style.background]="getSexColor(pet.sex)"
+             [style.border]="'3px solid ' + getSexColor(pet.sex)">
+          {{ getPetIconFallback(pet.species) }}
+        </div>
+        <div class="pet-info">
+          <p class="pet-name">{{ pet.name }}</p>
+          <p class="pet-breed">{{ pet.breed }}</p>
+        </div>
+      </div>
+
+      <div class="pet-stats">
+        <div class="pstat">
+          <span class="pstat-label">Edad</span>
+          <span class="pstat-val">{{ pet.ageMonths ? pet.ageMonths + ' meses' : '—' }}</span>
+        </div>
+        <div class="pstat">
+          <span class="pstat-label">Vacunas</span>
+          <span class="pstat-val">—</span>
+        </div>
+        <div class="pstat">
+          <span class="pstat-label">Visitas al veterinario</span>
+          <span class="pstat-val">—</span>
+        </div>
+        <div class="pstat">
+          <span class="pstat-label">Peso</span>
+          <span class="pstat-val">{{ pet.weight ?? '—' }} kg</span>
+        </div>
+      </div>
+
+      <div class="pet-caregivers" *ngIf="petCaregivers[pet.id]?.length">
+        <div class="caregiver" *ngFor="let c of petCaregivers[pet.id]">
+          <img [src]="c.avatarUrl" alt="" />
+          <span>{{ c.name }}</span>
+        </div>
+      </div>
+      <p class="no-caregivers" *ngIf="!petCaregivers[pet.id]?.length">
+        Nadie está cuidando esta mascota todavía
+      </p>
+    </div>
+  </div>
+
+  <div class="empty-state-transparent" *ngIf="showEmptyMyPets">
+    <p>No tienes mascotas registradas todavía</p>
+  </div>
+</ng-container>
 
         <!-- TAB: PERSONAS COMPARTIDAS -->
         <ng-container *ngIf="activeTab === 'personas'">
-          <div class="personas-grid">
-            <div class="persona-card" *ngFor="let p of sharedPersons">
-              <img [src]="p.avatarUrl" alt="" class="persona-avatar" />
-              <span class="persona-name">{{ p.name }}</span>
-              <span class="persona-role">{{ p.role }}</span>
-              <div class="persona-pets">
-                <img *ngFor="let pet of p.pets"
-                  [src]="pet.imageUrl" alt=""
-                  class="persona-pet-img" />
-              </div>
-            </div>
-          </div>
-        </ng-container>
+  <div class="personas-grid" *ngIf="sharedPersons.length > 0">
+    <div class="persona-card" *ngFor="let p of sharedPersons">
+      <img [src]="p.avatarUrl" alt="" class="persona-avatar" />
+      <span class="persona-name">{{ p.name }}</span>
+      <span class="persona-role">{{ p.role }}</span>
+      <div class="persona-pets">
+        <img *ngFor="let pet of p.pets"
+          [src]="pet.imageUrl" alt=""
+          class="persona-pet-img" />
+      </div>
+    </div>
+  </div>
 
-        <!-- TAB: MASCOTAS A MI CUIDADO -->
+  <div class="empty-state-transparent" *ngIf="showEmptyPersonas">
+    <p>No tienes personas asociadas todavía</p>
+  </div>
+</ng-container>
+
         <ng-container *ngIf="activeTab === 'a-mi-cuidado'">
-          <div class="pet-list">
-            <div class="pet-card" *ngFor="let pet of petsInCare">
-              <div class="pet-card-top">
-                <img [src]="pet.imageUrl" alt="" class="pet-img" />
-                <div class="pet-info">
-                  <p class="pet-name">{{ pet.name }}</p>
-                  <p class="pet-breed">{{ pet.breed }}</p>
-                  <div class="pet-stats">
-                    <div class="pstat">
-                      <span class="pstat-label">Edad</span>
-                      <span class="pstat-val">{{ pet.age }}</span>
-                    </div>
-                    <div class="pstat">
-                      <span class="pstat-label">Vacunas</span>
-                      <span class="pstat-val">{{ pet.vaccines }}</span>
-                    </div>
-                    <div class="pstat">
-                      <span class="pstat-label">Visitas al veterinario</span>
-                      <span class="pstat-val">{{ pet.vetVisits }}</span>
-                    </div>
-                    <div class="pstat">
-                      <span class="pstat-label">Peso</span>
-                      <span class="pstat-val">{{ pet.weight }} kg</span>
-                    </div>
-                  </div>
-                  <button class="ver-btn" (click)="onViewPet(pet.id)">Ver</button>
-                </div>
-              </div>
-              <div class="pet-owner">
-                <img [src]="pet.owner.avatarUrl" alt="" />
-                <span>{{ pet.owner.name }}</span>
-                <span class="owner-role">{{ pet.owner.role }}</span>
-              </div>
-            </div>
-          </div>
-        </ng-container>
+  <div class="pet-list" *ngIf="petsInCare.length > 0">
+    <div class="pet-card" *ngFor="let pet of petsInCare">
+      <div class="pet-card-top">
+        <img *ngIf="pet.imageUrl" [src]="pet.imageUrl" alt=""
+             class="pet-avatar"
+             [style.border]="'3px solid ' + getSexColor(pet.sex)" />
+        <div *ngIf="!pet.imageUrl"
+             class="pet-avatar pet-avatar-fallback"
+             [style.background]="getSexColor(pet.sex)"
+             [style.border]="'3px solid ' + getSexColor(pet.sex)">
+          {{ getPetIconFallback(pet.species) }}
+        </div>
+        <div class="pet-info">
+          <p class="pet-name">{{ pet.name }}</p>
+          <p class="pet-breed">{{ pet.breed }}</p>
+        </div>
+      </div>
+
+      <div class="pet-stats">
+        <div class="pstat">
+          <span class="pstat-label">Edad</span>
+          <span class="pstat-val">—</span>
+        </div>
+        <div class="pstat">
+          <span class="pstat-label">Vacunas</span>
+          <span class="pstat-val">—</span>
+        </div>
+        <div class="pstat">
+          <span class="pstat-label">Visitas al veterinario</span>
+          <span class="pstat-val">—</span>
+        </div>
+        <div class="pstat">
+          <span class="pstat-label">Peso</span>
+          <span class="pstat-val">—</span>
+        </div>
+      </div>
+
+      <button class="ver-btn" (click)="onViewPet(pet.id)">Ver</button>
+
+      <div class="pet-owner">
+        <img [src]="pet.ownerAvatarUrl || 'assets/images/default-avatar.png'" alt="" />
+        <span>{{ pet.ownerName || 'Dueño' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state-transparent" *ngIf="showEmptyPetsInCare">
+    <p>No tienes mascotas a tu cuidado todavía</p>
+  </div>
+</ng-container>
+
+<div class="invite-modal-backdrop" *ngIf="showInviteModal" (click)="closeInviteModal()">
+  <div class="invite-modal" (click)="$event.stopPropagation()">
+    <div class="invite-modal-header">
+      <span>Compartir mascota</span>
+      <button class="invite-modal-close" (click)="closeInviteModal()">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+
+    <div class="invite-modal-body">
+      <label class="invite-label">Mascota</label>
+      <select class="invite-select" [(ngModel)]="inviteSelectedPetId">
+        <option *ngFor="let pet of myPets" [value]="pet.id">{{ pet.name }}</option>
+      </select>
+
+      <label class="invite-label">Correo del invitado</label>
+      <input type="email" class="invite-input" placeholder="correo@ejemplo.com" [(ngModel)]="inviteEmail" />
+
+      <div class="invite-role-row">
+        <span class="invite-role-label" [class.active]="inviteRole === 'VIEWER'">Solo vista</span>
+        <div class="invite-switch" [class.on]="inviteRole === 'EDITOR'" (click)="toggleInviteRole()">
+          <div class="invite-switch-knob"></div>
+        </div>
+        <span class="invite-role-label" [class.active]="inviteRole === 'EDITOR'">Editor</span>
+      </div>
+
+      <button class="invite-send-btn" [disabled]="sendingInvite || !inviteEmail" (click)="sendInvite()">
+        {{ sendingInvite ? 'Enviando...' : 'Enviar invitación' }}
+      </button>
+    </div>
+  </div>
+</div>
 
       </div>
     </div>

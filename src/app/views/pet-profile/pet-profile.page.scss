@@ -237,12 +237,17 @@ ion-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
 
-  img {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
+  .species-emoji-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #FFB84F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
   }
 
   span {
@@ -263,17 +268,26 @@ ion-content {
 }
 
 .pet-avatar-wrap {
-  width: 90px;
-  height: 90px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
   overflow: hidden;
   border: 3px solid #FFB84F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
+}
+
+.pet-avatar-fallback {
+  font-size: 56px;
+  line-height: 1;
 }
 
 .pet-name {
@@ -398,6 +412,8 @@ ion-content {
   }
 }
 
+
+
 // VACCINE CARD
 .vaccine-card {
   background: white;
@@ -482,6 +498,37 @@ ion-content {
   &.secondary {
     background: #f0f0f0;
     color: #1a1a2e;
+  }
+}
+
+.empty-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  text-align: center;
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: #888;
+    font-family: 'Actor', sans-serif;
+  }
+
+  button {
+    background: #4037BE;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Actor', sans-serif;
+    cursor: pointer;
   }
 }
 
