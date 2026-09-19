@@ -72,8 +72,10 @@
           <span class="event-card-title">{{ ev.title }}</span>
         </div>
         <p class="event-card-desc" *ngIf="ev.description">{{ ev.description }}</p>
-        <p class="event-card-time">{{ ev.time }}</p>
-        <div class="event-actions" (click)="$event.stopPropagation()">
+       <p class="event-card-time">
+          {{ ev.time }}<span *ngIf="ev.endTime"> - {{ ev.endTime }}</span>
+      </p>        
+      <div class="event-actions" (click)="$event.stopPropagation()">
           <button class="action-btn edit" (click)="onEdit(ev, $event)"><ion-icon name="create-outline"></ion-icon></button>
           <button class="action-btn delete" (click)="onDelete(ev, $event)"><ion-icon name="trash-outline"></ion-icon></button>
         </div>
@@ -93,8 +95,9 @@
             <span class="event-card-title">{{ ev.title }}</span>
           </div>
           <p class="event-card-desc" *ngIf="ev.description">{{ ev.description }}</p>
-          <p class="event-card-time">{{ ev.time }}</p>
-          <div class="event-actions" (click)="$event.stopPropagation()">
+          <p class="event-card-time">
+              {{ ev.time }}<span *ngIf="ev.endTime"> - {{ ev.endTime }}</span>
+        </p>          <div class="event-actions" (click)="$event.stopPropagation()">
             <button class="action-btn edit" (click)="onEdit(ev, $event)"><ion-icon name="create-outline"></ion-icon></button>
             <button class="action-btn delete" (click)="onDelete(ev, $event)"><ion-icon name="trash-outline"></ion-icon></button>
           </div>
@@ -127,9 +130,11 @@
       </div>
 
       <div class="modal-cell">
-        <span class="modal-cell-label">Hora</span>
-        <span class="modal-cell-value">{{ selectedEvent.time }}</span>
-      </div>
+  <span class="modal-cell-label">Hora</span>
+  <span class="modal-cell-value">
+    {{ selectedEvent.time }}<span *ngIf="selectedEvent.endTime"> - {{ selectedEvent.endTime }}</span>
+  </span>
+</div>
 
       <div class="modal-cell" *ngIf="selectedEvent.intervalHours">
         <span class="modal-cell-label">Se repite cada</span>

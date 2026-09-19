@@ -1,0 +1,467 @@
+.calendar-content {
+  --background: #1B1338;
+}
+
+.calendar-wrap {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #2A1B5E 0%, #1B1338 100%);
+}
+
+// HEADER
+.calendar-header {
+  padding: 52px 16px 12px;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-title-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.back-btn, .menu-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+
+  ion-icon { font-size: 24px; color: #fff; }
+}
+
+.pets-avatars-row {
+  display: flex;
+  align-items: center;
+}
+
+.pet-avatar-mini-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  margin-left: -8px;
+
+  &:first-child { margin-left: 0; }
+}
+
+.pet-avatar-mini {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pet-avatar-mini-fallback {
+  font-size: 14px;
+}
+
+.pets-counter {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'Actor', sans-serif;
+  margin-left: -10px;
+  border: 2px solid #1B1338;
+}
+
+// MENÚ FLOTANTE
+.options-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+}
+
+.options-menu {
+  position: absolute;
+  top: 100px;
+  right: 16px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  z-index: 100;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+  text-align: left;
+
+  ion-icon { font-size: 18px; color: #1b5e20; }
+}
+
+.loading-state {
+  padding: 40px 0;
+  text-align: center;
+  color: rgba(255,255,255,0.7);
+  font-family: 'Actor', sans-serif;
+}
+
+// NAV DE MES
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 20px;
+
+  button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+
+    ion-icon { font-size: 20px; color: #fff; }
+  }
+
+  .cal-month-label {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    font-family: 'Actor', sans-serif;
+    text-transform: capitalize;
+  }
+}
+
+// DÍAS DE LA SEMANA
+.cal-days-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 0 16px;
+  margin-bottom: 4px;
+
+  span {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.45);
+    padding: 4px 0;
+    font-family: 'Actor', sans-serif;
+  }
+}
+
+// GRID DE DÍAS
+.cal-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 0 16px;
+}
+
+.cal-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 0;
+  cursor: pointer;
+  min-height: 40px;
+  transition: background 0.2s;
+  border-radius: 8px;
+
+  &.empty { cursor: default; }
+  &:active:not(.empty) { background: rgba(255,255,255,0.06); }
+
+  &.today .day-num {
+    background: #FFB84F;
+    color: #1a1a2e;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &.selected:not(.today) .day-num {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.calendar-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  font-family: 'Actor', sans-serif;
+}
+
+.calendar-date-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  font-family: 'Actor', sans-serif;
+  text-transform: capitalize;
+}
+
+.day-num {
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Actor', sans-serif;
+}
+
+.day-dots {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 2px;
+  min-height: 6px;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.more-dots {
+  font-size: 8px;
+  color: rgba(255,255,255,0.6);
+}
+
+// CARD BLANCA DE EVENTOS
+.events-card {
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  margin-top: 20px;
+  flex: 1;
+  padding: 20px 16px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.events-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+  text-transform: capitalize;
+}
+
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.event-card {
+  background: #fff;
+  border: 1px solid #f0f0f5;
+  border-left: 4px solid;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+
+  .event-card-title-row {
+    padding-right: 60px;
+  }
+
+  .event-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+  }
+
+  .event-card-desc {
+    font-size: 12px;
+    color: #666;
+    margin: 0;
+    padding-right: 60px;
+    font-family: 'Actor', sans-serif;
+  }
+
+  .event-card-time {
+    font-size: 12px;
+    font-weight: 600;
+    color: #4037BE;
+    margin: 0;
+    font-family: 'Actor', sans-serif;
+  }
+
+  .event-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 4px;
+
+    .action-btn {
+      border: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      ion-icon { font-size: 13px; color: #fff; }
+
+      &.edit { background: #4037BE; }
+      &.delete { background: #e74c3c; }
+    }
+  }
+}
+
+.empty-events {
+  font-size: 13px;
+  color: #aaa;
+  text-align: center;
+  padding: 30px 0;
+  font-family: 'Actor', sans-serif;
+}
+
+.pets-avatars-row {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.option-item.active {
+  background: #EEF0FF;
+  color: #4037BE;
+
+  ion-icon { color: #4037BE; }
+}
+
+.week-view-card {
+  background: white;
+  border-radius: 24px 24px 0 0;
+  padding: 12px 8px 20px;
+  margin-top: 12px;
+
+  &.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+  }
+}
+
+.week-days-header {
+  display: flex;
+  padding-left: 40px; // deja espacio para la columna de horas
+  margin-bottom: 8px;
+}
+
+.week-day-col {
+  flex: 1;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #333;
+  font-family: 'Actor', sans-serif;
+
+  &.today {
+    color: #4037BE;
+    font-weight: 700;
+  }
+}
+
+.week-scroll {
+  overflow-y: auto;
+  max-height: 500px; // ajusta según espacio disponible en pantalla
+  position: relative;
+}
+
+.week-grid {
+  position: relative;
+  display: flex;
+  padding-left: 40px;
+}
+
+.week-hour-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #EEE;
+
+  .week-hour-label {
+    position: absolute;
+    left: -40px;
+    top: -8px;
+    width: 36px;
+    font-size: 10px;
+    color: #999;
+    text-align: right;
+    font-family: 'Actor', sans-serif;
+  }
+}
+
+.week-day-column {
+  flex: 1;
+  position: relative;
+  border-left: 1px solid #F0F0F0;
+}
+
+.week-event-block {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  border-radius: 6px;
+  padding: 2px 4px;
+  overflow: hidden;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.week-event-title {
+  font-size: 9px;
+  color: white;
+  font-weight: 600;
+  font-family: 'Actor', sans-serif;
+  line-height: 1.2;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

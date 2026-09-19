@@ -1,5 +1,8 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
+import { MedicalHistoryService } from 'src/app/services/MedicalHistoryService/medical-history';
+import { PetService } from 'src/app/services/PetService/pet';
 
 @Component({
   selector: 'app-add-consultation',
@@ -7,10 +10,11 @@ import { Router } from '@angular/router';
   styleUrls: ['./add-consultation.page.scss'],
   standalone: false
 })
-export class AddConsultationPage {
+export class AddConsultationPage implements OnInit {
 
-  petName = 'Juan';
-  petAvatar = 'assets/images/Profile/cat-juan.png';
+  petId: string = '';
+  petName = '';
+  petAvatar: string | null = null;
 
   visitDate = '';
   vet = '';
@@ -20,22 +24,62 @@ export class AddConsultationPage {
   diagnosis = '';
   notes = '';
 
-  constructor(private router: Router) {}
+  saving = false;
 
-  save() {
-    console.log('Guardar consulta:', {
-      visitDate: this.visitDate,
-      vet: this.vet,
-      reason: this.reason,
-      temperature: this.temperature,
-      weight: this.weight,
-      diagnosis: this.diagnosis,
-      notes: this.notes,
-    });
-    // TODO: ConsultationService.create(...)
-    history.back();
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private location: Location,
+    private medicalHistoryService: MedicalHistoryService,
+    private petService: PetService
+  ) {}
+
+  ngOnInit() {
+    this.petId = this.route.snapshot.paramMap.get('petId') || '';
+    if (this.petId) {
+      this.petService.getPetById(this.petId).subscribe({
+        next: (pet) => {
+          this.petName = pet.name;
+          this.petAvatar = pet.imageUrl;
+        },
+        error: (err) => console.error('❌ Error cargando mascota:', err)
+      });
+    }
   }
 
-  cancel() { history.back(); }
-  goBack() { history.back(); }
+  save() {
+    if (this.saving || !this.petId) return;
+    if (!this.visitDate || !this.reason) {
+      alert('Fecha y motivo de la visita son obligatorios.');
+      return;
+    }
+
+    this.saving = true;
+
+    const payload = {
+      petId: this.petId,
+      date: this.visitDate,
+      reason: this.reason,
+      veterinarian: this.vet,
+      diagnosis: this.diagnosis || undefined,
+      notes: this.notes || undefined,
+      weight: this.weight ? parseFloat(this.weight) : undefined,
+      temperature: this.temperature ? parseFloat(this.temperature) : undefined,
+    };
+
+    this.medicalHistoryService.createVisit(payload).subscribe({
+      next: () => {
+        this.saving = false;
+        this.router.navigate(['/medical-history', this.petId]);
+      },
+      error: (err) => {
+        this.saving = false;
+        console.error('❌ Error guardando consulta:', err);
+        alert('No se pudo guardar la consulta. Intenta de nuevo.');
+      }
+    });
+  }
+
+  cancel() { this.location.back(); }
+  goBack() { this.location.back(); }
 }

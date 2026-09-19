@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
+import { MedicalHistoryService } from 'src/app/services/MedicalHistoryService/medical-history';
+import { PetService } from 'src/app/services/PetService/pet';
+import { Visit, SurgeryStatus, SurgeryOutcome } from 'src/app/models/medical-history.model';
 
-type SurgeryStatus = 'completed' | 'recovery' | 'scheduled';
 type OutcomeType = 'successful' | 'partial' | 'complicated';
 type ComplicationType = 'none' | 'bleeding' | 'reaction' | 'other';
 
@@ -11,10 +14,14 @@ type ComplicationType = 'none' | 'bleeding' | 'reaction' | 'other';
   styleUrls: ['./add-surgery.page.scss'],
   standalone: false
 })
-export class AddSurgeryPage {
+export class AddSurgeryPage implements OnInit {
 
-  petName = 'Juan';
-  petAvatar = 'assets/images/Profile/cat-juan.png';
+  petId: string = '';
+  petName = '';
+  petAvatar: string | null = null;
+
+  visits: Visit[] = [];
+  selectedVisitId: string = '';
 
   currentStep = 1;
   totalSteps = 4;
@@ -24,21 +31,20 @@ export class AddSurgeryPage {
   description = '';
   surgeryDate = '';
   durationMinutes: number | null = null;
-  vet = '';
   anesthesia = '';
 
-  // Step 2 - Procedimiento
+  // Step 2 - Procedimiento (solo UI local, no se envía al backend todavía)
   complication: ComplicationType = 'none';
   complicationDetail = '';
 
   // Step 3 - Recuperación
-  outcome: OutcomeType = 'successful';
-  outcomeDetail = '';
   postOpInstructions = '';
-  nextCheckupDate = '';
 
   // Step 4 - Estado
-  status: SurgeryStatus = 'completed';
+  status: SurgeryStatus = 'SCHEDULED';
+  outcome: OutcomeType = 'successful';
+
+  saving = false;
 
   stepTitles = ['Info', 'Proced.', 'Recup.', 'Estado'];
 
@@ -56,33 +62,52 @@ export class AddSurgeryPage {
     { key: 'other',     label: 'Otra' },
   ];
 
-  outcomeOptions: { key: OutcomeType; label: string }[] = [
-    { key: 'successful',  label: 'Exitosa' },
-    { key: 'partial',     label: 'Parcial' },
-    { key: 'complicated', label: 'Con compl.' },
-  ];
-
   statusOptions: { key: SurgeryStatus; label: string }[] = [
-    { key: 'completed', label: 'Completada' },
-    { key: 'recovery',  label: 'En recuperación' },
-    { key: 'scheduled', label: 'Programada' },
+    { key: 'SCHEDULED',   label: 'Programada' },
+    { key: 'IN_PROGRESS', label: 'En progreso' },
+    { key: 'COMPLETED',   label: 'Completada' },
+    { key: 'CANCELLED',   label: 'Cancelada' },
   ];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private location: Location,
+    private medicalHistoryService: MedicalHistoryService,
+    private petService: PetService
+  ) {}
+
+  ngOnInit() {
+    this.petId = this.route.snapshot.paramMap.get('petId') || '';
+    if (!this.petId) return;
+
+    this.petService.getPetById(this.petId).subscribe({
+      next: (pet) => {
+        this.petName = pet.name;
+        this.petAvatar = pet.imageUrl;
+      },
+      error: (err) => console.error('❌ Error cargando mascota:', err)
+    });
+
+    this.medicalHistoryService.getVisitsByPet(this.petId).subscribe({
+      next: (visits) => {
+        this.visits = visits;
+        if (visits.length > 0) {
+          this.selectedVisitId = visits[0].id;
+        }
+      },
+      error: (err) => console.error('❌ Error cargando visitas:', err)
+    });
+  }
 
   goNext() { if (this.currentStep < this.totalSteps) this.currentStep++; }
   goPrev() { if (this.currentStep > 1) this.currentStep--; }
 
   setComplication(c: ComplicationType) { this.complication = c; }
-  setOutcome(o: OutcomeType) { this.outcome = o; }
   setStatus(s: SurgeryStatus) { this.status = s; }
 
   get progressPercent(): number {
     return ((this.currentStep - 1) / (this.totalSteps - 1)) * 100;
-  }
-
-  get outcomeLabel(): string {
-    return this.outcomeOptions.find(o => o.key === this.outcome)?.label || '';
   }
 
   get statusLabel(): string {
@@ -90,28 +115,47 @@ export class AddSurgeryPage {
   }
 
   save() {
-    console.log('Guardar cirugía:', {
+    if (this.saving) return;
+    if (!this.selectedVisitId) {
+      alert('Selecciona a qué consulta pertenece esta cirugía.');
+      return;
+    }
+    if (!this.title || !this.surgeryDate) {
+      alert('Título y fecha de cirugía son obligatorios.');
+      return;
+    }
+
+    this.saving = true;
+
+    const payload = {
+      petId: this.petId,
+      veterinaryVisitId: this.selectedVisitId,
       title: this.title,
       description: this.description,
       surgeryDate: this.surgeryDate,
-      durationMinutes: this.durationMinutes,
-      vet: this.vet,
-      anesthesia: this.anesthesia,
-      complication: this.complication,
-      complicationDetail: this.complicationDetail,
-      outcome: this.outcome,
-      outcomeDetail: this.outcomeDetail,
+      durationMinutes: this.durationMinutes ?? 0,
+      anesthesiaUsed: this.anesthesia,
       postOpInstructions: this.postOpInstructions,
-      nextCheckupDate: this.nextCheckupDate,
-      status: this.status,
+    };
+
+    this.medicalHistoryService.createSurgery(payload).subscribe({
+      next: () => {
+        this.saving = false;
+        this.router.navigate(['/medical-history', this.petId], { queryParams: { tab: 'cirugias' } });
+      },
+      error: (err) => {
+        this.saving = false;
+        console.error('❌ Error guardando cirugía:', err);
+        alert('No se pudo guardar la cirugía. Intenta de nuevo.');
+      }
     });
-    // TODO: SurgeryService.create(...)
-    history.back();
   }
 
-  cancel() { history.back(); }
+  cancel() { this.location.back(); }
   goBack() {
     if (this.currentStep > 1) this.goPrev();
-    else history.back();
+    else this.location.back();
   }
+
+  
 }

@@ -1,0 +1,210 @@
+<ion-content [fullscreen]="true" class="add-event-content">
+  <div class="add-event-wrap">
+
+    <!-- HEADER -->
+    <div class="event-header">
+      <button class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <h1 class="event-title">{{ isEditMode ? 'Editar evento' : 'Agregar evento' }}</h1>
+      <img [src]="userAvatar" alt="" class="user-avatar" />
+    </div>
+
+    <!-- MASCOTA -->
+    <div class="mascota-section">
+      <span class="section-label">Mascota</span>
+
+      <!-- Modo múltiple: selector de mascota (calendario del usuario) -->
+      <div class="pet-chip-row" *ngIf="mode === 'multi'">
+        <div class="pet-chip selectable"
+          *ngFor="let pet of pets"
+          [class.selected]="pet.id === selectedPetId"
+          (click)="selectPet(pet)">
+          <div class="chip-avatar-wrap" [style.background-color]="!pet.imageUrl ? getSexColor(pet.sex) : null">
+            <img *ngIf="pet.imageUrl" [src]="pet.imageUrl" alt="" />
+            <span *ngIf="!pet.imageUrl" class="chip-fallback">{{ getPetIconFallback(pet.species) }}</span>
+          </div>
+          <span class="chip-name">{{ pet.name }}</span>
+          <ion-icon *ngIf="pet.id === selectedPetId" name="checkmark-circle" class="chip-check"></ion-icon>
+        </div>
+        <p class="empty-pets" *ngIf="pets.length === 0">No tienes mascotas registradas.</p>
+      </div>
+
+      <!-- Modo único: chip fijo (calendario de la mascota) -->
+      <div class="pet-chip fixed" *ngIf="mode === 'single' && selectedPet">
+        <div class="chip-avatar-wrap" [style.background-color]="!selectedPet.imageUrl ? getSexColor(selectedPet.sex) : null">
+          <img *ngIf="selectedPet.imageUrl" [src]="selectedPet.imageUrl" alt="" />
+          <span *ngIf="!selectedPet.imageUrl" class="chip-fallback">{{ getPetIconFallback(selectedPet.species) }}</span>
+        </div>
+        <span class="chip-name">{{ selectedPet.name }}<ng-container *ngIf="selectedPet.breed"> - {{ selectedPet.breed }}</ng-container></span>
+      </div>
+    </div>
+
+    <!-- CARD BLANCA -->
+    <div class="event-card">
+
+      <div class="loading-state" *ngIf="loading">
+        <p>Cargando evento...</p>
+      </div>
+
+      <ng-container *ngIf="!loading">
+
+        <!-- ACTIVIDAD -->
+        <div class="field">
+          <label class="field-label">
+            <ion-icon name="create-outline" class="edit-icon"></ion-icon>
+            Actividad
+          </label>
+          <div class="activity-row">
+            <button type="button" class="activity-btn"
+              *ngFor="let opt of activityOptions"
+              [class.active]="opt.type === selectedType"
+              (click)="selectType(opt.type)">
+              <ion-icon [name]="opt.icon"></ion-icon>
+              <span>{{ opt.label }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- TITULO -->
+        <div class="field">
+          <label class="field-label">
+            <ion-icon name="create-outline" class="edit-icon"></ion-icon>
+            Título
+            <ion-icon *ngIf="title.trim()" name="checkmark-circle" class="valid-check"></ion-icon>
+          </label>
+          <div class="input-wrap">
+            <input class="field-input" type="text" placeholder="Ej. Cita control Milo" [(ngModel)]="title" name="title" />
+          </div>
+        </div>
+
+        <!-- DESCRIPCIÓN -->
+        <div class="field">
+          <label class="field-label">
+            <ion-icon name="create-outline" class="edit-icon"></ion-icon>
+            Descripción
+            <ion-icon *ngIf="description.trim()" name="checkmark-circle" class="valid-check"></ion-icon>
+          </label>
+          <div class="textarea-wrap">
+            <textarea class="field-textarea" rows="2" placeholder="Detalles del evento" [(ngModel)]="description" name="description"></textarea>
+          </div>
+        </div>
+
+        <!-- FECHA / HORAS -->
+<div class="field">
+  <label class="field-label">
+    <ion-icon name="create-outline" class="edit-icon"></ion-icon>
+    Fecha y hora
+  </label>
+  <div class="date-time-row">
+    <button type="button" class="input-wrap date-wrap picker-trigger" (click)="openDatePicker()">
+      <img src="assets/images/AddVaccine/CalendarioIcon.png" alt="" class="field-img-icon orange" />
+      <span class="picker-value" [class.placeholder]="!date">{{ date ? formatDateDisplay(date) : 'Fecha' }}</span>
+      <ion-icon *ngIf="date" name="checkmark-circle" class="valid-check inline"></ion-icon>
+    </button>
+
+    <button type="button" class="input-wrap time-wrap picker-trigger" (click)="openStartTimePicker()">
+      <ion-icon name="time-outline" class="time-icon"></ion-icon>
+      <span class="picker-value" [class.placeholder]="!startTime">{{ startTime ? formatTimeDisplay(startTime) : 'Inicio' }}</span>
+      <ion-icon *ngIf="startTime" name="checkmark-circle" class="valid-check inline"></ion-icon>
+    </button>
+
+    <button type="button" class="input-wrap time-wrap picker-trigger" (click)="openEndTimePicker()">
+      <ion-icon name="time-outline" class="time-icon"></ion-icon>
+      <span class="picker-value" [class.placeholder]="!endTime">{{ endTime ? formatTimeDisplay(endTime) : 'Fin' }}</span>
+      <ion-icon *ngIf="endTime" name="checkmark-circle" class="valid-check inline"></ion-icon>
+    </button>
+  </div>
+</div>
+
+<!-- MODAL: SELECTOR DE FECHA -->
+<ion-modal [isOpen]="showDatePicker" (didDismiss)="showDatePicker = false" class="datetime-modal">
+  <ng-template>
+      <ion-datetime
+        presentation="date"
+        [value]="dateTimeValue"
+        (ionChange)="onDateConfirm($event.detail.value)"
+        locale="es-ES"
+        [showDefaultButtons]="true"
+        doneText="Listo"
+        cancelText="Cancelar"
+        (ionCancel)="showDatePicker = false">
+      </ion-datetime>
+  </ng-template>
+</ion-modal>
+
+<!-- MODAL: SELECTOR DE HORA INICIO -->
+<ion-modal [isOpen]="showStartTimePicker" (didDismiss)="showStartTimePicker = false" class="datetime-modal">
+  <ng-template>
+  
+      <ion-datetime
+        presentation="time"
+        [value]="startTimeValue"
+        (ionChange)="onStartTimeConfirm($event.detail.value)"
+        locale="es-ES"
+        [showDefaultButtons]="true"
+        doneText="Listo"
+        cancelText="Cancelar"
+        (ionCancel)="showStartTimePicker = false">
+      </ion-datetime>
+
+  </ng-template>
+</ion-modal>
+
+<!-- MODAL: SELECTOR DE HORA FIN -->
+<ion-modal [isOpen]="showEndTimePicker" (didDismiss)="showEndTimePicker = false" class="datetime-modal">
+  <ng-template>
+      <ion-datetime
+        presentation="time"
+        [value]="endTimeValue"
+        (ionChange)="onEndTimeConfirm($event.detail.value)"
+        locale="es-ES"
+        [showDefaultButtons]="true"
+        doneText="Listo"
+        cancelText="Cancelar"
+        (ionCancel)="showEndTimePicker = false">
+      </ion-datetime>
+  </ng-template>
+</ion-modal>
+
+        <!-- LUGAR -->
+        <div class="field">
+          <label class="field-label">
+            <ion-icon name="create-outline" class="edit-icon"></ion-icon>
+            Lugar (opcional)
+          </label>
+          <div class="input-wrap">
+            <ion-icon name="location-outline" class="time-icon"></ion-icon>
+            <input class="field-input" type="text" placeholder="Ej. Dr.pet" [(ngModel)]="location" name="location" />
+          </div>
+        </div>
+
+        <!-- RECORDATORIO -->
+        <div class="reminder-card">
+          <ion-icon name="notifications-outline" class="reminder-icon"></ion-icon>
+          <div class="reminder-info">
+            <span class="reminder-title">1 día antes</span>
+            <span class="reminder-sub" *ngIf="reminderPreviewLabel">{{ reminderPreviewLabel }}</span>
+          </div>
+          <ion-icon
+            [name]="reminderEnabled ? 'toggle' : 'toggle-outline'"
+            class="toggle-icon"
+            [class.active]="reminderEnabled"
+            (click)="reminderEnabled = !reminderEnabled">
+          </ion-icon>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="event-footer">
+          <button class="btn-primary" [disabled]="saving || !canSave" (click)="save()">
+            {{ saving ? 'Guardando...' : (isEditMode ? 'Guardar cambios' : 'Guardar evento') }}
+          </button>
+          <button class="btn-secondary" (click)="goBack()">Cancelar</button>
+        </div>
+
+      </ng-container>
+
+    </div>
+
+  </div>
+</ion-content>

@@ -9,7 +9,10 @@
       <div class="event-dot" [style.background]="getTypeColor(event.type)"></div>
       <div class="event-info">
         <p class="event-title">{{ event.title }}</p>
-        <p class="event-date">{{ event.date | date:'d MMM · h:mm a' }}</p>
+        <p class="event-date">
+          {{ event.date | date:'d MMM' }} ·
+          {{ event.date | date:'h:mm a' }}<ng-container *ngIf="event.endDate"> - {{ event.endDate | date:'h:mm a' }}</ng-container>
+        </p>
       </div>
       <ion-icon [name]="getTypeIcon(event.type)" [style.color]="getTypeColor(event.type)"></ion-icon>
     </div>

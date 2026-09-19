@@ -53,6 +53,22 @@ export class SharedProfilesHomePage implements OnInit {
   }
   
 
+  formatAge(ageMonths: number | null | undefined, birthDate: string | undefined): string {
+  if (ageMonths !== null && ageMonths !== undefined) {
+    if (ageMonths < 12) return `${ageMonths} meses`;
+    const years = Math.floor(ageMonths / 12);
+    const months = ageMonths % 12;
+    return months > 0 ? `${years} años ${months} meses` : `${years} años`;
+  }
+  if (birthDate) {
+    const birth = new Date(birthDate);
+    const now = new Date();
+    const months = (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
+    return months < 12 ? `${months} meses` : `${Math.floor(months / 12)} años`;
+  }
+  return '—';
+}
+
   getPetIconFallback(species: string | undefined): string {
   const speciesMap: { [key: string]: string } = {
     'perro': '🐶',

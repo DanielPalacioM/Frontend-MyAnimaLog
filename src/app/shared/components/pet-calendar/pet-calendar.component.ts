@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { EventType, EVENT_TYPE_DEFAULTS } from 'src/app/models/calendar-event.model'; // 👈 ÚNICO cambio 1: import correcto
 
 export interface CalendarEvent {
   id: string;
@@ -6,9 +7,10 @@ export interface CalendarEvent {
   description?: string;
   date: string;
   time: string;
-  type: string;
+  endTime?: string;   // ⬅️ NUEVO
+  type: EventType;
   color: string;
-  intervalHours?: number; // NUEVO: para calcular próxima dosis (ej: 8 = cada 8 horas)
+  intervalHours?: number;
 }
 
 @Component({
@@ -145,15 +147,9 @@ export class PetCalendarComponent implements OnInit {
 
   get totalEventsThisMonth(): number { return this.monthEvents.length; }
 
-  // NUEVO: ícono según tipo de evento
-  getTypeIcon(type: string): string {
-    const icons: Record<string, string> = {
-      medicine: 'medical-outline',
-      vet:      'paw-outline',
-      vaccine:  'shield-checkmark-outline',
-      other:    'calendar-outline'
-    };
-    return icons[type] || 'calendar-outline';
+  // ÚNICO cambio 2: usa el enum real en vez del mapa hardcodeado con claves que nunca coincidían
+  getTypeIcon(type: EventType): string {
+    return EVENT_TYPE_DEFAULTS[type]?.icon || 'calendar-outline';
   }
 
   // NUEVO: emite evento para navegar a crear evento
@@ -163,47 +159,45 @@ export class PetCalendarComponent implements OnInit {
   onDelete(event: CalendarEvent, ev: Event) { ev.stopPropagation(); this.deleteEvent.emit(event); }
 
   // Modal
-selectedEvent: CalendarEvent | null = null;
+  selectedEvent: CalendarEvent | null = null;
 
-openEventModal(ev: CalendarEvent) {
-  this.selectedEvent = ev;
-}
-
-closeEventModal() {
-  this.selectedEvent = null;
-}
-
-// Calcula próxima dosis sumando intervalHours a la hora del evento
-getNextDose(ev: CalendarEvent): string {
-  if (!ev.intervalHours) return '';
-  const [h, m] = ev.time.split(':').map(Number);
-  const base = new Date();
-  base.setHours(h, m, 0, 0);
-  base.setHours(base.getHours() + ev.intervalHours);
-  const hh = String(base.getHours()).padStart(2, '0');
-  const mm = String(base.getMinutes()).padStart(2, '0');
-  return `${hh}:${mm}`;
-}
-
-formatDisplayDate(dateStr: string): string {
-  const [y, m, d] = dateStr.split('-').map(Number);
-  const date = new Date(y, m - 1, d);
-  return date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-}
-
-// Eventos del mes agrupados por fecha para la vista "todos"
-get groupedMonthEvents(): { label: string; events: CalendarEvent[] }[] {
-  const map = new Map<string, CalendarEvent[]>();
-  for (const ev of this.monthEvents) {
-    if (!map.has(ev.date)) map.set(ev.date, []);
-    map.get(ev.date)!.push(ev);
+  openEventModal(ev: CalendarEvent) {
+    this.selectedEvent = ev;
   }
-  return Array.from(map.entries()).map(([date, events]) => ({
-    label: this.formatDisplayDate(date),
-    events
-  }));
-}
 
+  closeEventModal() {
+    this.selectedEvent = null;
+  }
 
+  // Calcula próxima dosis sumando intervalHours a la hora del evento
+  getNextDose(ev: CalendarEvent): string {
+    if (!ev.intervalHours) return '';
+    const [h, m] = ev.time.split(':').map(Number);
+    const base = new Date();
+    base.setHours(h, m, 0, 0);
+    base.setHours(base.getHours() + ev.intervalHours);
+    const hh = String(base.getHours()).padStart(2, '0');
+    const mm = String(base.getMinutes()).padStart(2, '0');
+    return `${hh}:${mm}`;
+  }
+
+  formatDisplayDate(dateStr: string): string {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    return date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  // Eventos del mes agrupados por fecha para la vista "todos"
+  get groupedMonthEvents(): { label: string; events: CalendarEvent[] }[] {
+    const map = new Map<string, CalendarEvent[]>();
+    for (const ev of this.monthEvents) {
+      if (!map.has(ev.date)) map.set(ev.date, []);
+      map.get(ev.date)!.push(ev);
+    }
+    return Array.from(map.entries()).map(([date, events]) => ({
+      label: this.formatDisplayDate(date),
+      events
+    }));
+  }
 
 }

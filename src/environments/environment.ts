@@ -4,9 +4,8 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'https://giant-donkeys-marry.loca.lt/api'
-
-
+  apiUrl: 'https://pets-api-gateway-20369076707.us-central1.run.app/api',
+  
 };
 
 /*

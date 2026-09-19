@@ -5,8 +5,14 @@ import { ProfileService } from 'src/app/services/ProfileService/profile';
 
 import { MedicalHistorySection, MedicalHistorySummary } from '../../shared/components/medical-history-card/medical-history-card.component';
 import { VaccineSummary } from '../../shared/components/vaccine-card/vaccine-card.component';
-import { CalendarEvent } from '../../shared/components/pet-calendar/pet-calendar.component';
-import { PetDocument } from '../../shared/components/documents-section/documents-section.component';
+import { CalendarEvent as PetCalendarEvent } from '../../shared/components/pet-calendar/pet-calendar.component';
+import { CalendarEvent as BackendCalendarEvent } from 'src/app/models/calendar-event.model';
+import { EVENT_TYPE_DEFAULTS } from 'src/app/models/calendar-event-options';
+import { PetDocument } from 'src/app/models/pet-document.model';
+import { MedicalHistoryService } from '../../services/MedicalHistoryService/medical-history';
+import { VaccineService } from '../../services/VaccineService/vaccine/vaccine';
+import { DocumentService } from 'src/app/services/DocumentService/document-service/document-service';
+import { CalendarService } from 'src/app/services/CalendarService/calendar';
 
 interface PetStats {
   age: string;
@@ -31,7 +37,6 @@ export class PetProfilePage implements OnInit {
 
   pet: PetModel | null = null;
 
-  // Usuario logueado, para el sidebar
   userName = '';
   userEmail = '';
   userAvatar = 'assets/images/default-avatar.png';
@@ -43,7 +48,6 @@ export class PetProfilePage implements OnInit {
     height: 'No registrado',
   };
 
-  // TODO: reemplazar por datos reales cuando exista el servicio de historial médico
   historyItems: MedicalHistorySummary[] = [
     { section: 'visits',     label: 'Visitas veterinarias', count: 0, icon: 'assets/images/PetProfiile/VisitasVeterinariasIcon.png' },
     { section: 'treatments', label: 'Tratamientos',         count: 0, icon: 'assets/images/PetProfiile/TratamientosIcon.png' },
@@ -51,18 +55,21 @@ export class PetProfilePage implements OnInit {
     { section: 'surgeries',  label: 'Cirugías',             count: 0, icon: 'assets/images/PetProfiile/CirugiasIcon.png' },
   ];
 
-  // TODO: reemplazar por datos reales cuando exista el servicio de vacunas
-  vaccineSummary: VaccineSummary | null = null; // null = "no hay vacunas registradas"
+  vaccineSummary: VaccineSummary | null = null;
 
-  calendarEvents: CalendarEvent[] = []; // TODO: cargar desde servicio de calendario cuando exista
+  calendarEvents: PetCalendarEvent[] = [];
 
-  documents: PetDocument[] = []; // TODO: cargar desde servicio de documentos cuando exista
+  documents: PetDocument[] = [];
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private petService: PetService,
-    private profileService: ProfileService
+    private profileService: ProfileService,
+    private medicalHistoryService: MedicalHistoryService,
+    private vaccineService: VaccineService,
+    private documentService: DocumentService,
+    private calendarService: CalendarService
   ) {}
 
   ngOnInit(): void {
@@ -78,12 +85,12 @@ export class PetProfilePage implements OnInit {
   }
 
   ionViewWillEnter() {
-  const petId = this.route.snapshot.paramMap.get('id');
-  if (petId) {
-    this.loadPet(petId);
+    const petId = this.route.snapshot.paramMap.get('id');
+    if (petId) {
+      this.loadPet(petId);
+    }
+    this.loadUserData();
   }
-  this.loadUserData();
-}
 
   private loadUserData(): void {
     this.profileService.getProfile().subscribe({
@@ -107,6 +114,10 @@ export class PetProfilePage implements OnInit {
         this.pet = pet;
         this.petStats = this.buildStats(pet);
         this.loading = false;
+        this.loadMedicalHistoryCounts(id);
+        this.loadVaccineSummary(id);
+        this.loadDocuments(id);
+        this.loadCalendarEvents(id);
       },
       error: (err) => {
         console.error('❌ Error cargando mascota:', err);
@@ -116,11 +127,167 @@ export class PetProfilePage implements OnInit {
     });
   }
 
+  private loadDocuments(petId: string): void {
+    this.documentService.getDocumentsByPet(petId).subscribe({
+      next: (docs) => this.documents = docs,
+      error: (err) => console.error('❌ Error cargando documentos:', err)
+    });
+  }
+
+  private loadCalendarEvents(petId: string): void {
+    this.calendarService.getAllUserEvents().subscribe({
+      next: (events) => {
+        this.calendarEvents = events
+          .filter(e => e.pet_id === petId)
+          .map(e => this.mapToPetCalendarEvent(e));
+      },
+      error: (err) => console.error('❌ Error cargando eventos:', err)
+    });
+  }
+
+  private ensureUtc(dateStr: string): string {
+  // Si ya trae 'Z' o un offset explícito (+hh:mm / -hh:mm), se deja igual.
+  if (/[Zz]$/.test(dateStr) || /[+-]\d{2}:\d{2}$/.test(dateStr)) {
+    return dateStr;
+  }
+  return dateStr + 'Z';
+}
+
+  private mapToPetCalendarEvent(e: BackendCalendarEvent): PetCalendarEvent {
+  const start = new Date(this.ensureUtc(e.start_date));
+  const date = this.toLocalDateString(start);
+  const time = this.toLocalTimeString(start);
+
+  let endTime: string | undefined;
+  if (e.end_date) {
+    const end = new Date(this.ensureUtc(e.end_date));
+    endTime = this.toLocalTimeString(end);
+  }
+
+  return {
+    id: e.id,
+    title: e.title,
+    description: e.description,
+    date: date,
+    time: time,
+    endTime: endTime,
+    type: e.event_type,
+    color: e.color || EVENT_TYPE_DEFAULTS[e.event_type]?.color || '#4037BE',
+  };
+}
+
+private toLocalDateString(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+private toLocalTimeString(d: Date): string {
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  return `${hh}:${mm}`;
+}
+
+  private loadVaccineSummary(petId: string): void {
+    this.vaccineService.getVaccinesByPet(petId).subscribe({
+      next: (vaccines) => {
+        if (vaccines.length === 0) {
+          this.vaccineSummary = null;
+          return;
+        }
+
+        const today = new Date();
+        const applied = vaccines.filter(v => new Date(v.applicationDate) <= today);
+
+        const upcoming = vaccines
+          .filter(v => v.nextDoseDate && new Date(v.nextDoseDate) >= today)
+          .sort((a, b) => new Date(a.nextDoseDate!).getTime() - new Date(b.nextDoseDate!).getTime());
+
+        const next = upcoming[0] || null;
+        const nextDate = next?.nextDoseDate ? new Date(next.nextDoseDate) : null;
+        const daysUntil = nextDate
+          ? Math.ceil((nextDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+          : null;
+
+        this.vaccineSummary = {
+          appliedCount: applied.length,
+          totalCount: vaccines.length,
+          nextVaccineName: next?.name || null,
+          nextVaccineDate: nextDate,
+          daysUntilNext: daysUntil,
+        };
+      },
+      error: (err) => {
+        console.error('❌ Error cargando vacunas:', err);
+        this.vaccineSummary = null;
+      }
+    });
+  }
+
+  private loadMedicalHistoryCounts(petId: string): void {
+    this.medicalHistoryService.getVisitsByPet(petId).subscribe({
+      next: (visits) => {
+        this.setCount('visits', visits.length);
+
+        if (visits.length === 0) {
+          this.setCount('treatments', 0);
+          this.setCount('lab', 0);
+          return;
+        }
+
+        let treatmentsFound = 0;
+        let labsFound = 0;
+        let completed = 0;
+        const total = visits.length * 2;
+
+        const checkDone = () => {
+          completed++;
+          if (completed === total) {
+            this.setCount('treatments', treatmentsFound);
+            this.setCount('lab', labsFound);
+          }
+        };
+
+        visits.forEach((visit) => {
+          this.medicalHistoryService.getTreatmentForVisit(visit.id).subscribe({
+            next: (treatment) => {
+              if (treatment) treatmentsFound++;
+              checkDone();
+            },
+            error: () => checkDone()
+          });
+
+          this.medicalHistoryService.getLabResultsByVisit(visit.id).subscribe({
+            next: (labs) => {
+              labsFound += labs.length;
+              checkDone();
+            },
+            error: () => checkDone()
+          });
+        });
+      },
+      error: (err) => console.error('❌ Error contando visitas:', err)
+    });
+
+    this.medicalHistoryService.getSurgeriesByPet(petId).subscribe({
+      next: (surgeries) => this.setCount('surgeries', surgeries.length),
+      error: (err) => console.error('❌ Error contando cirugías:', err)
+    });
+  }
+
+  private setCount(section: MedicalHistorySection, count: number): void {
+    const item = this.historyItems.find(h => h.section === section);
+    if (item) item.count = count;
+  }
+
   private buildStats(pet: PetModel): PetStats {
     return {
       age: this.formatAge(pet.ageMonths, pet.birthDate),
-      weight: pet.weight != null ? `${pet.weight} kg` : 'No registrado',      gender: pet.sex || '—',
-      height: pet.height != null ? `${pet.height} cm` : 'No registrado',    };
+      weight: pet.weight != null ? `${pet.weight} kg` : 'No registrado',
+      gender: pet.sex || '—',
+      height: pet.height != null ? `${pet.height} cm` : 'No registrado',
+    };
   }
 
   private formatAge(ageMonths: number | null, birthDate: string): string {
@@ -139,7 +306,6 @@ export class PetProfilePage implements OnInit {
     return '—';
   }
 
-  // ── Fallback de ícono/color por especie y sexo (igual que en Home) ──
   getPetIconFallback(species: string | undefined): string {
     const speciesMap: { [key: string]: string } = {
       'perro': '🐶',
@@ -157,12 +323,11 @@ export class PetProfilePage implements OnInit {
 
   getSexColor(sex: string | undefined): string {
     const s = (sex || '').toLowerCase().trim();
-    if (s === 'macho' || s === 'male') return '#4A90E2'; // azul
-    if (s === 'hembra' || s === 'female') return '#FF8FB1'; // rosa
-    return '#CCCCCC'; // neutro si no hay dato
+    if (s === 'macho' || s === 'male') return '#4A90E2';
+    if (s === 'hembra' || s === 'female') return '#FF8FB1';
+    return '#CCCCCC';
   }
 
-  // ── Sidebar ──
   toggleSidebar(): void { this.sidebarOpen = !this.sidebarOpen; }
   closeSidebar(): void  { this.sidebarOpen = false; }
 
@@ -179,7 +344,7 @@ export class PetProfilePage implements OnInit {
   onFiltrarVacunas(): void {
     this.closeSidebar();
     if (!this.pet) return;
-    this.router.navigate(['/pets', this.pet.id, 'vaccines'], { queryParams: { filter: true } });
+    this.router.navigate(['/vaccine-timeline'], { queryParams: { petId: this.pet.id, filter: true } });
   }
 
   onPersonasAcceso(): void {
@@ -191,7 +356,7 @@ export class PetProfilePage implements OnInit {
   onAgendarCita(): void {
     this.closeSidebar();
     if (!this.pet) return;
-    this.router.navigate(['/calendar/add'], { queryParams: { petId: this.pet.id } });
+    this.router.navigate(['/calendar/add-event'], { queryParams: { petId: this.pet.id } });
   }
 
   onEditarInfo(): void {
@@ -218,42 +383,52 @@ export class PetProfilePage implements OnInit {
     });
   }
 
-  // ── Historial médico ──
   onHistorySection(section: MedicalHistorySection): void {
     if (!this.pet) return;
-    this.router.navigate(['/pets', this.pet.id, 'medical-history', section]);
+    this.router.navigate(['/medical-history', this.pet.id], { queryParams: { tab: section } });
   }
 
   goToMedicalHistory(): void {
     if (!this.pet) return;
-    this.router.navigate(['/pets', this.pet.id, 'medical-history']);
+    this.router.navigate(['/medical-history', this.pet.id]);
   }
 
-  // ── Vacunas ──
+  goToRegisterVaccine(): void {
+    if (!this.pet) return;
+    this.router.navigate(['/register-vaccine'], { queryParams: { petId: this.pet.id } });
+  }
+
   goToVaccineLine(): void {
     if (!this.pet) return;
-    this.router.navigate(['/pets', this.pet.id, 'vaccines']);
+    this.router.navigate(['/vaccine-timeline'], { queryParams: { petId: this.pet.id } });
   }
 
-  // ── Calendario ──
   onDateSelected(date: string): void {
     this.selectedDate = date;
   }
 
-  onEditEvent(event: CalendarEvent): void {
-    this.router.navigate(['/calendar', event.id, 'edit']);
+  onEditEvent(event: PetCalendarEvent): void {
+    this.router.navigate(['/calendar/add-event'], {
+      queryParams: { eventId: event.id, petId: this.pet?.id }
+    });
   }
 
-  onDeleteEvent(event: CalendarEvent): void {
-    this.calendarEvents = this.calendarEvents.filter(e => e.id !== event.id);
+  onDeleteEvent(event: PetCalendarEvent): void {
+    this.calendarService.deleteEvent(event.id).subscribe({
+      next: () => {
+        this.calendarEvents = this.calendarEvents.filter(e => e.id !== event.id);
+      },
+      error: (err) => console.error('❌ Error eliminando evento:', err)
+    });
   }
 
   onAddCalendarEvent(): void {
     if (!this.pet) return;
-    this.router.navigate(['/calendar/add'], { queryParams: { petId: this.pet.id } });
+    this.router.navigate(['/calendar/add-event'], {
+      queryParams: { petId: this.pet.id }
+    });
   }
 
-  // ── Documentos ──
   goToAllDocuments(): void {
     if (!this.pet) return;
     this.router.navigate(['/pets', this.pet.id, 'documents']);
@@ -267,4 +442,6 @@ export class PetProfilePage implements OnInit {
   onDocClick(doc: PetDocument): void {
     console.log('doc clicked', doc);
   }
+  
+ 
 }

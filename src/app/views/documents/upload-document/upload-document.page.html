@@ -1,0 +1,83 @@
+<ion-content [fullscreen]="true" class="ud-content">
+  <div class="ud-wrap">
+
+    <div class="ud-header">
+      <button class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <h1 class="ud-title">Historial médico</h1>
+    </div>
+
+    <div class="pet-chip">
+      <img *ngIf="petAvatar && !imageLoadFailed" [src]="petAvatar" alt="" class="pet-av" (error)="onImageError()" />
+      <div *ngIf="!petAvatar || imageLoadFailed" class="pet-av pet-av-fallback" [style.background]="getSexColor(petSex)">
+        {{ getPetIconFallback(petSpecies) }}
+      </div>
+      <span class="pet-nm">{{ petName }}</span>
+    </div>
+
+    <div class="ud-card">
+
+      <div class="field">
+        <label class="field-label">Tipo de documento</label>
+        <div class="type-grid">
+          <button class="type-chip" *ngFor="let t of typeOptions" [class.active]="selectedType === t.key" (click)="selectType(t.key)">
+            <ion-icon [name]="t.icon"></ion-icon> {{ t.label }}
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Archivo</label>
+
+        <div class="file-preview" *ngIf="selectedFile">
+          <div class="file-icon" [class.pdf]="isPdfSelected()">
+            <ion-icon [name]="isPdfSelected() ? 'document-text-outline' : 'image-outline'"></ion-icon>
+          </div>
+          <div class="file-info">
+            <span class="file-name">{{ fileName }}</span>
+            <span class="file-size">{{ fileSizeLabel }} - {{ isPdfSelected() ? 'PDF' : 'Imagen' }}</span>
+          </div>
+          <button class="file-remove" (click)="removeFile()"><ion-icon name="close-outline"></ion-icon></button>
+        </div>
+
+        <div class="file-picker-row">
+          <label class="file-picker-btn">
+            <ion-icon name="camera-outline"></ion-icon> Foto
+            <input type="file" accept="image/*" capture="environment" class="file-input-hidden" (change)="onFileSelected($event, 'foto')" />
+          </label>
+          <label class="file-picker-btn">
+            <ion-icon name="images-outline"></ion-icon> Galería
+            <input type="file" accept="image/*" class="file-input-hidden" (change)="onFileSelected($event, 'galeria')" />
+          </label>
+          <label class="file-picker-btn">
+            <ion-icon name="document-outline"></ion-icon> PDF
+            <input type="file" accept="application/pdf" class="file-input-hidden" (change)="onFileSelected($event, 'pdf')" />
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Título</label>
+        <div class="input-wrap">
+          <input type="text" class="field-input" placeholder="Carné parvovirus 2024" [(ngModel)]="title" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Descripción</label>
+        <div class="input-wrap">
+          <textarea class="field-input field-textarea" rows="3" placeholder="Notas sobre el documento" [(ngModel)]="description"></textarea>
+        </div>
+      </div>
+
+      <div class="footer-btns">
+        <button class="btn-save" [disabled]="saving" (click)="save()">
+          {{ saving ? 'Guardando...' : 'Guardar documento' }}
+        </button>
+        <button class="btn-cancel" (click)="cancel()">Cancelar</button>
+      </div>
+
+    </div>
+  </div>
+</ion-content>

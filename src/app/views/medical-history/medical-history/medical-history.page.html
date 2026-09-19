@@ -46,143 +46,146 @@
     <div class="mh-card">
 
       <!-- CONSULTAS -->
-      <div class="section" *ngIf="activeTab === 'consultas'">
-        <div class="record-card" *ngFor="let c of consultations">
-          <div class="rc-top">
-            <div class="rc-icon" [class.blue]="c.status === 'applied'" [class.orange]="c.status === 'follow-up'">
-              <img src="assets/images/MH/ConsultasIcon.png" alt="" />
-            </div>
-            <div class="rc-info">
-              <span class="rc-title">{{ c.title }}</span>
-              <span class="rc-sub">{{ c.date }} · {{ c.vet }}</span>
-            </div>
-            <span class="badge" [class.bg]="c.status === 'applied'" [class.bo]="c.status === 'follow-up'">
-              {{ c.status === 'applied' ? 'Aplicada' : 'Seguimiento' }}
-            </span>
-          </div>
-          <div class="rc-divider"></div>
-          <div class="rc-row"><span class="rl">Motivo</span><span class="rv">{{ c.reason }}</span></div>
-          <div class="rc-row" *ngIf="c.temperature"><span class="rl">Temperatura</span><span class="rv">{{ c.temperature }}</span></div>
-          <div class="rc-row" *ngIf="c.weight"><span class="rl">Peso</span><span class="rv">{{ c.weight }}</span></div>
-          <div class="tag-row" *ngIf="c.hasDoc || c.hasTreatment">
-            <span class="tag blue" *ngIf="c.hasDoc"><ion-icon name="document-outline"></ion-icon> Informe.pdf</span>
-            <span class="tag orange" *ngIf="c.hasTreatment"><ion-icon name="medical-outline"></ion-icon> Tratamiento</span>
-          </div>
-        </div>
-        <button class="add-btn" (click)="goToAddConsultation()">
-          <ion-icon name="add-outline"></ion-icon> Registrar consulta
-        </button>
+<div class="section" *ngIf="activeTab === 'consultas'">
+
+  <div class="empty-state" *ngIf="!loading && consultations.length === 0">
+    <ion-icon name="document-text-outline"></ion-icon>
+    <p>No hay consultas registradas todavía.</p>
+  </div>
+
+  <div class="record-card" *ngFor="let c of consultations">
+    <div class="rc-top">
+      <div class="rc-icon blue">
+        <img src="assets/images/MH/ConsultasIcon.png" alt="" />
       </div>
+      <div class="rc-info">
+        <span class="rc-title">{{ c.reason }}</span>
+        <span class="rc-sub">{{ c.date }} · {{ c.veterinarian }}</span>
+      </div>
+    </div>
+    <div class="rc-divider"></div>
+    <div class="rc-row" *ngIf="c.diagnosis"><span class="rl">Diagnóstico</span><span class="rv">{{ c.diagnosis }}</span></div>
+    <div class="rc-row" *ngIf="c.temperature"><span class="rl">Temperatura</span><span class="rv">{{ c.temperature }}°C</span></div>
+    <div class="rc-row" *ngIf="c.weight"><span class="rl">Peso</span><span class="rv">{{ c.weight }} kg</span></div>
+    <div class="rc-row" *ngIf="c.notes"><span class="rl">Notas</span><span class="rv">{{ c.notes }}</span></div>
+  </div>
+  <button class="add-btn" (click)="goToAddConsultation()">
+    <ion-icon name="add-outline"></ion-icon> Registrar consulta
+  </button>
+</div>
 
       <!-- TRATAMIENTOS -->
-      <div class="section" *ngIf="activeTab === 'tratamientos'">
-        <div class="record-card" *ngFor="let t of treatments" [class.dimmed]="t.status === 'completed'">
-          <div class="rc-top">
-            <div class="rc-icon blue">
-              <img src="assets/images/MH/TratamientosIcon.png" alt="" />
-            </div>
-            <div class="rc-info">
-              <span class="rc-title">{{ t.title }}</span>
-              <span class="rc-sub">{{ t.startDate }} → {{ t.endDate }}</span>
-            </div>
-            <span class="badge" [class.bg]="t.status === 'active'" [class.bgy]="t.status === 'completed'" [class.br]="t.status === 'suspended'">
-              {{ t.status === 'active' ? 'Activo' : t.status === 'completed' ? 'Completo' : 'Suspendido' }}
-            </span>
-          </div>
-          <div class="rc-divider"></div>
-          <div class="rc-row" *ngIf="t.description"><span class="rl">Descripción</span><span class="rv">{{ t.description }}</span></div>
-          <div class="rc-row" *ngIf="t.notes"><span class="rl">Notas</span><span class="rv">{{ t.notes }}</span></div>
-          <div class="prog-wrap" *ngIf="t.status === 'active'">
-            <div class="prog-bar"><div class="prog-fill" [style.width.%]="(t.progressDays / t.totalDays) * 100"></div></div>
-            <span class="prog-lbl">Progreso · {{ t.progressDays }}/{{ t.totalDays }} días</span>
-          </div>
-          <div class="med-chip" *ngFor="let m of t.medications">
-            <ion-icon name="medical-outline" class="med-icon"></ion-icon>
-            <div class="med-info">
-              <span class="med-name">{{ m.name }}</span>
-              <span class="med-dose">{{ m.dose }}</span>
-            </div>
-            <span class="badge bg">{{ m.status === 'active' ? 'Activo' : 'Inactivo' }}</span>
-          </div>
-        </div>
-         <button class="add-btn" (click)="goToAddTreatment()">
-          <ion-icon name="add-outline"></ion-icon> Registrar tratamiento
-        </button>
-      </div>
+<div class="section" *ngIf="activeTab === 'tratamientos'">
 
-      <!-- LAB -->
-      <div class="section" *ngIf="activeTab === 'lab'">
-        <div class="record-card" *ngFor="let l of labTests" [class.border-blue]="l.isNormal" [class.border-red]="!l.isNormal">
-          <div class="rc-top">
-            <div class="rc-icon" [class.blue]="l.isNormal" [class.red]="!l.isNormal">
-              <img src="assets/images/MH/LabIcon.png" alt="" />
-            </div>
-            <div class="rc-info">
-              <span class="rc-title">{{ l.title }}</span>
-              <span class="rc-sub">{{ l.date }}<span *ngIf="l.lab"> · {{ l.lab }}</span></span>
-            </div>
-            <span class="badge" [class.bg]="l.status === 'active'" [class.br]="l.status === 'review'">
-              {{ l.status === 'active' ? 'Activo' : 'Revisar' }}
-            </span>
-          </div>
-          <div class="result-strip" [class.rs-normal]="l.isNormal" [class.rs-abnormal]="!l.isNormal">
-            <ion-icon [name]="l.isNormal ? 'checkmark-circle-outline' : 'alert-outline'"></ion-icon>
-            <span>{{ l.resultMessage }}</span>
-          </div>
-          <div class="lab-cells" *ngIf="l.values && l.values.length">
-            <div class="lab-cell" *ngFor="let v of l.values">
-              <span class="lc-num">{{ v.value }}</span>
-              <span class="lc-lbl">{{ v.label }}</span>
-              <span class="lc-range">{{ v.range }}</span>
-            </div>
-          </div>
-          <span class="tag blue" *ngIf="l.hasDoc"><ion-icon name="document-outline"></ion-icon> Resultados.pdf</span>
-        </div>
-        <button class="add-btn" (click)="goToAddLab()">
-          <ion-icon name="add-outline"></ion-icon> Registrar examen
-        </button>
+  <div class="empty-state" *ngIf="!loading && treatments.length === 0">
+    <ion-icon name="medkit-outline"></ion-icon>
+    <p>No hay tratamientos registrados todavía.</p>
+  </div>
+
+  <div class="record-card" *ngFor="let t of treatments">
+    <div class="rc-top">
+      <div class="rc-icon blue">
+        <img src="assets/images/MH/TratamientosIcon.png" alt="" />
       </div>
+      <div class="rc-info">
+        <span class="rc-title">{{ t.description }}</span>
+        <span class="rc-sub">{{ t.startDate }} → {{ t.endDate }}</span>
+      </div>
+    </div>
+    <div class="rc-divider"></div>
+    <div class="rc-row" *ngIf="t.notes"><span class="rl">Notas</span><span class="rv">{{ t.notes }}</span></div>
+    <div class="med-chip" *ngFor="let m of t.medications">
+      <ion-icon name="medical-outline" class="med-icon"></ion-icon>
+      <div class="med-info">
+        <span class="med-name">{{ m.name }}</span>
+        <span class="med-dose">{{ m.dosage }} · {{ m.frequency }} · {{ m.duration }}</span>
+      </div>
+    </div>
+  </div>
+  <button class="add-btn" (click)="goToAddTreatment()">
+    <ion-icon name="add-outline"></ion-icon> Registrar tratamiento
+  </button>
+</div>
+
+     <!-- LAB -->
+<div class="section" *ngIf="activeTab === 'lab'">
+
+  <div class="empty-state" *ngIf="!loading && labTests.length === 0">
+    <ion-icon name="flask-outline"></ion-icon>
+    <p>No hay exámenes de laboratorio registrados todavía.</p>
+  </div>
+
+  <div class="record-card" *ngFor="let l of labTests" [class.border-blue]="l.isNormal" [class.border-red]="!l.isNormal">
+    <div class="rc-top">
+      <div class="rc-icon" [class.blue]="l.isNormal" [class.red]="!l.isNormal">
+        <img src="assets/images/MH/LabIcon.png" alt="" />
+      </div>
+      <div class="rc-info">
+        <span class="rc-title">{{ l.name }}</span>
+        <span class="rc-sub">{{ l.date }}</span>
+      </div>
+    </div>
+    <div class="result-strip" [class.rs-normal]="l.isNormal" [class.rs-abnormal]="!l.isNormal">
+      <ion-icon [name]="l.isNormal ? 'checkmark-circle-outline' : 'alert-outline'"></ion-icon>
+      <span>{{ l.result }} <span *ngIf="l.normal_range">(rango normal: {{ l.normal_range }})</span></span>
+    </div>
+    <div class="rc-row" *ngIf="l.notes"><span class="rl">Notas</span><span class="rv">{{ l.notes }}</span></div>
+  </div>
+  <button class="add-btn" (click)="goToAddLab()">
+    <ion-icon name="add-outline"></ion-icon> Registrar examen
+  </button>
+</div>
 
       <!-- CIRUGÍAS -->
-      <div class="section" *ngIf="activeTab === 'cirugias'">
-        <div class="record-card border-blue" *ngFor="let s of surgeries">
-          <div class="rc-top">
-            <div class="rc-icon blue">
-              <img src="assets/images/MH/CirugiasIcon.png" alt="" />
-            </div>
-            <div class="rc-info">
-              <span class="rc-title">{{ s.title }}</span>
-              <span class="rc-sub">{{ s.date }} · {{ s.vet }}</span>
-            </div>
-            <span class="badge" [class.bg]="s.status === 'completed'" [class.bo]="s.status === 'recovery'" [class.bb]="s.status === 'scheduled'">
-              {{ s.status === 'completed' ? 'Completada' : s.status === 'recovery' ? 'Recuperación' : 'Programada' }}
-            </span>
-          </div>
-          <div class="rc-divider"></div>
-          <div class="rc-row"><span class="rl">Duración</span><span class="rv">{{ s.durationMin }} min</span></div>
-          <div class="rc-row"><span class="rl">Anestesia</span><span class="rv">{{ s.anesthesia }}</span></div>
-          <div class="rc-row"><span class="rl">Complicaciones</span><span class="rv green">{{ s.complications }}</span></div>
-          <div class="rc-row"><span class="rl">Próximo chequeo</span><span class="rv blue">{{ s.nextCheckup }}</span></div>
-          <div class="rc-divider"></div>
-          <div class="timeline-row">
-            <div class="tl-dot done"><ion-icon name="checkmark-outline"></ion-icon></div>
-            <div class="tl-info">
-              <span class="tl-t">Cirugía realizada</span>
-              <span class="tl-s">{{ s.date }} · {{ s.vet }}</span>
-            </div>
-          </div>
-          <div class="timeline-row">
-            <div class="tl-dot pending"><ion-icon name="time-outline"></ion-icon></div>
-            <div class="tl-info">
-              <span class="tl-t">Revisión post-op</span>
-              <span class="tl-s">{{ s.nextCheckup }} · Pendiente</span>
-            </div>
-          </div>
-        </div>
-         <button class="add-btn" (click)="goToAddSurgery()">
-          <ion-icon name="add-outline"></ion-icon> Registrar cirugía
-        </button>
+<div class="section" *ngIf="activeTab === 'cirugias'">
+
+  <div class="empty-state" *ngIf="!loading && surgeries.length === 0">
+    <ion-icon name="cut-outline"></ion-icon>
+    <p>No hay cirugías registradas todavía.</p>
+  </div>
+
+  <div class="record-card border-blue" *ngFor="let s of surgeries">
+    <div class="rc-top">
+      <div class="rc-icon blue">
+        <img src="assets/images/MH/CirugiasIcon.png" alt="" />
       </div>
+      <div class="rc-info">
+        <span class="rc-title">{{ s.title }}</span>
+        <span class="rc-sub">{{ s.surgeryDate }}</span>
+      </div>
+      <span class="badge"
+            [class.bg]="s.status === 'COMPLETED'"
+            [class.bo]="s.status === 'IN_PROGRESS'"
+            [class.bb]="s.status === 'SCHEDULED'">
+        {{ s.status === 'COMPLETED' ? 'Completada' : s.status === 'IN_PROGRESS' ? 'En curso' : s.status === 'CANCELLED' ? 'Cancelada' : 'Programada' }}
+      </span>
+    </div>
+    <div class="rc-divider"></div>
+    <div class="rc-row"><span class="rl">Descripción</span><span class="rv">{{ s.description }}</span></div>
+    <div class="rc-row"><span class="rl">Duración</span><span class="rv">{{ s.durationMinutes }} min</span></div>
+    <div class="rc-row"><span class="rl">Anestesia</span><span class="rv">{{ s.anesthesiaUsed }}</span></div>
+    <div class="rc-row" *ngIf="s.postOpInstructions">
+      <span class="rl">Instrucciones post-op</span><span class="rv">{{ s.postOpInstructions }}</span>
+    </div>
+    <div class="rc-row" *ngIf="s.outcome">
+      <span class="rl">Resultado</span>
+      <span class="rv" [class.green]="s.outcome === 'SUCCESSFUL'">
+        {{ s.outcome === 'SUCCESSFUL' ? 'Exitosa' : s.outcome === 'COMPLICATIONS' ? 'Con complicaciones' : 'No exitosa' }}
+      </span>
+    </div>
+    <div class="rc-divider" *ngIf="s.status === 'COMPLETED'"></div>
+    <div class="timeline-row" *ngIf="s.status === 'COMPLETED'">
+      <div class="tl-dot done"><ion-icon name="checkmark-outline"></ion-icon></div>
+      <div class="tl-info">
+        <span class="tl-t">Cirugía realizada</span>
+        <span class="tl-s">{{ s.surgeryDate }}</span>
+      </div>
+    </div>
+  </div>
+  <button class="add-btn" (click)="goToAddSurgery()">
+    <ion-icon name="add-outline"></ion-icon> Registrar cirugía
+  </button>
+</div>
 
     </div>
   </div>

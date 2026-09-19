@@ -1,61 +1,76 @@
 <ion-content [fullscreen]="true" class="as-content">
   <div class="as-wrap">
 
-    <!-- HEADER -->
     <div class="as-header">
       <button class="back-btn" (click)="goBack()">
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
-      <h1 class="as-title">Cirugias</h1>
+      <h1 class="as-title">Cirugía</h1>
     </div>
 
-    <!-- PET CHIP -->
     <div class="pet-chip">
-      <img [src]="petAvatar" alt="" class="pet-av" />
+      <img *ngIf="petAvatar" [src]="petAvatar" alt="" class="pet-av" />
       <span class="pet-nm">{{ petName }}</span>
     </div>
 
-    <!-- CARD BLANCA -->
     <div class="as-card">
 
       <!-- STEPPER -->
       <div class="stepper">
-        <ng-container *ngFor="let s of stepTitles; let i = index">
+        <ng-container *ngFor="let t of stepTitles; let i = index">
           <div class="step-item">
             <div class="step-dot"
-              [class.done]="currentStep > i + 1"
-              [class.active]="currentStep === i + 1">
-              <img *ngIf="currentStep <= i + 1" [src]="stepIcons[i]" alt="" class="step-icon" />
+                 [class.active]="currentStep === i + 1"
+                 [class.done]="currentStep > i + 1">
               <ion-icon *ngIf="currentStep > i + 1" name="checkmark-outline" class="step-check"></ion-icon>
+              <img *ngIf="currentStep <= i + 1" [src]="stepIcons[i]" alt="" class="step-icon" />
             </div>
             <span class="step-lbl" [class.active]="currentStep === i + 1" [class.done]="currentStep > i + 1">
-              {{ s }}
+              {{ t }}
             </span>
           </div>
           <div class="step-line" *ngIf="i < stepTitles.length - 1" [class.done]="currentStep > i + 1"></div>
         </ng-container>
       </div>
 
-      <!-- STEP 1: Info básica -->
+      <!-- STEP 1: INFO BÁSICA -->
       <div class="step-content" *ngIf="currentStep === 1">
         <div class="step-section-header ssh-info">
-  <div class="ssh-icon" style="background:#0063FF">
-    <img src="assets/images/MH/InfoBasicaCirugias.png" alt="" />
-  </div>
+          <div class="ssh-icon"><ion-icon name="information-circle-outline" style="font-size:20px;color:#0063FF;"></ion-icon></div>
           <div>
             <div class="ssh-title">Información básica</div>
-            <div class="ssh-sub">Título, fecha, duración, cirujano</div>
+            <div class="ssh-sub">Título, fecha, duración</div>
           </div>
         </div>
 
         <div class="field">
-          <label class="field-label"><ion-icon name="clipboard-outline"></ion-icon> Título del procedimiento</label>
-          <div class="input-wrap"><input type="text" class="field-input" placeholder="Castración, extirpación..." [(ngModel)]="title" /></div>
+          <label class="field-label">
+            <ion-icon name="document-text-outline"></ion-icon>
+            Consulta asociada
+          </label>
+          <div class="input-wrap">
+            <select class="field-input" [(ngModel)]="selectedVisitId">
+              <option *ngFor="let v of visits" [value]="v.id">{{ v.date }} - {{ v.reason }}</option>
+            </select>
+          </div>
+        </div>
+
+        <p *ngIf="visits.length === 0" style="color:#e65100;font-size:12px;font-family:'Actor',sans-serif;">
+          Esta mascota no tiene consultas registradas todavía. Registra una consulta primero para poder asociar una cirugía.
+        </p>
+
+        <div class="field">
+          <label class="field-label"><ion-icon name="cut-outline"></ion-icon> Título de la cirugía</label>
+          <div class="input-wrap">
+            <input type="text" class="field-input" placeholder="Cirugía de rodilla" [(ngModel)]="title" />
+          </div>
         </div>
 
         <div class="field">
-          <label class="field-label"><ion-icon name="document-text-outline"></ion-icon> Descripción general</label>
-          <div class="input-wrap"><textarea class="field-input field-textarea" rows="2" placeholder="Descripción del procedimiento..." [(ngModel)]="description"></textarea></div>
+          <label class="field-label"><ion-icon name="clipboard-outline"></ion-icon> Descripción</label>
+          <div class="input-wrap">
+            <textarea class="field-input field-textarea" rows="3" placeholder="Descripción del procedimiento..." [(ngModel)]="description"></textarea>
+          </div>
         </div>
 
         <div class="row2">
@@ -65,61 +80,53 @@
           </div>
           <div class="field">
             <label class="field-label"><ion-icon name="time-outline"></ion-icon> Duración (min)</label>
-            <div class="input-wrap"><input type="number" class="field-input" placeholder="45" [(ngModel)]="durationMinutes" /></div>
+            <div class="input-wrap"><input type="number" class="field-input" placeholder="90" [(ngModel)]="durationMinutes" /></div>
           </div>
         </div>
 
         <div class="field">
-          <label class="field-label"><ion-icon name="person-outline"></ion-icon> Veterinario cirujano</label>
-          <div class="input-wrap"><input type="text" class="field-input" placeholder="Dr. Pet - Cartagena" [(ngModel)]="vet" /></div>
-        </div>
-
-        <div class="field">
-          <label class="field-label"><ion-icon name="medical-outline"></ion-icon> Anestesia utilizada</label>
-          <div class="input-wrap"><input type="text" class="field-input" placeholder="Ketamina + Xilazina..." [(ngModel)]="anesthesia" /></div>
+          <label class="field-label"><ion-icon name="medkit-outline"></ion-icon> Anestesia utilizada</label>
+          <div class="input-wrap">
+            <input type="text" class="field-input" placeholder="Isoflurano" [(ngModel)]="anesthesia" />
+          </div>
         </div>
       </div>
 
-      <!-- STEP 2: Procedimiento -->
+      <!-- STEP 2: PROCEDIMIENTO -->
       <div class="step-content" *ngIf="currentStep === 2">
         <div class="step-section-header ssh-proc">
-  <div class="ssh-icon" style="background:#FF6969">
-    <img src="assets/images/MH/DetallesProcedimiento.png" alt="" />
-  </div>
+          <div class="ssh-icon"><ion-icon name="medical-outline" style="font-size:20px;color:#FF6969;"></ion-icon></div>
           <div>
             <div class="ssh-title">Detalles del procedimiento</div>
-            <div class="ssh-sub">Anestesia y complicaciones</div>
+            <div class="ssh-sub">Complicaciones durante la cirugía</div>
           </div>
         </div>
 
         <div class="field">
-          <label class="field-label"><ion-icon name="alert-circle-outline"></ion-icon> Complicaciones</label>
+          <label class="field-label"><ion-icon name="warning-outline"></ion-icon> Complicaciones</label>
           <div class="chips-row">
-            <button
-              class="chip"
-              *ngFor="let c of complicationOptions"
-              [class.active-green]="complication === c.key && c.key === 'none'"
-              [class.active-red]="complication === c.key && c.key !== 'none'"
-              (click)="setComplication(c.key)">
+            <button class="chip"
+                    *ngFor="let c of complicationOptions"
+                    [class.active-blue]="complication === c.key && c.key === 'none'"
+                    [class.active-red]="complication === c.key && c.key !== 'none'"
+                    (click)="setComplication(c.key)">
               {{ c.label }}
             </button>
           </div>
         </div>
 
         <div class="field" *ngIf="complication !== 'none'">
-          <label class="field-label"><ion-icon name="create-outline"></ion-icon> Descripción anomalías (si no hay saltar)</label>
+          <label class="field-label"><ion-icon name="create-outline"></ion-icon> Detalle de la complicación</label>
           <div class="input-wrap">
             <textarea class="field-input field-textarea" rows="3" placeholder="Describe la complicación..." [(ngModel)]="complicationDetail"></textarea>
           </div>
         </div>
       </div>
 
-      <!-- STEP 3: Recuperación -->
+      <!-- STEP 3: RECUPERACIÓN -->
       <div class="step-content" *ngIf="currentStep === 3">
         <div class="step-section-header ssh-recup">
-  <div class="ssh-icon" style="background:#129A6B">
-    <img src="assets/images/MH/Recuperacion.png" alt="" />
-  </div>
+          <div class="ssh-icon"><ion-icon name="bandage-outline" style="font-size:20px;color:#129A6B;"></ion-icon></div>
           <div>
             <div class="ssh-title">Recuperación</div>
             <div class="ssh-sub">Instrucciones post-op y seguimiento</div>
@@ -127,48 +134,17 @@
         </div>
 
         <div class="field">
-          <label class="field-label"><ion-icon name="list-outline"></ion-icon> Instrucciones post-op</label>
+          <label class="field-label"><ion-icon name="bandage-outline"></ion-icon> Instrucciones post-operatorias</label>
           <div class="input-wrap">
-            <textarea class="field-input field-textarea" rows="3" placeholder="Reposo 3 días, dieta blanda..." [(ngModel)]="postOpInstructions"></textarea>
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="field-label"><ion-icon name="checkmark-circle-outline"></ion-icon> Complicaciones</label>
-          <div class="chips-row">
-            <button
-              class="chip"
-              *ngFor="let o of outcomeOptions"
-              [class.active-green]="outcome === o.key && o.key === 'successful'"
-              [class.active-orange]="outcome === o.key && o.key === 'partial'"
-              [class.active-red]="outcome === o.key && o.key === 'complicated'"
-              (click)="setOutcome(o.key)">
-              {{ o.label }}
-            </button>
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="field-label"><ion-icon name="create-outline"></ion-icon> Detalle del resultado</label>
-          <div class="input-wrap">
-            <input type="text" class="field-input" placeholder="Sin complicaciones..." [(ngModel)]="outcomeDetail" />
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="field-label"><ion-icon name="calendar-outline"></ion-icon> Próximo chequeo</label>
-          <div class="input-wrap">
-            <input type="date" class="field-input" [(ngModel)]="nextCheckupDate" />
+            <textarea class="field-input field-textarea" rows="4" placeholder="Reposo por 2 semanas, administrar antibióticos..." [(ngModel)]="postOpInstructions"></textarea>
           </div>
         </div>
       </div>
 
-      <!-- STEP 4: Estado + Resumen -->
+      <!-- STEP 4: ESTADO -->
       <div class="step-content" *ngIf="currentStep === 4">
         <div class="step-section-header ssh-estado">
-  <div class="ssh-icon" style="background:#FFAB2D">
-    <img src="assets/images/MH/EstadoCirugia.png" alt="" />
-  </div>
+          <div class="ssh-icon"><ion-icon name="checkmark-done-outline" style="font-size:20px;color:#FFAB2D;"></ion-icon></div>
           <div>
             <div class="ssh-title">Estado de la cirugía</div>
             <div class="ssh-sub">¿Cómo quedó el proceso?</div>
@@ -176,47 +152,38 @@
         </div>
 
         <div class="field">
-          <label class="field-label"><ion-icon name="alert-circle-outline"></ion-icon> Estado del proceso final</label>
+          <label class="field-label"><ion-icon name="checkmark-circle-outline"></ion-icon> Estado del proceso final</label>
           <div class="chips-row">
-            <button
-              class="chip"
-              *ngFor="let s of statusOptions"
-              [class.active-green]="status === s.key && s.key === 'completed'"
-              [class.active-orange]="status === s.key && s.key === 'recovery'"
-              [class.active-blue]="status === s.key && s.key === 'scheduled'"
-              (click)="setStatus(s.key)">
+            <button class="chip"
+                    *ngFor="let s of statusOptions"
+                    [class.active-blue]="status === s.key"
+                    (click)="setStatus(s.key)">
               {{ s.label }}
             </button>
           </div>
         </div>
 
-        <!-- RESUMEN -->
         <div class="summary-card">
-          <div class="summary-title">
-            <ion-icon name="list-outline"></ion-icon>
-            Detalle del registro
-          </div>
-          <div class="sum-row"><span class="sl">Procedimiento</span><span class="sv blue">{{ title || 'Procedimiento' }}</span></div>
+          <div class="summary-title"><ion-icon name="document-text-outline"></ion-icon> Detalle del registro</div>
+          <div class="sum-row"><span class="sl">Procedimiento</span><span class="sv blue">{{ title || '—' }}</span></div>
           <div class="sum-divider"></div>
-          <div class="sum-row"><span class="sl">Fecha</span><span class="sv blue">{{ surgeryDate || '15 ene 2026' }}</span></div>
+          <div class="sum-row"><span class="sl">Fecha</span><span class="sv">{{ surgeryDate || '—' }}</span></div>
           <div class="sum-divider"></div>
-          <div class="sum-row"><span class="sl">Duración</span><span class="sv blue">{{ durationMinutes || 45 }} min</span></div>
+          <div class="sum-row"><span class="sl">Duración</span><span class="sv">{{ durationMinutes ? durationMinutes + ' min' : '—' }}</span></div>
           <div class="sum-divider"></div>
-          <div class="sum-row"><span class="sl">Anestesia</span><span class="sv blue">{{ anesthesia || 'Ketamina' }}</span></div>
-          <div class="sum-divider"></div>
-          <div class="sum-row"><span class="sl">Outcome</span><span class="sv green">{{ outcomeLabel }}</span></div>
+          <div class="sum-row"><span class="sl">Anestesia</span><span class="sv">{{ anesthesia || '—' }}</span></div>
           <div class="sum-divider"></div>
           <div class="sum-row"><span class="sl">Estado</span><span class="sv green">{{ statusLabel }}</span></div>
         </div>
       </div>
 
-      <!-- BOTONES NAV -->
       <div class="nav-btns">
-        <button class="btn-cancel" (click)="currentStep === 1 ? cancel() : goPrev()">
-          {{ currentStep === 1 ? 'Cancelar' : '← Atrás' }}
-        </button>
-        <button class="btn-save" (click)="currentStep < totalSteps ? goNext() : save()">
-          {{ currentStep < totalSteps ? 'Continuar →' : 'Guardar Cirugía' }}
+        <button class="btn-cancel" (click)="goBack()">
+          {{ currentStep > 1 ? 'Atrás' : 'Cancelar' }}
+       </button>
+        <button *ngIf="currentStep < totalSteps" class="btn-save" (click)="goNext()">Continuar</button>
+        <button *ngIf="currentStep === totalSteps" class="btn-save" [disabled]="saving" (click)="save()">
+          {{ saving ? 'Guardando...' : 'Guardar cirugía' }}
         </button>
       </div>
 

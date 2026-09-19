@@ -13,6 +13,24 @@
       <span class="pet-nm">{{ petName }}</span>
     </div>
 
+    <div class="field">
+  <label class="field-label">
+    <ion-icon name="document-text-outline"></ion-icon>
+    Consulta asociada
+  </label>
+  <div class="input-wrap">
+    <select class="field-input" [(ngModel)]="selectedVisitId">
+      <option *ngFor="let v of visits" [value]="v.id">{{ v.date }} - {{ v.reason }}</option>
+    </select>
+  </div>
+</div>
+
+<div class="field" *ngIf="visits.length === 0">
+  <p style="color: #e65100; font-size: 13px;">
+    Esta mascota no tiene consultas registradas todavía. Registra una consulta primero para poder asociar un tratamiento.
+  </p>
+</div>
+
     <div class="at-card">
 
       <!-- DESCRIPCIÓN -->
@@ -58,8 +76,8 @@
         <div class="med-chip" *ngFor="let m of medications; let i = index">
           <ion-icon name="medical-outline" class="med-icon"></ion-icon>
           <div class="med-info">
-            <span class="med-name">{{ m.name }} {{ m.dose }}</span>
-            <span class="med-dose">{{ m.frequency }} · {{ m.route }}</span>
+            <span class="med-name">{{ m.name }}</span>
+            <span class="med-dose">{{ m.dosage }} · {{ m.frequency }} · {{ m.duration }}</span>
           </div>
           <button class="med-remove" (click)="removeMedication(i)">
             <ion-icon name="close-outline"></ion-icon>
@@ -72,22 +90,7 @@
         </button>
       </div>
 
-      <!-- ESTADO -->
-      <div class="field">
-        <label class="field-label">
-          <ion-icon name="alert-circle-outline"></ion-icon>
-          Estado
-        </label>
-        <div class="chips-row">
-          <button
-            class="chip"
-            *ngFor="let s of statusOptions"
-            [class.active]="status === s.key"
-            (click)="setStatus(s.key)">
-            {{ s.label }}
-          </button>
-        </div>
-      </div>
+      
 
       <!-- NOTAS -->
       <div class="field">
@@ -142,11 +145,11 @@
       </div>
 
       <div class="field">
-        <label class="field-label"><ion-icon name="navigate-outline"></ion-icon> Vía</label>
-        <div class="input-wrap">
-          <input type="text" class="field-input" placeholder="Oral, inyectable..." [(ngModel)]="newMedRoute" />
-        </div>
-      </div>
+  <label class="field-label"><ion-icon name="time-outline"></ion-icon> Duración</label>
+  <div class="input-wrap">
+    <input type="text" class="field-input" placeholder="7 días" [(ngModel)]="newMedDuration" />
+  </div>
+    </div>
 
       <button class="btn-save" style="width:100%;margin-top:8px" (click)="addMedication()">
         <ion-icon name="add-outline"></ion-icon> Agregar

@@ -1,0 +1,56 @@
+<ion-content [fullscreen]="true" class="di-content">
+  <div class="di-wrap">
+
+    <div class="di-header">
+      <button class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <h1 class="di-title">Info del documento</h1>
+    </div>
+
+    <ng-container *ngIf="doc">
+      <div class="di-preview-wrap">
+        <div class="di-preview" [class.pdf]="isPdf()">
+          <ion-icon [name]="isPdf() ? 'document-text-outline' : 'image-outline'" class="di-preview-icon"></ion-icon>
+        </div>
+        <span class="di-filename">{{ fileName }}</span>
+      </div>
+
+      <div class="di-card">
+        <span class="di-section-title">Información del documento</span>
+
+        <div class="di-row">
+          <span class="di-label">Tipo</span>
+          <span class="di-badge">{{ typeLabel() }}</span>
+        </div>
+        <div class="di-row">
+          <span class="di-label">Fecha subida</span>
+          <span class="di-value">{{ formatDate(doc.uploadedAt) }}</span>
+        </div>
+        <div class="di-row">
+          <span class="di-label">Tamaño</span>
+          <span class="di-value">{{ formatSize(doc.fileSizeBytes) }}</span>
+        </div>
+        <div class="di-row" *ngIf="doc.description">
+          <span class="di-label">Descripción</span>
+          <span class="di-value">{{ doc.description }}</span>
+        </div>
+
+        <div class="di-actions">
+          <button class="btn-save" (click)="onDownload()">
+            <ion-icon name="download-outline"></ion-icon> Descargar
+          </button>
+          <button class="btn-secondary" (click)="onShare()">
+            <ion-icon name="share-social-outline"></ion-icon> Compartir
+          </button>
+        </div>
+
+        <button class="btn-danger" [disabled]="deleting" (click)="onDelete()">
+          {{ deleting ? 'Eliminando...' : 'Eliminar documento' }}
+        </button>
+      </div>
+    </ng-container>
+
+    <p *ngIf="!doc && !loading" class="di-not-found">Documento no encontrado.</p>
+  </div>
+</ion-content>

@@ -1,0 +1,221 @@
+.dl-content { --background: #FFB84F; }
+
+.dl-wrap {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dl-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 52px 14px 10px;
+  background: #FFB84F;
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  ion-icon { font-size: 24px; color: #1a1a2e; }
+}
+
+.dl-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: #1a1a2e;
+  margin: 0;
+  font-family: 'Actor', sans-serif;
+}
+
+.pet-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 9px 14px;
+  margin: 0 14px 10px;
+
+  .pet-av {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #FFB84F;
+  }
+
+  .pet-av-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .pet-nm {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+  }
+}
+
+.dl-card {
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  flex: 1;
+  padding: 20px 14px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+// TABS
+.doc-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+
+  &::-webkit-scrollbar { height: 0; }
+}
+
+.doc-tab {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1.5px solid #e0e0e0;
+  background: #f5f5f5;
+  font-size: 12px;
+  font-weight: 500;
+  color: #888;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .2s;
+  flex-shrink: 0;
+
+  &.active {
+    background: #4037BE;
+    border-color: #4037BE;
+    color: #fff;
+  }
+}
+
+// LISTA DE DOCUMENTOS
+.doc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.doc-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border: 1.5px solid #e8e8f5;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.doc-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: #EEF0FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon { font-size: 20px; color: #4037BE; }
+
+  &.pdf-icon {
+    background: #FFF0E8;
+    ion-icon { color: #e65100; }
+  }
+}
+
+.doc-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+}
+
+.doc-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-meta {
+  font-size: 11px;
+  color: #888;
+  font-family: 'Actor', sans-serif;
+}
+
+.doc-type {
+  font-size: 10px;
+  color: #4037BE;
+  font-family: 'Actor', sans-serif;
+}
+
+.doc-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.doc-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f5f5ff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  ion-icon { font-size: 16px; color: #4037BE; }
+
+  &:active { background: #e0e0ff; }
+}
+
+.doc-empty {
+  text-align: center;
+  padding: 30px 10px;
+  color: #aaa;
+  font-size: 13px;
+  font-family: 'Actor', sans-serif;
+}
+
+// BOTÓN SUBIR
+.upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1.5px dashed #4037BE;
+  background: transparent;
+  border-radius: 12px;
+  padding: 13px;
+  font-size: 13px;
+  color: #4037BE;
+  font-weight: 500;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+  margin-top: 4px;
+
+  ion-icon { font-size: 18px; }
+}

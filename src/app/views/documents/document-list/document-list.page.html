@@ -1,0 +1,56 @@
+<ion-content [fullscreen]="true" class="dl-content">
+  <div class="dl-wrap">
+
+    <div class="dl-header">
+      <button class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <h1 class="dl-title">Documentos</h1>
+    </div>
+
+    <div class="pet-chip">
+      <img *ngIf="petAvatar && !imageLoadFailed" [src]="petAvatar" alt="" class="pet-av" (error)="onImageError()" />
+      <div *ngIf="!petAvatar || imageLoadFailed" class="pet-av pet-av-fallback" [style.background]="getSexColor(petSex)">
+        {{ getPetIconFallback(petSpecies) }}
+      </div>
+      <span class="pet-nm">{{ petName }} · {{ documents.length }} documentos</span>
+    </div>
+
+    <div class="dl-card">
+
+      <div class="doc-tabs">
+        <button class="doc-tab" *ngFor="let t of tabs" [class.active]="activeFilter === t.key" (click)="setFilter(t.key)">
+          {{ t.label }}
+        </button>
+      </div>
+
+      <div class="doc-list" *ngIf="!loading">
+        <div class="doc-row" *ngFor="let doc of filteredDocuments">
+          <div class="doc-icon" [class.pdf-icon]="isPdf(doc)">
+            <ion-icon [name]="isPdf(doc) ? 'document-text-outline' : 'image-outline'"></ion-icon>
+          </div>
+          <div class="doc-main" (click)="onViewDoc(doc)">
+            <span class="doc-title">{{ doc.title }}</span>
+            <span class="doc-meta">{{ formatDate(doc.uploadedAt) }} · {{ formatSize(doc.fileSizeBytes) }}</span>
+<span class="doc-type">{{ typeLabel(doc.documentType) }}</span>
+          </div>
+          <div class="doc-actions">
+            <button class="doc-action-btn" (click)="onViewDoc(doc)"><ion-icon name="eye-outline"></ion-icon></button>
+            <button class="doc-action-btn" (click)="onDownload(doc, $event)"><ion-icon name="download-outline"></ion-icon></button>
+          </div>
+        </div>
+
+        <p class="doc-empty" *ngIf="filteredDocuments.length === 0">
+          No hay documentos en esta categoría.
+        </p>
+      </div>
+
+      <button class="upload-btn" (click)="onUpload()">
+        <ion-icon name="cloud-upload-outline"></ion-icon> Subir documento
+      </button>
+
+    </div>
+  </div>
+
+  <app-tab-bar activeTab="pet-profile"></app-tab-bar>
+</ion-content>

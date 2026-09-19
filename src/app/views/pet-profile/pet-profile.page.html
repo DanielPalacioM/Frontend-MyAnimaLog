@@ -110,17 +110,17 @@
       </app-medical-history-card>
 
       <!-- VACUNAS: mensaje si no hay ninguna registrada -->
-      <app-vaccine-card
-        *ngIf="vaccineSummary"
-        [summary]="vaccineSummary"
-        (addVaccine)="goToVaccineLine()"
-        (viewTimeline)="goToVaccineLine()">
-      </app-vaccine-card>
+       <app-vaccine-card
+  *ngIf="vaccineSummary"
+  [summary]="vaccineSummary"
+  (addVaccine)="goToRegisterVaccine()"
+  (viewTimeline)="goToVaccineLine()">
+</app-vaccine-card>
 
-      <div class="empty-card" *ngIf="!vaccineSummary">
-        <p>No hay vacunas registradas.</p>
-        <button (click)="goToVaccineLine()">Registrar vacuna</button>
-      </div>
+<div class="empty-card" *ngIf="!vaccineSummary">
+  <p>No hay vacunas registradas.</p>
+  <button (click)="goToRegisterVaccine()">Registrar vacuna</button>
+</div>
 
       <!-- ANUNCIOS -->
       <div class="ads-section">
@@ -142,14 +142,15 @@
       </div>
 
       <!-- DOCUMENTOS -->
-      <div class="section">
-        <app-documents-section
-          [documents]="documents"
-          (viewAll)="goToAllDocuments()"
-          (upload)="goToAddDocument()"
-          (docClick)="onDocClick($event)">
-        </app-documents-section>
-      </div>
+<div class="section" *ngIf="pet">
+  <app-documents-section
+    [petId]="pet.id"
+    [documents]="documents"
+    (viewAll)="goToAllDocuments()"
+    (upload)="goToAddDocument()"
+    (docClick)="onDocClick($event)">
+  </app-documents-section>
+</div>
 
     </div>
 

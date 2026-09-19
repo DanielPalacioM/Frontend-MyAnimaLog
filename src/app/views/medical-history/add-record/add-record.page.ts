@@ -1,19 +1,16 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-
-
-
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-record',
   templateUrl: './add-record.page.html',
   styleUrls: ['./add-record.page.scss'],
-  standalone:false
+  standalone: false
 })
-export class AddRecordPage {
+export class AddRecordPage implements OnInit {
 
   selectedCategory: string | null = null;
-
+  petId: string = '';
 
   categories = [
     {
@@ -54,18 +51,20 @@ export class AddRecordPage {
     },
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private route: ActivatedRoute) {}
 
-  goTo(route: string) { this.router.navigate([route]); }
+  ngOnInit() {
+    this.petId = this.route.snapshot.paramMap.get('petId') || '';
+  }
+
+  goTo(route: string) {
+    this.router.navigate([route, this.petId]);
+  }
+
   goBack() { history.back(); }
 
-
-
-selectCategory(key: string, route: string) {
-  this.selectedCategory = key;
-  setTimeout(() => this.router.navigate([route]), 200);
+  selectCategory(key: string, route: string) {
+    this.selectedCategory = key;
+    setTimeout(() => this.router.navigate([route, this.petId]), 200);
+  }
 }
-}
-
-
-

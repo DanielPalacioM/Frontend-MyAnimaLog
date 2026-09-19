@@ -265,7 +265,6 @@ export class HomePage implements OnInit, AfterViewInit {
   }
 
   navigate(route: string) { this.router.navigate([route]); }
-  onSeeAll() { this.router.navigate(['/pets']); }
   onAsociationVet() { this.router.navigate(['/vet']); }
   onFindVet() { this.router.navigate(['/vet/find']); }
   goToProfile() { this.router.navigate(['/profile']); }

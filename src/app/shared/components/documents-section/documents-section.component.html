@@ -10,20 +10,20 @@
 
   <div class="docs-scroll">
 
-    <div class="doc-card" *ngFor="let doc of documents" (click)="onDocClick(doc)">
+    <div class="doc-card" *ngFor="let doc of recentDocuments" (click)="onDocClick(doc)">
       <div class="doc-preview">
-        <ng-container *ngIf="doc.type === 'pdf'">
+        <ng-container *ngIf="isPdf(doc)">
           <div class="doc-pdf-icon">
             <ion-icon name="arrow-down-circle-outline" class="pdf-arrow"></ion-icon>
             <span class="pdf-label">PDF</span>
           </div>
         </ng-container>
-        <ng-container *ngIf="doc.type !== 'pdf'">
+        <ng-container *ngIf="!isPdf(doc)">
           <ion-icon name="image-outline" class="img-icon"></ion-icon>
         </ng-container>
       </div>
-      <span class="doc-name">{{ doc.name }}</span>
-      <span class="doc-date">{{ doc.date }}</span>
+      <span class="doc-name">{{ doc.title }}</span>
+      <span class="doc-date">{{ formatDate(doc.uploadedAt) }}</span>
     </div>
 
     <!-- CARD AGREGAR -->

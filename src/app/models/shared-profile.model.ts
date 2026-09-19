@@ -12,7 +12,11 @@ export interface SharedPet {
   name: string;
   species: string;
   breed: string;
-  sex?: string; 
+  sex?: string;
+  birthDate?: string;
+  ageMonths?: number | null;
+  weight?: number | null;
+  height?: number | null;
   imageUrl: string | null;
   ownerId: string;
   ownerName?: string;

@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { VaccineService } from 'src/app/services/VaccineService/vaccine/vaccine'; 
+import { PetService } from 'src/app/services/PetService/pet';
 
 @Component({
   selector: 'app-register-vaccine',
@@ -9,10 +11,10 @@ import { Router } from '@angular/router';
 })
 export class RegisterVaccineComponent implements OnInit {
 
-  // Mascota (mock por ahora)
-  petName = 'Milo';
-  petAge = '5 meses';
-  petAvatar = 'assets/images/Profile/cat-juan.png';
+  petId = '';
+  petName = '';
+  petAge = '';
+  petAvatar: string | null = null;
 
   // Campos vacuna
   vaccineType = '';
@@ -24,14 +26,15 @@ export class RegisterVaccineComponent implements OnInit {
   attachedFileName = '';
   attachedFileSize = '';
 
-  // Agendar cita
+  // Agendar cita (UI local por ahora — no hay servicio de calendario todavía)
   scheduleAppointment = true;
   reminderActive = true;
   suggestedDate = '';
   motivo = '';
-  vetName = 'Dr.pet - Cartagena';
+  vetName = '';
 
-  // Tipos de vacuna
+  saving = false;
+
   vaccineTypes = [
     'Rabia', 'Moquillo', 'Parvovirus', 'Hepatitis',
     'Leptospirosis', 'Bordetella', 'Leucemia felina',
@@ -39,9 +42,34 @@ export class RegisterVaccineComponent implements OnInit {
   ];
   showVaccineDropdown = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private vaccineService: VaccineService,
+    private petService: PetService
+  ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.petId = this.route.snapshot.queryParamMap.get('petId') || '';
+    if (!this.petId) {
+      console.error('❌ No se recibió petId para registrar la vacuna');
+      return;
+    }
+    this.loadPetInfo();
+  }
+
+  private loadPetInfo() {
+    this.petService.getPetById(this.petId).subscribe({
+      next: (pet) => {
+        this.petName = pet.name;
+        this.petAvatar = pet.imageUrl;
+        this.petAge = pet.ageMonths != null
+          ? (pet.ageMonths < 12 ? `${pet.ageMonths} meses` : `${Math.floor(pet.ageMonths / 12)} años`)
+          : '—';
+      },
+      error: (err) => console.error('❌ Error cargando mascota:', err)
+    });
+  }
 
   selectVaccineType(type: string) {
     this.vaccineType = type;
@@ -54,9 +82,7 @@ export class RegisterVaccineComponent implements OnInit {
     if (!this.appliedDate) return;
     const d = new Date(this.appliedDate);
     d.setFullYear(d.getFullYear() + 1);
-    this.nextDoseDate = d.toLocaleDateString('es-ES', {
-      day: 'numeric', month: 'long', year: 'numeric'
-    }).toUpperCase();
+    this.nextDoseDate = d.toISOString().split('T')[0]; // formato ISO para enviar al backend
     this.suggestedDate = d.toLocaleDateString('es-ES', {
       day: 'numeric', month: 'long', year: 'numeric'
     });
@@ -83,26 +109,41 @@ export class RegisterVaccineComponent implements OnInit {
   }
 
   save() {
-    console.log('Guardar vacuna:', {
-      vaccineType: this.vaccineType,
-      description: this.description,
-      appliedDate: this.appliedDate,
-      lotId: this.lotId,
-      nextDoseDate: this.nextDoseDate,
-      scheduleAppointment: this.scheduleAppointment,
-      reminderActive: this.reminderActive,
+    if (this.saving) return;
+
+    if (!this.vaccineType || !this.appliedDate) {
+      alert('Selecciona el tipo de vacuna y la fecha de aplicación.');
+      return;
+    }
+
+    this.saving = true;
+
+    const payload = {
+      petId: this.petId,
+      name: this.vaccineType,
+      lotNumber: this.lotId,
+      applicationDate: new Date(this.appliedDate).toISOString(),
+      nextDoseDate: this.nextDoseDate ? new Date(this.nextDoseDate).toISOString() : undefined,
+      veterinarian: this.vetName,
+      notes: this.description,
+    };
+
+    this.vaccineService.createVaccine(payload).subscribe({
+      next: (vaccine) => {
+        console.log('✅ Vacuna registrada exitosamente:', vaccine);
+        this.saving = false;
+        this.router.navigate(['/vaccine-timeline'], { queryParams: { petId: this.petId } });
+      },
+      error: (err) => {
+        this.saving = false;
+        console.error('❌ Error registrando vacuna:', err);
+        alert('No se pudo registrar la vacuna. Intenta de nuevo.');
+      }
     });
-    // TODO: VaccineService.create(...)
-    this.router.navigate(['/home']);
   }
 
   cancel() {
-  history.back();
-}
-
-  delete() {
-    // TODO: VaccineService.delete(...)
-    this.router.navigate(['/home']);
+    history.back();
   }
 
   goBack() {

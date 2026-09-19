@@ -1,0 +1,404 @@
+.add-event-content {
+  --background: #FFB84F;
+}
+
+.add-event-wrap {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+// HEADER
+.event-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 52px 16px 12px;
+  background: #FFB84F;
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+
+  ion-icon { font-size: 24px; color: #1a1a2e; }
+}
+
+.event-title {
+  flex: 1;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+  font-family: 'Actor', sans-serif;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  flex-shrink: 0;
+}
+
+// MASCOTA
+.mascota-section {
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+}
+
+.pet-chip-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pet-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 8px 14px 8px 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
+  &.selectable {
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: border-color 0.15s, background 0.15s;
+
+    &.selected {
+      background: #4037BE;
+      border-color: #4037BE;
+
+      .chip-name { color: #fff; }
+    }
+  }
+
+  &.fixed {
+    padding: 10px 16px 10px 8px;
+  }
+}
+
+.chip-avatar-wrap {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+  .chip-fallback { font-size: 18px; }
+}
+
+.chip-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+  white-space: nowrap;
+}
+
+.chip-check {
+  font-size: 18px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.empty-pets {
+  font-size: 13px;
+  color: #6b5a2e;
+  font-family: 'Actor', sans-serif;
+  margin: 4px 0 0;
+}
+
+// CARD BLANCA
+.event-card {
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  padding: 24px 16px 40px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loading-state {
+  padding: 40px 0;
+  text-align: center;
+  color: #888;
+  font-family: 'Actor', sans-serif;
+}
+
+// CAMPOS
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #4037BE;
+  font-family: 'Actor', sans-serif;
+}
+
+.edit-icon {
+  font-size: 13px;
+  color: #4037BE;
+  flex-shrink: 0;
+}
+
+.valid-check {
+  font-size: 15px;
+  color: #38B77C;
+  margin-left: auto;
+
+  &.inline { margin-left: 0; }
+}
+
+.input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1.5px solid #4037BE;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #fff;
+
+  .field-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+    background: transparent;
+    min-width: 0;
+
+    &::placeholder { color: #bbb; }
+  }
+}
+
+.field-img-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+
+  &.orange {
+    filter: invert(74%) sepia(60%) saturate(800%) hue-rotate(340deg) brightness(105%);
+  }
+}
+
+.time-icon {
+  font-size: 18px;
+  color: #4037BE;
+  flex-shrink: 0;
+}
+
+.textarea-wrap {
+  border: 1.5px solid #4037BE;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #fff;
+
+  .field-textarea {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+    background: transparent;
+    resize: none;
+    box-sizing: border-box;
+
+    &::placeholder { color: #bbb; }
+  }
+}
+
+// ACTIVIDAD
+.activity-row {
+  display: flex;
+  gap: 8px;
+}
+
+.activity-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 4px;
+  border-radius: 14px;
+  border: 1.5px solid #4037BE;
+  background: #fff;
+  cursor: pointer;
+  min-width: 0;
+
+  ion-icon { font-size: 20px; color: #4037BE; }
+
+  span {
+    font-size: 10px;
+    font-weight: 600;
+    color: #4037BE;
+    font-family: 'Actor', sans-serif;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  &.active {
+    background: #4037BE;
+
+    ion-icon, span { color: #fff; }
+  }
+}
+
+// FECHA + HORAS
+.date-time-row {
+  display: flex;
+  gap: 8px;
+
+  .input-wrap {
+    padding: 10px 10px;
+  }
+}
+
+.date-wrap { flex: 1.3; min-width: 0; }
+.time-wrap { flex: 1; min-width: 0; }
+
+// RECORDATORIO
+.reminder-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #d6e9ff;
+  border: none;
+  border-radius: 16px;
+  padding: 14px 16px;
+
+  .reminder-icon {
+    font-size: 24px;
+    color: #FFB84F;
+    flex-shrink: 0;
+  }
+
+  .reminder-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+
+    .reminder-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1a1a2e;
+      font-family: 'Actor', sans-serif;
+    }
+
+    .reminder-sub {
+      font-size: 11px;
+      color: #666;
+      font-family: 'Actor', sans-serif;
+      text-transform: capitalize;
+    }
+  }
+}
+
+::ng-config {}
+
+
+
+.picker-trigger {
+  background: white;
+  border: 1px solid #E0E0E0;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.picker-value {
+  flex: 1;
+  font-size: 13px;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+
+  &.placeholder {
+    color: #aaa;
+  }
+}
+
+.toggle-icon {
+  font-size: 32px;
+  color: #ccc;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &.active { color: #4037BE; }
+}
+
+// FOOTER
+.event-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 16px;
+  background: #4037BE;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 14px;
+  background: #fff;
+  color: #1a1a2e;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+}

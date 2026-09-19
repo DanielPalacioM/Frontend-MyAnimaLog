@@ -1,0 +1,204 @@
+<ion-content [fullscreen]="true" class="calendar-content">
+  <div class="calendar-wrap">
+
+    <!-- HEADER -->
+    <div class="calendar-header">
+      <div class="header-top">
+        <button class="back-btn" (click)="goHome()">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+
+        <div class="header-title-wrap">
+          <h1 class="calendar-title">Calendario</h1>
+          <span class="calendar-date-sub">{{ headerDateLabel }}</span>
+        </div>
+
+          
+          <div class="pets-avatars-row">
+       <div class="pet-avatar-mini-wrap" *ngFor="let pet of visiblePets" [style.background-color]="!pet.imageUrl ? getSexColor(pet.sex) : null">
+        <img *ngIf="pet.imageUrl" [src]="pet.imageUrl" class="pet-avatar-mini" alt="" />
+         <span *ngIf="!pet.imageUrl" class="pet-avatar-mini-fallback">{{ getPetIconFallback(pet.species) }}</span>
+      </div>
+       <div class="pets-counter" *ngIf="extraPetsCount > 0">
+        +{{ extraPetsCount }}
+     </div>
+         </div>
+          
+
+        <button class="menu-btn" (click)="toggleOptionsMenu()">
+          <ion-icon name="menu-outline"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- MENÚ FLOTANTE -->
+    <div class="options-menu-backdrop" *ngIf="showOptionsMenu" (click)="closeOptionsMenu()">
+      <div class="options-menu" (click)="$event.stopPropagation()">
+        <button class="option-item" [class.active]="viewMode === 'day'" (click)="setViewMode('day')">
+          <ion-icon name="today-outline"></ion-icon> Vista por día
+        </button>
+        <button class="option-item" [class.active]="viewMode === 'week'" (click)="setViewMode('week')">
+          <ion-icon name="calendar-outline"></ion-icon> Vista por semana
+        </button>
+        <button class="option-item" [class.active]="viewMode === 'month'" (click)="setViewMode('month')">
+          <ion-icon name="grid-outline"></ion-icon> Vista por mes
+        </button>
+        <div class="option-divider"></div>
+        <button class="option-item add" (click)="onAddEvent(); closeOptionsMenu()">
+          <ion-icon name="add-circle-outline"></ion-icon> Agregar evento
+        </button>
+      </div>
+    </div>
+
+    <!-- LOADING -->
+    <div class="loading-state" *ngIf="loading">
+      <p>Cargando eventos...</p>
+    </div>
+
+    <!-- CONTENIDO -->
+<ng-container *ngIf="!loading">
+
+  <!-- ============ VISTA POR DÍA ============ -->
+  <ng-container *ngIf="viewMode === 'day'">
+    <div class="cal-nav">
+      <button (click)="prevDay()"><ion-icon name="chevron-back-outline"></ion-icon></button>
+      <span class="cal-month-label">{{ selectedDayNavLabel }}</span>
+      <button (click)="nextDay()"><ion-icon name="chevron-forward-outline"></ion-icon></button>
+    </div>
+
+    <div class="events-card">
+      <span class="events-card-title">
+        {{ selectedDateLabel }}, {{ currentYear }}
+      </span>
+
+      <div class="events-list">
+        <div class="event-card" *ngFor="let ev of selectedDayEvents"
+             [style.border-left-color]="ev.color"
+             (click)="openEventModal(ev)">
+          <div class="event-card-title-row">
+            <ion-icon [name]="getTypeIcon(ev.type)" class="event-card-icon" [style.color]="ev.color"></ion-icon>
+            <span class="event-card-title">{{ ev.title }}</span>
+          </div>
+          <p class="event-card-desc" *ngIf="ev.description">{{ ev.description }}</p>
+          <p class="event-card-time">{{ ev.time }}</p>
+
+          <div class="event-actions" (click)="$event.stopPropagation()">
+            <button class="action-btn edit" (click)="onEditEvent(ev)"><ion-icon name="create-outline"></ion-icon></button>
+            <button class="action-btn delete" (click)="onDeleteEvent(ev)"><ion-icon name="trash-outline"></ion-icon></button>
+          </div>
+        </div>
+
+        <div class="empty-day-state" *ngIf="selectedDayEvents.length === 0">
+          <img src="assets/images/Calendar/CalendarioVacioDia.png" alt="" class="empty-day-img" />
+          <p class="empty-events">Agenda vacía</p>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="viewMode === 'week'">
+  <div class="cal-nav">
+    <button (click)="prevWeek()"><ion-icon name="chevron-back-outline"></ion-icon></button>
+    <span class="cal-month-label">{{ selectedDateLabel }}</span>
+    <button (click)="nextWeek()"><ion-icon name="chevron-forward-outline"></ion-icon></button>
+  </div>
+
+  <div class="week-view-card" *ngIf="weekHasEvents; else emptyWeek">
+    <div class="week-days-header">
+      <span class="week-day-col" *ngFor="let d of currentWeekDays" [class.today]="isToday(d)">
+        {{ dayNames[getDayIndex(d)] }}<br>{{ d.getDate() }}
+      </span>
+    </div>
+
+    <div class="week-scroll">
+      <div class="week-grid" [style.height.px]="weekGridHeight">
+
+        <!-- Líneas de fondo por hora -->
+        <div class="week-hour-line" *ngFor="let hour of weekHours" [style.top.px]="(hour - WEEK_START_HOUR) * HOUR_HEIGHT">
+          <span class="week-hour-label">{{ hour }}:00</span>
+        </div>
+
+        <!-- Columnas por día -->
+        <div class="week-day-column" *ngFor="let d of currentWeekDays">
+          <div class="week-event-block"
+            *ngFor="let ev of getEventsForDay(d)"
+            [style.top]="getEventStyle(ev).top"
+            [style.height]="getEventStyle(ev).height"
+            [style.background]="ev.color"
+            (click)="openEventModal(ev)">
+            <span class="week-event-title">{{ ev.title }}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <ng-template #emptyWeek>
+    <div class="week-view-card empty">
+      <img src="assets/images/Calendar/CalendarioVacioSemana.png" alt="" class="empty-week-img" />
+      <p class="empty-events">Agenda vacía</p>
+    </div>
+  </ng-template>
+</ng-container>
+
+  <!-- ============ VISTA POR MES ============ -->
+  <ng-container *ngIf="viewMode === 'month'">
+    <div class="cal-nav">
+      <button (click)="prevMonth()"><ion-icon name="chevron-back-outline"></ion-icon></button>
+      <span class="cal-month-label">{{ monthNames[currentMonth] }}, {{ currentYear }}</span>
+      <button (click)="nextMonth()"><ion-icon name="chevron-forward-outline"></ion-icon></button>
+    </div>
+
+    <div class="cal-days-header">
+      <span *ngFor="let d of dayNames">{{ d }}</span>
+    </div>
+
+    <div class="cal-week" *ngFor="let week of weeks">
+      <div class="cal-day"
+        *ngFor="let day of week"
+        [class.today]="isToday(day)"
+        [class.selected]="isSelected(day)"
+        [class.empty]="!day"
+        (click)="selectDate(day)">
+        <span class="day-num" *ngIf="day">{{ day.getDate() }}</span>
+        <div class="day-dots">
+          <ng-container *ngIf="day">
+            <span class="dot" *ngFor="let e of getDotsForDay(day)" [style.background]="e.color"></span>
+            <span class="more-dots" *ngIf="hasMoreEvents(day)">...</span>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <div class="events-card" *ngIf="monthHasEvents; else emptyMonth">
+      <span class="events-card-title">
+        {{ selectedDateLabel }}, {{ currentYear }}
+      </span>
+      <div class="events-list">
+        <div class="event-card" *ngFor="let ev of selectedDayEvents"
+             [style.border-left-color]="ev.color"
+             (click)="openEventModal(ev)">
+          <div class="event-card-title-row">
+            <ion-icon [name]="getTypeIcon(ev.type)" class="event-card-icon" [style.color]="ev.color"></ion-icon>
+            <span class="event-card-title">{{ ev.title }}</span>
+          </div>
+          <p class="event-card-desc" *ngIf="ev.description">{{ ev.description }}</p>
+          <p class="event-card-time">{{ ev.time }}</p>
+          <div class="event-actions" (click)="$event.stopPropagation()">
+            <button class="action-btn edit" (click)="onEditEvent(ev)"><ion-icon name="create-outline"></ion-icon></button>
+            <button class="action-btn delete" (click)="onDeleteEvent(ev)"><ion-icon name="trash-outline"></ion-icon></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #emptyMonth>
+      <div class="events-card empty">
+        <img src="assets/images/Calendar/CalendarioVacioSemana.png" alt="" class="empty-week-img" />
+        <p class="empty-events">Agenda vacía</p>
+      </div>
+    </ng-template>
+  </ng-container>
+
+</ng-container>

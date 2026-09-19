@@ -169,3 +169,46 @@
     opacity: 0 !important;
   }
 }
+
+ion-modal.datetime-modal {
+  --width: 320px;
+  --max-width: 90vw;
+  --height: auto;
+  --border-radius: 24px;
+  --background: #ffffff;
+  --box-shadow: 0 20px 60px rgba(26, 26, 46, 0.35);
+  --backdrop-opacity: 1;
+
+  align-items: center;
+  justify-content: center;
+
+  &::part(backdrop) {
+    background: rgba(26, 26, 46, 0.35);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    opacity: 1;
+  }
+
+  &::part(content) {
+    background: #ffffff;
+    border-radius: 24px;
+    overflow: hidden;
+    padding: 6px;
+  }
+
+  ion-datetime {
+    color-scheme: light;            // <- esto es lo que mata el fondo negro
+    --background: #ffffff;
+    --background-rgb: 255, 255, 255;
+    --ion-color-base: #4037BE;      // color del seleccionado
+    --ion-color-contrast: #ffffff;
+    --ion-text-color: #1a1a2e;
+    --wheel-highlight-background: #ece9ff;
+    --wheel-fade-background-rgb: 255, 255, 255;
+    --title-color: #4037BE;
+
+    width: 100%;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+  }
+}

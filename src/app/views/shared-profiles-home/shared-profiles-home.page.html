@@ -7,9 +7,7 @@
     </button>
 
     <!-- FONDO NARANJA -->
-    <div class="bg-naranja">
-      <img src="assets/images/SharedProfilesHome/FondoNaranja.png" alt="" />
-    </div>
+    <div class="bg-naranja"></div>
 
     <!-- CARD AZUL -->
     <div class="card-azul">
@@ -113,22 +111,21 @@
         </div>
         <div class="pet-info">
           <p class="pet-name">{{ pet.name }}</p>
-          <p class="pet-breed">{{ pet.breed }}</p>
-        </div>
+          <p class="pet-breed">{{ pet.breed }}{{ pet.sex ? ' - ' + pet.sex : '' }}{{ pet.height ? ' - ' + pet.height + ' cm' : '' }}</p>        </div>
       </div>
 
       <div class="pet-stats">
         <div class="pstat">
           <span class="pstat-label">Edad</span>
-          <span class="pstat-val">{{ pet.ageMonths ? pet.ageMonths + ' meses' : '—' }}</span>
+          <span class="pstat-val">{{ formatAge(pet.ageMonths, pet.birthDate) }}</span>
         </div>
         <div class="pstat">
           <span class="pstat-label">Vacunas</span>
-          <span class="pstat-val">—</span>
+          <span class="pstat-val">0</span>
         </div>
         <div class="pstat">
           <span class="pstat-label">Visitas al veterinario</span>
-          <span class="pstat-val">—</span>
+          <span class="pstat-val">0</span>
         </div>
         <div class="pstat">
           <span class="pstat-label">Peso</span>

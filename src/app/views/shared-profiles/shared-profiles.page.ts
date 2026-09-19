@@ -13,7 +13,10 @@ export class SharedProfilesPage implements OnInit {
 
   ngOnInit() {
     if (localStorage.getItem('sharedProfilesVisited') === 'true') {
-      this.router.navigate(['/shared-profiles-home']);
+      // El usuario ya pasó por aquí antes: saltamos esta pantalla
+      // sin dejar rastro en el historial, para que el botón "atrás"
+      // nunca vuelva a mostrarla.
+      this.router.navigate(['/shared-profiles-home'], { replaceUrl: true });
     }
   }
 
@@ -23,6 +26,9 @@ export class SharedProfilesPage implements OnInit {
 
   onStartSharing() {
     localStorage.setItem('sharedProfilesVisited', 'true');
-    this.router.navigate(['/shared-profiles-home']);
+    // replaceUrl: true asegura que esta pantalla NO quede en el historial —
+    // así, si el usuario luego presiona "atrás" desde shared-profiles-home,
+    // salta directo a la pantalla anterior (Home), no vuelve aquí.
+    this.router.navigate(['/shared-profiles-home'], { replaceUrl: true });
   }
 }

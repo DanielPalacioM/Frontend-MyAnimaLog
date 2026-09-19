@@ -1,58 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
+import { MedicalHistoryService } from 'src/app/services/MedicalHistoryService/medical-history';
+import { PetService } from 'src/app/services/PetService/pet';
+import {
+  Visit,
+  Treatment,
+  LabResult,
+  Surgery
+} from 'src/app/models/medical-history.model';
 
 export type MHTab = 'consultas' | 'tratamientos' | 'lab' | 'cirugias';
-
-export interface Consultation {
-  id: string;
-  title: string;
-  date: string;
-  vet: string;
-  reason: string;
-  temperature?: string;
-  weight?: string;
-  status: 'applied' | 'follow-up';
-  hasDoc?: boolean;
-  hasTreatment?: boolean;
-}
-
-export interface Treatment {
-  id: string;
-  title: string;
-  startDate: string;
-  endDate: string;
-  description: string;
-  notes?: string;
-  status: 'active' | 'completed' | 'suspended';
-  progressDays: number;
-  totalDays: number;
-  medications: { name: string; dose: string; status: string }[];
-}
-
-export interface LabTest {
-  id: string;
-  title: string;
-  date: string;
-  lab: string;
-  isNormal: boolean;
-  resultMessage: string;
-  values?: { label: string; value: string; range: string }[];
-  hasDoc?: boolean;
-  status: 'active' | 'review';
-}
-
-export interface Surgery {
-  id: string;
-  title: string;
-  date: string;
-  vet: string;
-  durationMin: number;
-  anesthesia: string;
-  complications: string;
-  nextCheckup: string;
-  outcome: string;
-  status: 'completed' | 'recovery' | 'scheduled';
-}
 
 @Component({
   selector: 'app-medical-history',
@@ -63,88 +21,277 @@ export interface Surgery {
 export class MedicalHistoryPage implements OnInit {
 
   activeTab: MHTab = 'consultas';
+  petId: string = '';
 
-  petName = 'Juan';
-  petBreed = 'Siamés';
-  petAvatar = 'assets/images/Profile/cat-juan.png';
+  petName = '';
+  petBreed = '';
+  petAvatar: string | null = null;
 
-  consultations: Consultation[] = [
-    {
-      id: 'c1', title: 'Chequeo general',
-      date: '12 jun 2026', vet: 'Dr.pet',
-      reason: 'Revisión rutinaria',
-      temperature: '38.5°C', weight: '40 Kg',
-      status: 'applied', hasDoc: true, hasTreatment: true
-    },
-    {
-      id: 'c2', title: 'Consulta digestiva',
-      date: '12 feb 2026', vet: 'Dr.pet',
-      reason: 'Vómitos frecuentes',
-      status: 'follow-up'
-    },
-  ];
+  consultations: Visit[] = [];
+  treatments: Treatment[] = [];
+  labTests: LabResult[] = [];
+  surgeries: Surgery[] = [];
 
-  treatments: Treatment[] = [
-    {
-      id: 't1', title: 'Tratamiento digestivo',
-      startDate: '3 abr', endDate: '10 abr 2026',
-      description: 'Gastritis leve', notes: 'Dieta blanda',
-      status: 'active', progressDays: 5, totalDays: 7,
-      medications: [{ name: 'Omeprazol 20mg', dose: '1 caps · c/12h · Oral', status: 'active' }]
-    },
-    {
-      id: 't2', title: 'Post - Vacuna',
-      startDate: '', endDate: 'ene 2024',
-      description: '', status: 'completed',
-      progressDays: 7, totalDays: 7, medications: []
-    },
-  ];
+  loading = true;
 
-  labTests: LabTest[] = [
-    {
-      id: 'l1', title: 'Hemograma',
-      date: '10 jun 2024', lab: 'Lab·Dr.pet',
-      isNormal: true, resultMessage: 'Resultados normales',
-      status: 'active', hasDoc: true,
-      values: [
-        { label: 'Glóbulos', value: '6.2', range: '5.5–8.5' },
-        { label: 'Plaquetas', value: '320k', range: '200–500k' },
-        { label: 'Hematocrito', value: '42%', range: '37–55%' },
-      ]
-    },
-    {
-      id: 'l2', title: 'Rayos X tórax',
-      date: '3 abr 2024', lab: '',
-      isNormal: false, resultMessage: 'Leve opacidad lóbulo derecho',
-      status: 'review'
-    },
-  ];
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private location: Location,
+    private medicalHistoryService: MedicalHistoryService,
+    private petService: PetService
+  ) {}
 
-  surgeries: Surgery[] = [
-    {
-      id: 's1', title: 'Castración',
-      date: '3 jul 2026', vet: 'Dr. Pet - Cartagena',
-      durationMin: 45, anesthesia: 'Ketamina + Xilazina',
-      complications: 'Ninguna', nextCheckup: '10 jul 2026',
-      outcome: 'Exitosa', status: 'completed'
-    },
-  ];
+  ngOnInit() {
+    this.petId = this.route.snapshot.paramMap.get('petId') || '';
 
-  constructor(private router: Router) {}
+    const tabParam =
+      this.route.snapshot.queryParamMap.get('tab') as MHTab;
 
-  ngOnInit() {}
+    if (
+      tabParam &&
+      ['consultas', 'tratamientos', 'lab', 'cirugias'].includes(tabParam)
+    ) {
+      this.activeTab = tabParam;
+    }
 
-  setTab(tab: MHTab) { this.activeTab = tab; }
-
-  get progressPercent(): number {
-    const t = this.treatments.find(x => x.status === 'active');
-    return t ? Math.round((t.progressDays / t.totalDays) * 100) : 0;
+    if (this.petId) {
+      this.loadPetInfo();
+    }
   }
 
-goToAddConsultation() { this.router.navigate(['/add-consultation']); }
-goToAddTreatment() { this.router.navigate(['/add-treatment']); }
-goToAddLab() { this.router.navigate(['/add-lab']); }
-goToAddSurgery() { this.router.navigate(['/add-surgery']); }
-goBack() { history.back(); }
+  ionViewWillEnter() {
+    if (this.petId) {
+      this.loadAll();
+    }
+  }
 
+  private loadPetInfo() {
+    this.petService.getPetById(this.petId).subscribe({
+      next: (pet) => {
+        this.petName = pet.name;
+        this.petBreed = pet.breed;
+        this.petAvatar = pet.imageUrl;
+      },
+      error: (err) => {
+        console.error('❌ Error cargando datos de mascota:', err);
+      }
+    });
+  }
+
+  private loadAll() {
+    this.loading = true;
+
+    this.medicalHistoryService.getVisitsByPet(this.petId).subscribe({
+      next: (visits) => {
+
+        console.log('📋 VISITAS DEVUELTAS:', visits);
+
+        visits.forEach((visit) => {
+          console.log('📌 VISIT ID:', visit.id);
+        });
+
+        this.consultations = visits;
+
+        this.loadTreatmentsAndLabsForVisits(visits);
+      },
+
+      error: (err) => {
+        console.error('❌ Error cargando consultas:', err);
+
+        this.consultations = [];
+        this.treatments = [];
+        this.labTests = [];
+      }
+    });
+
+    this.medicalHistoryService.getSurgeriesByPet(this.petId).subscribe({
+      next: (surgeries) => {
+        this.surgeries = surgeries;
+        this.loading = false;
+      },
+
+      error: (err) => {
+        console.error('❌ Error cargando cirugías:', err);
+
+        this.surgeries = [];
+        this.loading = false;
+      }
+    });
+  }
+
+  private loadTreatmentsAndLabsForVisits(visits: Visit[]) {
+
+    if (visits.length === 0) {
+      this.treatments = [];
+      this.labTests = [];
+      return;
+    }
+
+    const allTreatments: Treatment[] = [];
+    const allLabs: LabResult[] = [];
+
+    let completed = 0;
+
+    const totalCalls = visits.length * 2;
+
+    const checkDone = () => {
+      completed++;
+
+      if (completed === totalCalls) {
+
+        this.treatments = allTreatments;
+        this.labTests = allLabs;
+
+        console.log(
+          '🧪 LABORATORIOS FINALES:',
+          this.labTests
+        );
+      }
+    };
+
+    visits.forEach((visit) => {
+
+      // ==========================
+      // TRATAMIENTOS
+      // ==========================
+
+      this.medicalHistoryService
+        .getTreatmentForVisit(visit.id)
+        .subscribe({
+
+          next: (treatmentsForVisit) => {
+
+            if (treatmentsForVisit.length === 0) {
+              checkDone();
+              return;
+            }
+
+            let treatmentsCompleted = 0;
+
+            treatmentsForVisit.forEach((summary) => {
+
+              this.medicalHistoryService
+                .getTreatmentById(summary.id)
+                .subscribe({
+
+                  next: (fullTreatment) => {
+
+                    allTreatments.push(fullTreatment);
+
+                    treatmentsCompleted++;
+
+                    if (
+                      treatmentsCompleted ===
+                      treatmentsForVisit.length
+                    ) {
+                      checkDone();
+                    }
+                  },
+
+                  error: (err) => {
+
+                    console.error(
+                      `❌ Error cargando detalle del tratamiento ${summary.id}:`,
+                      err
+                    );
+
+                    allTreatments.push(summary);
+
+                    treatmentsCompleted++;
+
+                    if (
+                      treatmentsCompleted ===
+                      treatmentsForVisit.length
+                    ) {
+                      checkDone();
+                    }
+                  }
+
+                });
+            });
+          },
+
+          error: (err) => {
+
+            if (err.status !== 404) {
+              console.error(
+                `❌ Error cargando tratamiento de la consulta ${visit.id}:`,
+                err
+              );
+            }
+
+            checkDone();
+          }
+
+        });
+
+
+      // ==========================
+      // LABORATORIOS
+      // ==========================
+
+      console.log(
+        '🔎 BUSCANDO LABS PARA VISIT ID:',
+        visit.id
+      );
+
+      this.medicalHistoryService.getLabResultsByVisit(visit.id).subscribe({
+  next: (labs) => {
+    console.log(`🧪 Labs para visita ${visit.id}:`, labs);
+    allLabs.push(...labs);
+    checkDone();
+  },
+
+          error: (err) => {
+    const noEncontrado = err.status === 404 ||
+      (err.status === 500 && (
+        err.error?.error?.includes('No se encontró') ||
+        err.error?.erro?.includes('No se encontró')
+      ));
+    if (!noEncontrado) {
+      console.error(`❌ Error cargando labs de la consulta ${visit.id}:`, err);
+    }
+    checkDone();
+  }
+});
+
+    });
+  }
+
+  setTab(tab: MHTab) {
+    this.activeTab = tab;
+  }
+
+  goToAddConsultation() {
+    this.router.navigate([
+      '/add-consultation',
+      this.petId
+    ]);
+  }
+
+  goToAddTreatment() {
+    this.router.navigate([
+      '/add-treatment',
+      this.petId
+    ]);
+  }
+
+  /*
+   * Ahora recibe el ID de la consulta
+   */
+  goToAddLab() {
+  this.router.navigate(['/add-lab', this.petId]);
+}
+
+  goToAddSurgery() {
+    this.router.navigate([
+      '/add-surgery',
+      this.petId
+    ]);
+  }
+
+  goBack() {
+    this.location.back();
+  }
 }
