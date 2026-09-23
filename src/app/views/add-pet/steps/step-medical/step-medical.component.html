@@ -28,14 +28,7 @@
             {{ selectedVaccineType || 'Tipo vacuna' }}
           </span>
         </div>
-        <div class="input-wrap">
-          <ion-icon name="calendar-outline" class="input-icon"></ion-icon>
-          <input
-            class="field-input"
-            type="date"
-            [(ngModel)]="vaccineDate"
-            (ngModelChange)="onVaccineDateChange()" />
-        </div>
+        <app-date-picker-field placeholder="Fecha" [value]="vaccineDate" (valueChange)="vaccineDate = $event; onVaccineDateChange()"></app-date-picker-field>
       </div>
 
       <div class="vaccine-dropdown" *ngIf="showVaccineTypeDropdown">

@@ -1,8 +1,10 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { CalendarEvent } from '../../shared/components/calendar-widget/calendar-widget.component';
 import { ProfileService } from 'src/app/services/ProfileService/profile';
 import { PetService, Pet } from 'src/app/services/PetService/pet';
+import { NotificationService } from 'src/app/services/NotificationService/notification';
 
 @Component({
   selector: 'app-home',
@@ -10,7 +12,7 @@ import { PetService, Pet } from 'src/app/services/PetService/pet';
   styleUrls: ['home.page.scss'],
   standalone: false,
 })
-export class HomePage implements OnInit, AfterViewInit {
+export class HomePage implements OnInit, AfterViewInit, OnDestroy {
 
   username: string = 'Username';
   userAvatar: string = 'assets/images/default-avatar.png';
@@ -36,6 +38,7 @@ export class HomePage implements OnInit, AfterViewInit {
 
   pets: Pet[] = [];
   upcomingEvents: CalendarEvent[] = [];
+  unreadNotificationsCount: number = 0;
 
   // --- Swipe / carrusel state ---
   @ViewChild('swipeContainer') swipeContainerRef!: ElementRef<HTMLDivElement>;
@@ -46,18 +49,38 @@ export class HomePage implements OnInit, AfterViewInit {
   isDragging = false;
   cardTransition = 'none';
 
-  constructor(public router: Router, private profileService: ProfileService, private petService: PetService) {}
+  private unreadCountSub?: Subscription;
+
+  constructor(
+    public router: Router,
+    private profileService: ProfileService,
+    private petService: PetService,
+    private notificationService: NotificationService
+  ) {}
 
   ngOnInit() {
     this.loadUserData();
     this.loadPets();
     this.loadEvents();
     this.checkFirstTime();
+
+    // El contador se mantiene al día solo: si desde Notificaciones (u otra
+    // pantalla) se marca algo como leído, este valor baja de inmediato sin
+    // que Home tenga que volver a pedirlo.
+    this.unreadCountSub = this.notificationService.unreadCount$.subscribe(
+      count => this.unreadNotificationsCount = count
+    );
+    this.notificationService.refreshUnreadCount();
   }
 
    ionViewWillEnter() {
     this.loadUserData();
     this.loadPets();
+    this.notificationService.refreshUnreadCount();
+  }
+
+  ngOnDestroy() {
+    this.unreadCountSub?.unsubscribe();
   }
 
   ngAfterViewInit() {

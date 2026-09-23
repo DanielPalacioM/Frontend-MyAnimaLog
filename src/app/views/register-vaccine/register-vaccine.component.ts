@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { VaccineService } from 'src/app/services/VaccineService/vaccine/vaccine'; 
+import { VaccineService } from 'src/app/services/VaccineService/vaccine/vaccine';
 import { PetService } from 'src/app/services/PetService/pet';
+import { NotificationService } from 'src/app/services/NotificationService/notification';
 
 @Component({
   selector: 'app-register-vaccine',
@@ -46,7 +47,8 @@ export class RegisterVaccineComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private vaccineService: VaccineService,
-    private petService: PetService
+    private petService: PetService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit() {
@@ -131,14 +133,34 @@ export class RegisterVaccineComponent implements OnInit {
     this.vaccineService.createVaccine(payload).subscribe({
       next: (vaccine) => {
         console.log('✅ Vacuna registrada exitosamente:', vaccine);
+        this.notifyVaccineRegistered();
         this.saving = false;
-        this.router.navigate(['/vaccine-timeline'], { queryParams: { petId: this.petId } });
+        this.router.navigate(['/vaccine-timeline'], { queryParams: { petId: this.petId }, replaceUrl: true });
       },
       error: (err) => {
         this.saving = false;
         console.error('❌ Error registrando vacuna:', err);
         alert('No se pudo registrar la vacuna. Intenta de nuevo.');
       }
+    });
+  }
+
+  // El backend de vacunas solo programa el recordatorio de la próxima dosis
+  // (VACCINE_DUE); no manda una confirmación de que se registró. Se crea acá
+  // para que el dueño vea de una vez el "estado" de la vacuna en Notificaciones.
+  private notifyVaccineRegistered(): void {
+    const petLabel = this.petName || 'Tu mascota';
+    const nextDoseLabel = this.nextDoseDate
+      ? ` Próxima dosis: ${new Date(this.nextDoseDate).toLocaleDateString('es-CO')}.`
+      : '';
+
+    this.notificationService.createNotification({
+      title: '💉 Vacuna registrada',
+      message: `${petLabel} recibió la vacuna de ${this.vaccineType}.${nextDoseLabel}`,
+      type: 'MEDICAL',
+      sendAt: new Date().toISOString()
+    }).subscribe({
+      error: (err) => console.error('❌ No se pudo crear la notificación de vacuna:', err)
     });
   }
 

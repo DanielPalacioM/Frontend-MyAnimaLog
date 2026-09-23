@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { sharedProfilesIntroGuard } from './guards/shared-profiles-intro.guard';
 
 const routes: Routes = [
   {
@@ -35,6 +36,7 @@ const routes: Routes = [
   },
   {
     path: 'shared-profiles',
+    canActivate: [sharedProfilesIntroGuard],
     loadChildren: () => import('./views/shared-profiles/shared-profiles.module').then( m => m.SharedProfilesPageModule)
   },
   {

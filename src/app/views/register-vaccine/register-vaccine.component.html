@@ -64,9 +64,8 @@
           <span class="lot-label">LOT ID</span>
         </label>
         <div class="date-lot-row">
-  <div class="input-wrap date-wrap">
-    <img src="assets/images/AddVaccine/CalendarioIcon.png" alt="" class="field-img-icon orange" />
-    <input class="field-input" type="date" [(ngModel)]="appliedDate" (ngModelChange)="onDateChange()" />
+  <div class="date-wrap">
+    <app-date-picker-field placeholder="Fecha aplicada" [value]="appliedDate" (valueChange)="appliedDate = $event; onDateChange()"></app-date-picker-field>
   </div>
   <div class="input-wrap lot-wrap">
     <input class="field-input lot-input" type="text" placeholder="PV-001..." [(ngModel)]="lotId" />
@@ -157,10 +156,7 @@
 
           <div class="detail-row">
             <span class="detail-label">Fecha sugerida</span>
-            <div class="input-wrap">
-              <img src="assets/images/AddVaccine/AgendarCitaIcon.png" alt="" class="field-img-icon orange" />
-              <input class="field-input" type="date" [(ngModel)]="suggestedDate" />
-            </div>
+            <app-date-picker-field placeholder="Fecha sugerida" [(value)]="suggestedDate"></app-date-picker-field>
           </div>
 
           <div class="detail-row">

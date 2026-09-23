@@ -141,7 +141,7 @@ export class AddSurgeryPage implements OnInit {
     this.medicalHistoryService.createSurgery(payload).subscribe({
       next: () => {
         this.saving = false;
-        this.router.navigate(['/medical-history', this.petId], { queryParams: { tab: 'cirugias' } });
+        this.router.navigate(['/medical-history', this.petId], { queryParams: { tab: 'cirugias' }, replaceUrl: true });
       },
       error: (err) => {
         this.saving = false;

@@ -136,17 +136,17 @@ export class AddPetComponent implements OnInit {
           this.petService.deletePhoto(this.petId!).subscribe({
             next: () => {
               this.isSaving = false;
-              this.router.navigate(['/pet-profile', this.petId]);
+              this.router.navigate(['/pet-profile', this.petId], { replaceUrl: true });
             },
             error: (err) => {
               console.error('❌ Error eliminando foto:', err);
               this.isSaving = false;
-              this.router.navigate(['/pet-profile', this.petId]); // navega igual, la mascota sí se actualizó
+              this.router.navigate(['/pet-profile', this.petId], { replaceUrl: true }); // navega igual, la mascota sí se actualizó
             }
           });
         } else {
           this.isSaving = false;
-          this.router.navigate(['/pet-profile', this.petId]);
+          this.router.navigate(['/pet-profile', this.petId], { replaceUrl: true });
         }
       },
       error: (err) => {
@@ -160,7 +160,7 @@ export class AddPetComponent implements OnInit {
       next: (pet) => {
         console.log('✅ Mascota creada exitosamente:', pet);
         this.isSaving = false;
-        this.router.navigate(['/home']);
+        this.router.navigate(['/home'], { replaceUrl: true });
       },
       error: (err) => {
         this.isSaving = false;

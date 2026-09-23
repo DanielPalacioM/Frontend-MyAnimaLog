@@ -3,14 +3,34 @@
   align-items: flex-start;
   gap: 12px;
   padding: 14px 16px;
-  background: #fff;
   border-radius: 12px;
   margin-bottom: 8px;
   cursor: pointer;
   position: relative;
-  transition: opacity 0.2s;
+  transition: background 0.2s, box-shadow 0.2s;
 
-  &:active { opacity: 0.9; }
+  // Leída = opaca/apagada. No leída = blanca/nítida (ver ".unread" abajo).
+  // OJO: usamos color de fondo en vez de "opacity" a propósito — opacity < 1
+  // crea un stacking context nuevo y atrapa el menú "..." (z-index) dentro de
+  // la tarjeta, haciendo que la siguiente tarjeta lo tape.
+  background: #eeeeee;
+
+  .notif-title, .notif-message { color: #999; }
+
+  &.unread {
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,.08);
+
+    .notif-title { color: #1a1a2e; }
+    .notif-message { color: #666; }
+  }
+
+  &:active { background: #e4e4e4; }
+  &.unread:active { background: #f5f5f5; }
+
+  // Mientras el menú de una tarjeta está abierto, esa tarjeta debe quedar
+  // por encima de las que vienen después en la lista.
+  &.menu-open { z-index: 10; }
 }
 
 .notif-body {

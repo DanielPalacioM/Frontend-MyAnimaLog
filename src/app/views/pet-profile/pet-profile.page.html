@@ -88,10 +88,10 @@
 
       <!-- PET CARD -->
       <div class="pet-card">
-        <div class="pet-avatar-wrap" [style.background-color]="!pet.imageUrl ? getSexColor(pet.sex) : null">
-          <img *ngIf="pet.imageUrl" [src]="pet.imageUrl" alt="" class="pet-avatar" />
-          <span *ngIf="!pet.imageUrl" class="pet-avatar-fallback">{{ getPetIconFallback(pet.species) }}</span>
-        </div>
+        <div class="pet-avatar-wrap" [style.background-color]="!pet.imageUrl ? getSexColor(pet.sex) : null" (click)="openPhotoViewer()">
+           <img *ngIf="pet.imageUrl" [src]="pet.imageUrl" alt="" class="pet-avatar" />
+           <span *ngIf="!pet.imageUrl" class="pet-avatar-fallback">{{ getPetIconFallback(pet.species) }}</span>
+       </div>
         <p class="pet-name">{{ pet.name }}</p>
         <p class="pet-breed">{{ pet.breed }} · {{ petStats.age }}</p>
       </div>
@@ -155,5 +155,13 @@
     </div>
 
   </div>
+
+  <!-- VISOR DE FOTO A PANTALLA COMPLETA -->
+<div class="photo-viewer-backdrop" *ngIf="showPhotoViewer" (click)="closePhotoViewer()">
+  <button class="photo-viewer-close" (click)="closePhotoViewer()">
+    <ion-icon name="close-outline"></ion-icon>
+  </button>
+  <img [src]="pet?.imageUrl" alt="" class="photo-viewer-img" (click)="$event.stopPropagation()" />
+</div>
 
 </ion-content>

@@ -64,6 +64,7 @@
       <div class="header-icons">
         <div class="icon-card" (click)="navigate('/notifications')">
           <img src="assets/images/Home_icons/NotificationIcon.png" alt="notifications" />
+          <span class="notif-badge" *ngIf="unreadNotificationsCount > 0">{{ unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount }}</span>
         </div>
         <div class="icon-card">
           <img src="assets/images/Home_icons/IA icon.png" alt="IA" />

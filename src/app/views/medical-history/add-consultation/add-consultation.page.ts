@@ -70,7 +70,7 @@ export class AddConsultationPage implements OnInit {
     this.medicalHistoryService.createVisit(payload).subscribe({
       next: () => {
         this.saving = false;
-        this.router.navigate(['/medical-history', this.petId]);
+        this.router.navigate(['/medical-history', this.petId], { replaceUrl: true });
       },
       error: (err) => {
         this.saving = false;

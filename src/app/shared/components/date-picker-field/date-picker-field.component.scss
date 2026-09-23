@@ -1,0 +1,39 @@
+:host { display: block; width: 100%; min-width: 0; }
+
+.picker-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 12px;
+  background: #fff;
+  border: 1px solid #E0E0E0;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.field-img-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: invert(74%) sepia(60%) saturate(800%) hue-rotate(340deg) brightness(105%);
+}
+
+.picker-value {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: #1a1a2e;
+  font-family: 'Actor', sans-serif;
+
+  &.placeholder { color: #aaa; }
+}
+
+.valid-check {
+  font-size: 15px;
+  color: #38B77C;
+  flex-shrink: 0;
+}

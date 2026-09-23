@@ -22,9 +22,13 @@ import { PetStatsCardComponent } from './components/pet-stats-card/pet-stats-car
 import { VaccineCardComponent } from './components/vaccine-card/vaccine-card.component';
 import { DocumentsSectionComponent } from './components/documents-section/documents-section.component';
 import { VaccineTimelineCardComponent } from './components/vaccine-timeline-card/vaccine-timeline-card.component';
+import { DatePickerFieldComponent } from './components/date-picker-field/date-picker-field.component';
+import { VisitPickerFieldComponent } from './components/visit-picker-field/visit-picker-field.component';
 
 @NgModule({
   declarations: [
+    DatePickerFieldComponent,
+    VisitPickerFieldComponent,
     InputComponent,
     AvatarComponent,
     MenuItemComponent,
@@ -50,6 +54,8 @@ import { VaccineTimelineCardComponent } from './components/vaccine-timeline-card
     RouterModule,
   ],
   exports: [
+    DatePickerFieldComponent,
+    VisitPickerFieldComponent,
     InputComponent,
     AvatarComponent,
     MenuItemComponent,

@@ -97,13 +97,8 @@
       Fecha de nacimiento / Edad
     </label>
     <div class="date-row">
-      <div class="input-wrap date-input">
-        <ion-icon name="calendar-outline" class="input-icon"></ion-icon>
-        <input
-          class="field-input"
-          type="date"
-          [(ngModel)]="birthDate"
-          (ngModelChange)="onBirthDateChange()" />
+      <div class="date-input">
+        <app-date-picker-field placeholder="Fecha de nacimiento" [value]="birthDate" (valueChange)="birthDate = $event; onBirthDateChange()"></app-date-picker-field>
       </div>
       <div class="age-badge" *ngIf="ageMonths !== null">
         {{ ageMonths }} meses

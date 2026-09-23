@@ -18,11 +18,7 @@
     <ion-icon name="document-text-outline"></ion-icon>
     Consulta asociada
   </label>
-  <div class="input-wrap">
-    <select class="field-input" [(ngModel)]="selectedVisitId">
-      <option *ngFor="let v of visits" [value]="v.id">{{ v.date }} - {{ v.reason }}</option>
-    </select>
-  </div>
+  <app-visit-picker-field [visits]="visits" [(value)]="selectedVisitId"></app-visit-picker-field>
 </div>
 
 <div class="field" *ngIf="visits.length === 0">
@@ -51,18 +47,14 @@
             <ion-icon name="calendar-outline"></ion-icon>
             Inicio
           </label>
-          <div class="input-wrap">
-            <input type="date" class="field-input" [(ngModel)]="startDate" />
-          </div>
+          <app-date-picker-field placeholder="Inicio" [(value)]="startDate"></app-date-picker-field>
         </div>
         <div class="field">
           <label class="field-label">
             <ion-icon name="calendar-outline"></ion-icon>
             Fin
           </label>
-          <div class="input-wrap">
-            <input type="date" class="field-input" [(ngModel)]="endDate" />
-          </div>
+          <app-date-picker-field placeholder="Fin" [(value)]="endDate"></app-date-picker-field>
         </div>
       </div>
 

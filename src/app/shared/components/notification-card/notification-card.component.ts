@@ -2,7 +2,9 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 export interface AppNotification {
   id: string;
-  type: 'invitation' | 'medicine' | 'routine' | 'vet-appointment' | 'vet-message' | 'calendar';
+  // Tipos "de UI" (mock antiguo) + tipos reales que manda el backend
+  // (GENERAL, PET_INVITATION, SHARED_ACCESS, MEDICAL, VACCINE_DUE, VETERINARY_ALERT).
+  type: string;
   title: string;
   message: string;
   date: Date;

@@ -1,0 +1,41 @@
+<button type="button" class="picker-trigger" (click)="open()">
+  <ion-icon name="medkit-outline" class="lead-icon"></ion-icon>
+  <div class="picker-text" *ngIf="selected as sel; else placeholder">
+    <span class="picker-title">{{ sel.reason }}</span>
+    <span class="picker-sub">{{ formatDate(sel.date) }}<ng-container *ngIf="sel.veterinarian"> · {{ sel.veterinarian }}</ng-container></span>
+  </div>
+  <ng-template #placeholder>
+    <span class="picker-title placeholder">Selecciona una consulta</span>
+  </ng-template>
+  <ion-icon name="chevron-down-outline" class="chevron"></ion-icon>
+</button>
+
+<ion-modal [isOpen]="isOpen" (didDismiss)="isOpen = false" class="datetime-modal visit-modal">
+  <ng-template>
+    <div class="visit-sheet">
+      <div class="visit-sheet-header">
+        <span class="visit-sheet-title">Consulta asociada</span>
+        <button type="button" class="visit-sheet-close" (click)="isOpen = false">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="visit-list">
+        <button type="button" class="visit-item"
+          *ngFor="let v of visits"
+          [class.selected]="v.id === value"
+          (click)="select(v)">
+          <div class="visit-date">
+            <ion-icon name="calendar-outline"></ion-icon>
+            {{ formatDate(v.date) }}
+          </div>
+          <div class="visit-info">
+            <span class="visit-reason">{{ v.reason }}</span>
+            <span class="visit-vet" *ngIf="v.veterinarian">{{ v.veterinarian }}</span>
+          </div>
+          <ion-icon *ngIf="v.id === value" name="checkmark-circle" class="visit-check"></ion-icon>
+        </button>
+      </div>
+    </div>
+  </ng-template>
+</ion-modal>

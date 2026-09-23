@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { sharedProfilesIntroKey } from 'src/app/guards/shared-profiles-intro.guard';
 
 @Component({
   selector: 'app-shared-profiles',
@@ -12,23 +13,19 @@ export class SharedProfilesPage implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit() {
-    if (localStorage.getItem('sharedProfilesVisited') === 'true') {
-      // El usuario ya pasó por aquí antes: saltamos esta pantalla
-      // sin dejar rastro en el historial, para que el botón "atrás"
-      // nunca vuelva a mostrarla.
-      this.router.navigate(['/shared-profiles-home'], { replaceUrl: true });
-    }
+    // Esta pantalla solo se muestra la primera vez. Se marca como vista al
+    // entrar (no solo al pulsar el botón) para que nunca vuelva a aparecer;
+    // el guard de la ruta se encarga de saltarla desde ahora.
+    localStorage.setItem(sharedProfilesIntroKey(), 'true');
   }
 
   goBack() {
-    this.router.navigate(['/home']);
+    this.router.navigate(['/home'], { replaceUrl: true });
   }
 
   onStartSharing() {
-    localStorage.setItem('sharedProfilesVisited', 'true');
-    // replaceUrl: true asegura que esta pantalla NO quede en el historial —
-    // así, si el usuario luego presiona "atrás" desde shared-profiles-home,
-    // salta directo a la pantalla anterior (Home), no vuelve aquí.
+    // replaceUrl: la introducción no queda en el historial, así "atrás"
+    // desde shared-profiles-home no vuelve aquí.
     this.router.navigate(['/shared-profiles-home'], { replaceUrl: true });
   }
 }

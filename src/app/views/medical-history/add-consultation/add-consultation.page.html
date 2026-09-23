@@ -21,9 +21,7 @@
           <ion-icon name="calendar-outline"></ion-icon>
           Fecha de visita
         </label>
-        <div class="input-wrap">
-          <input type="date" class="field-input" [(ngModel)]="visitDate" />
-        </div>
+        <app-date-picker-field placeholder="Fecha de visita" [(value)]="visitDate"></app-date-picker-field>
       </div>
 
       <div class="field">

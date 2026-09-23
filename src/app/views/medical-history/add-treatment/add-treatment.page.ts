@@ -105,6 +105,7 @@ export class AddTreatmentPage implements OnInit {
     this.saving = true;
 
     const payload = {
+      petId: this.petId,
       visitId: this.selectedVisitId,
       description: this.description,
       startDate: this.startDate,
@@ -117,7 +118,7 @@ export class AddTreatmentPage implements OnInit {
         console.log('🔍 Tratamiento creado, id recibido:', treatment.id, treatment);
         if (this.medications.length === 0) {
           this.saving = false;
-          this.router.navigate(['/medical-history', this.petId]);
+          this.router.navigate(['/medical-history', this.petId], { replaceUrl: true });
           return;
         }
         this.saveMedicationsSequentially(treatment.id, 0);
@@ -133,11 +134,11 @@ export class AddTreatmentPage implements OnInit {
   private saveMedicationsSequentially(treatmentId: string, index: number) {
     if (index >= this.medications.length) {
       this.saving = false;
-      this.router.navigate(['/medical-history', this.petId]);
+      this.router.navigate(['/medical-history', this.petId], { replaceUrl: true });
       return;
     }
 
-    this.medicalHistoryService.addMedicationToTreatment(treatmentId, this.medications[index]).subscribe({
+    this.medicalHistoryService.addMedicationToTreatment(treatmentId, this.medications[index], this.petId).subscribe({
       next: () => this.saveMedicationsSequentially(treatmentId, index + 1),
       error: (err) => {
         console.error(`❌ Error agregando medicamento ${index}:`, err);

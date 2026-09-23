@@ -198,28 +198,33 @@ ion-content {
 }
 
 .gmail-btn-wrapper .gmail-btn {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none; // el clic pasa hacia el iframe de abajo
-  z-index: 1;
+
+  &.loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
 }
 
-.google-real-btn {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.01;  // ⚠️ NUNCA display:none ni visibility:hidden aquí
-  z-index: 2;
-  overflow: hidden;
+/* ============================================
+   RESPALDO GOOGLE (bottom sheet)
+============================================ */
+.google-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 4px 16px 24px;
 }
 
-// El iframe que Google mete adentro, forzarlo a llenar el contenedor
-.google-real-btn iframe {
-  width: 100% !important;
-  height: 100% !important;
+.google-fallback-hint {
+  font-size: 14px;
+  color: #555;
+  margin: 0;
+  text-align: center;
+}
+
+.google-fallback-btn {
+  min-height: 44px;
 }

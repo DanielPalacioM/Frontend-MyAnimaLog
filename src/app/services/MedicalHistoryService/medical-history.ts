@@ -11,13 +11,18 @@ import { Visit, Treatment, Medication, LabResult, Surgery } from 'src/app/models
 export class MedicalHistoryService {
   private baseUrl = environment.apiUrl;
 
+  private getUserId(): string {
+  return localStorage.getItem('userId') || '';
+}
+
   constructor(private http: HttpClient) {}
 
   // ============ VISITAS (visits) ============
 
   createVisit(visit: Partial<Visit>): Observable<Visit> {
-    return this.http.post<Visit>(`${this.baseUrl}/visits`, visit);
-  }
+  const userId = this.getUserId();
+  return this.http.post<Visit>(`${this.baseUrl}/visits`, { ...visit, userId });
+}
 
   getVisitById(id: string): Observable<Visit> {
     return this.http.get<Visit>(`${this.baseUrl}/visits/${id}`);
@@ -45,14 +50,18 @@ export class MedicalHistoryService {
 
   // ============ TRATAMIENTOS (treatments) ============
 
-  createTreatment(treatment: Partial<Treatment>): Observable<Treatment> {
-  return this.http.post<{ success: boolean; data: Treatment }>(`${this.baseUrl}/treatments`, treatment).pipe(
+  createTreatment(treatment: Partial<Treatment> & { petId: string }): Observable<Treatment> {
+  const userId = this.getUserId();
+  // El backend exige petId para las notificaciones (igual que lab)
+  return this.http.post<{ success: boolean; data: Treatment }>(`${this.baseUrl}/treatments`, { ...treatment, pet_id: treatment.petId, userId }).pipe(
     map(response => response.data)
   );
 }
 
-  addMedicationToTreatment(treatmentId: string, medication: Medication): Observable<Treatment> {
-    return this.http.post<Treatment>(`${this.baseUrl}/treatments/${treatmentId}/add-medication`, medication);
+  addMedicationToTreatment(treatmentId: string, medication: Medication, petId: string): Observable<Treatment> {
+    // El backend exige userId y petId para las notificaciones
+    const userId = this.getUserId();
+    return this.http.post<Treatment>(`${this.baseUrl}/treatments/${treatmentId}/add-medication`, { ...medication, petId, pet_id: petId, userId });
   }
 
   isTreatmentActive(treatmentId: string): Observable<{ isActive: boolean }> {
@@ -83,8 +92,10 @@ updateTreatment(id: string, treatment: Partial<Treatment>): Observable<Treatment
 
   // ============ LABORATORIO (lab) ============
 
-  createLabResult(lab: { visit_id: string; name: string; result: string; normal_range: string; date: string; notes?: string }): Observable<LabResult> {
-  return this.http.post<LabResult>(`${this.baseUrl}/lab`, lab);
+  createLabResult(lab: { petId: string; visit_id: string; name: string; result: string; normal_range: string; date: string; notes?: string }): Observable<LabResult> {
+  const userId = this.getUserId();
+  // El backend de lab usa snake_case (visit_id, normal_range), así que también enviamos pet_id
+  return this.http.post<LabResult>(`${this.baseUrl}/lab`, { ...lab, pet_id: lab.petId, userId });
 }
 
   getLabResultsByVisit(visitId: string): Observable<LabResult[]> {
@@ -109,7 +120,8 @@ updateTreatment(id: string, treatment: Partial<Treatment>): Observable<Treatment
   // ============ CIRUGÍAS (surgery) ============
 
   createSurgery(surgery: Partial<Surgery>): Observable<Surgery> {
-  return this.http.post<{ success: boolean; data: Surgery }>(`${this.baseUrl}/surgery`, surgery).pipe(
+  const userId = this.getUserId();
+  return this.http.post<{ success: boolean; data: Surgery }>(`${this.baseUrl}/surgery`, { ...surgery, userId }).pipe(
     map(response => response.data)
   );
 }

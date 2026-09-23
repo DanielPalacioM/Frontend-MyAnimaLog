@@ -15,25 +15,40 @@
     </div>
 
     <div class="notif-list">
-      <ng-container *ngIf="visibleNotifications.length > 0; else emptyState">
-        <app-notification-card
-          *ngFor="let notif of visibleNotifications"
-          [notification]="notif"
-          (accepted)="onAccepted($event)"
-          (rejected)="onRejected($event)"
-          (markRead)="onMarkRead($event)"
-          (hidden)="onHidden($event)"
-          (deleted)="onDeleted($event)"
-          (completed)="onCompleted($event)">
-        </app-notification-card>
-      </ng-container>
+      <div class="empty-state" *ngIf="loading">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando notificaciones...</p>
+      </div>
 
-      <ng-template #emptyState>
-        <div class="empty-state">
-          <ion-icon name="notifications-off-outline"></ion-icon>
-          <p>No tienes notificaciones</p>
-        </div>
-      </ng-template>
+      <div class="load-error-banner" *ngIf="!loading && loadError">
+        No se pudo actualizar la lista, se está mostrando la última que se cargó bien.
+      </div>
+
+      <ng-container *ngIf="!loading">
+        <ng-container *ngIf="visibleNotifications.length > 0; else emptyState">
+          <app-notification-card
+            *ngFor="let notif of visibleNotifications"
+            [notification]="notif"
+            (accepted)="onAccepted($event)"
+            (rejected)="onRejected($event)"
+            (markRead)="onMarkRead($event)"
+            (hidden)="onHidden($event)"
+            (deleted)="onDeleted($event)"
+            (completed)="onCompleted($event)">
+          </app-notification-card>
+        </ng-container>
+
+        <ng-template #emptyState>
+          <div class="empty-state">
+            <ion-icon name="notifications-off-outline"></ion-icon>
+            <p>No tienes notificaciones</p>
+          </div>
+        </ng-template>
+
+        <button class="load-more-btn" *ngIf="hasMore" (click)="loadMore()">
+          Ver más notificaciones
+        </button>
+      </ng-container>
     </div>
 
   </div>

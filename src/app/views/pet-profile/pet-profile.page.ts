@@ -34,6 +34,8 @@ export class PetProfilePage implements OnInit {
   showDeleteConfirm = false;
   loading = true;
   loadError = false;
+  showPhotoViewer = false;
+
 
   pet: PetModel | null = null;
 
@@ -83,6 +85,16 @@ export class PetProfilePage implements OnInit {
     }
     this.loadPet(petId);
   }
+
+  openPhotoViewer(): void {
+  if (this.pet?.imageUrl) {
+    this.showPhotoViewer = true;
+  }
+}
+
+closePhotoViewer(): void {
+  this.showPhotoViewer = false;
+}
 
   ionViewWillEnter() {
     const petId = this.route.snapshot.paramMap.get('id');
@@ -252,7 +264,7 @@ private toLocalTimeString(d: Date): string {
         visits.forEach((visit) => {
           this.medicalHistoryService.getTreatmentForVisit(visit.id).subscribe({
             next: (treatment) => {
-              if (treatment) treatmentsFound++;
+              treatmentsFound += treatment.length;
               checkDone();
             },
             error: () => checkDone()

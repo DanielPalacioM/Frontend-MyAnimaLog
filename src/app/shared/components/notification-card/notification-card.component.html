@@ -1,4 +1,4 @@
-<div class="notif-card" [class.unread]="!notification.isRead" (click)="onMarkRead()">
+<div class="notif-card" [class.unread]="!notification.isRead" [class.menu-open]="menuOpen" (click)="onMarkRead()">
 
   <div class="notif-body">
     <div class="notif-header">

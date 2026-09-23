@@ -48,11 +48,7 @@
             <ion-icon name="document-text-outline"></ion-icon>
             Consulta asociada
           </label>
-          <div class="input-wrap">
-            <select class="field-input" [(ngModel)]="selectedVisitId">
-              <option *ngFor="let v of visits" [value]="v.id">{{ v.date }} - {{ v.reason }}</option>
-            </select>
-          </div>
+          <app-visit-picker-field [visits]="visits" [(value)]="selectedVisitId"></app-visit-picker-field>
         </div>
 
         <p *ngIf="visits.length === 0" style="color:#e65100;font-size:12px;font-family:'Actor',sans-serif;">
@@ -76,7 +72,7 @@
         <div class="row2">
           <div class="field">
             <label class="field-label"><ion-icon name="calendar-outline"></ion-icon> Fecha</label>
-            <div class="input-wrap"><input type="date" class="field-input" [(ngModel)]="surgeryDate" /></div>
+            <app-date-picker-field placeholder="Fecha" [(value)]="surgeryDate"></app-date-picker-field>
           </div>
           <div class="field">
             <label class="field-label"><ion-icon name="time-outline"></ion-icon> Duración (min)</label>

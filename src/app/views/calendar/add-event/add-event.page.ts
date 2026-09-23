@@ -323,9 +323,9 @@ formatTimeDisplay(timeStr: string): string {
 
   private goToDestination(): void {
     if (this.mode === 'single' && this.petIdParam) {
-      this.router.navigate(['/pet-profile', this.petIdParam]);
+      this.router.navigate(['/pet-profile', this.petIdParam], { replaceUrl: true });
     } else {
-      this.router.navigate(['/calendar']);
+      this.router.navigate(['/calendar'], { replaceUrl: true });
     }
   }
 

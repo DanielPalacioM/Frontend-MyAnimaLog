@@ -289,7 +289,8 @@ export class AddLabPage implements OnInit {
         {
           queryParams: {
             tab: 'lab'
-          }
+          },
+          replaceUrl: true
         }
       );
 
@@ -299,6 +300,8 @@ export class AddLabPage implements OnInit {
     const v = this.labValues[index];
 
     const payload = {
+
+      petId: this.petId,
 
       visit_id: this.selectedVisitId,
 

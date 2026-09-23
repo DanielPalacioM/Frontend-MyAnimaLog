@@ -144,7 +144,7 @@ export class UploadDocumentPage implements OnInit {
       next: (doc) => {
         console.log('✅ Documento subido exitosamente:', doc);
         this.saving = false;
-        this.router.navigate(['/pets', this.petId, 'documents']);
+        this.router.navigate(['/pets', this.petId, 'documents'], { replaceUrl: true });
       },
       error: (err) => {
         this.saving = false;

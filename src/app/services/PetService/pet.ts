@@ -191,7 +191,7 @@ deletePhoto(petId: string): Observable<any> {
   }).pipe(
     map(raw => this.mapPet(raw)),
     switchMap((pet) => {
-      if (form.photo) {
+    if (form.photo && form.photo.startsWith('data:')) {
         return this.uploadPhoto(id, form.photo).pipe(
           switchMap(() => new Observable<Pet>((observer) => {
             observer.next(pet);

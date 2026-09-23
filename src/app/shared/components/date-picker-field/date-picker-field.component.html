@@ -1,0 +1,22 @@
+<button type="button" class="picker-trigger" (click)="open()">
+  <img src="assets/images/AddVaccine/CalendarioIcon.png" alt="" class="field-img-icon" />
+  <span class="picker-value" [class.placeholder]="!value">{{ display }}</span>
+  <ion-icon *ngIf="value" name="checkmark-circle" class="valid-check"></ion-icon>
+</button>
+
+<ion-modal [isOpen]="isOpen" (didDismiss)="isOpen = false" class="datetime-modal">
+  <ng-template>
+    <ion-datetime
+      presentation="date"
+      [value]="pickerValue"
+      [min]="min"
+      [max]="max"
+      (ionChange)="onConfirm($event.detail.value)"
+      locale="es-ES"
+      [showDefaultButtons]="true"
+      doneText="Listo"
+      cancelText="Cancelar"
+      (ionCancel)="isOpen = false">
+    </ion-datetime>
+  </ng-template>
+</ion-modal>

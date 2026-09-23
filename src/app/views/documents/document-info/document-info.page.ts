@@ -113,7 +113,7 @@ export class DocumentInfoPage implements OnInit {
     this.documentService.deleteDocument(this.petId, this.doc.id).subscribe({
       next: () => {
         this.deleting = false;
-        this.router.navigate(['/pets', this.petId, 'documents']);
+        this.router.navigate(['/pets', this.petId, 'documents'], { replaceUrl: true });
       },
       error: (err) => {
         this.deleting = false;

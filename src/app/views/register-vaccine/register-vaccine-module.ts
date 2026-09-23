@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { RegisterVaccineRoutingModule } from './register-vaccine-routing-module';
 import { RegisterVaccineComponent } from './register-vaccine.component';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 @NgModule({
   declarations: [RegisterVaccineComponent],
@@ -12,6 +13,7 @@ import { RegisterVaccineComponent } from './register-vaccine.component';
     FormsModule,
     IonicModule,
     RegisterVaccineRoutingModule,
+    SharedModule,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

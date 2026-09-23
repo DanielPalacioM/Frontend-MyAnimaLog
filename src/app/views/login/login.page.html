@@ -51,11 +51,9 @@
 
       <div class="socials">
   <div class="gmail-btn-wrapper">
-    <button type="button" class="gmail-btn" tabindex="-1">
+    <button type="button" class="gmail-btn" [class.loading]="googleLoading" (click)="onGoogleButtonClick()">
       <img src="../../../assets/images/google.png" alt="gm" />
     </button>
-
-    <div id="googleButtonDiv" class="google-real-btn"></div>
   </div>
 
   <button type="button" class="register-btn" (click)="goToRegister()">
@@ -64,4 +62,15 @@
 </div>
     </form>
   </div>
+
+  <!-- Respaldo: solo aparece si Google no pudo mostrar el selector flotante de cuentas -->
+  <app-bottom-sheet
+    [isOpen]="showGoogleFallback"
+    title="Continuar con Google"
+    (closed)="closeGoogleFallback()">
+    <div class="google-fallback">
+      <p class="google-fallback-hint">Elige tu cuenta de Google para continuar.</p>
+      <div id="googleButtonDiv" class="google-fallback-btn"></div>
+    </div>
+  </app-bottom-sheet>
 </ion-content>
