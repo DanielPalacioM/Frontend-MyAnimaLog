@@ -27,8 +27,10 @@ export interface SharedPet {
 export interface PetInvitation {
   id: string;
   petId: string;
+  petName?: string;
   email: string;
   accessRole: AccessRole;
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED';
   createdAt: string;
+  expiresAt?: string;
 }

@@ -8,6 +8,7 @@ import {
   CreateNotificationPayload,
   NotificationListResponse
 } from 'src/app/models/notification.model';
+import { SharedProfileService } from 'src/app/services/SharedProfileService/shared-profile';
 import { Dedupable, dedupeByContent, isNoiseNotification } from 'src/app/shared/utils/notification-text.util';
 
 @Injectable({
@@ -22,7 +23,10 @@ export class NotificationService {
   private unreadCountSubject = new BehaviorSubject<number>(0);
   readonly unreadCount$ = this.unreadCountSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private sharedProfileService: SharedProfileService
+  ) {}
 
   private getUserId(): string {
     return localStorage.getItem('userId') || '';
@@ -52,8 +56,13 @@ export class NotificationService {
   // Las duplicadas se limpian solas de una vez, así el badge no se queda
   // pegado en un número inflado aunque el usuario nunca abra Notificaciones.
   refreshUnreadCount(): void {
-    this.getUnreadNotifications().subscribe({
-      next: (list) => {
+    forkJoin({
+      list: this.getUnreadNotifications(),
+      // Las invitaciones pendientes no llegan como notificación del backend,
+      // pero también deben sumar en el badge.
+      invitations: this.sharedProfileService.getMyPendingInvitations().pipe(catchError(() => of([])))
+    }).subscribe({
+      next: ({ list, invitations }) => {
         const meaningful = list.filter(n => !isNoiseNotification(n));
         const dedupableList: (Dedupable & { dto: AppNotificationDto })[] = meaningful.map(n => ({
           id: n.id,
@@ -65,7 +74,7 @@ export class NotificationService {
         }));
 
         const { deduped, redundantIds } = dedupeByContent(dedupableList);
-        this.unreadCountSubject.next(deduped.length);
+        this.unreadCountSubject.next(deduped.length + invitations.length);
 
         if (redundantIds.length > 0) {
           forkJoin(redundantIds.map(id => this.patchRead(id))).subscribe({

@@ -222,39 +222,6 @@
   </div>
 </ng-container>
 
-<div class="invite-modal-backdrop" *ngIf="showInviteModal" (click)="closeInviteModal()">
-  <div class="invite-modal" (click)="$event.stopPropagation()">
-    <div class="invite-modal-header">
-      <span>Compartir mascota</span>
-      <button class="invite-modal-close" (click)="closeInviteModal()">
-        <ion-icon name="close-outline"></ion-icon>
-      </button>
-    </div>
-
-    <div class="invite-modal-body">
-      <label class="invite-label">Mascota</label>
-      <select class="invite-select" [(ngModel)]="inviteSelectedPetId">
-        <option *ngFor="let pet of myPets" [value]="pet.id">{{ pet.name }}</option>
-      </select>
-
-      <label class="invite-label">Correo del invitado</label>
-      <input type="email" class="invite-input" placeholder="correo@ejemplo.com" [(ngModel)]="inviteEmail" />
-
-      <div class="invite-role-row">
-        <span class="invite-role-label" [class.active]="inviteRole === 'VIEWER'">Solo vista</span>
-        <div class="invite-switch" [class.on]="inviteRole === 'EDITOR'" (click)="toggleInviteRole()">
-          <div class="invite-switch-knob"></div>
-        </div>
-        <span class="invite-role-label" [class.active]="inviteRole === 'EDITOR'">Editor</span>
-      </div>
-
-      <button class="invite-send-btn" [disabled]="sendingInvite || !inviteEmail" (click)="sendInvite()">
-        {{ sendingInvite ? 'Enviando...' : 'Enviar invitación' }}
-      </button>
-    </div>
-  </div>
-</div>
-
       </div>
     </div>
 
@@ -262,5 +229,40 @@
 
   <!-- FOOTER BAR -->
   <app-tab-bar activeTab="shared-profile"></app-tab-bar>
+
+  <!-- MODAL DE INVITACIÓN: fuera de .sp-below (que crea su propio stacking
+       context con z-index:1) para que quede por encima del dashboard y la tab-bar -->
+  <div class="invite-modal-backdrop" *ngIf="showInviteModal" (click)="closeInviteModal()">
+    <div class="invite-modal" (click)="$event.stopPropagation()">
+      <div class="invite-modal-header">
+        <span>Compartir mascota</span>
+        <button class="invite-modal-close" (click)="closeInviteModal()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="invite-modal-body">
+        <label class="invite-label">Mascota</label>
+        <select class="invite-select" [(ngModel)]="inviteSelectedPetId">
+          <option *ngFor="let pet of myPets" [value]="pet.id">{{ pet.name }}</option>
+        </select>
+
+        <label class="invite-label">Correo del invitado</label>
+        <input type="email" class="invite-input" placeholder="correo@ejemplo.com" [(ngModel)]="inviteEmail" />
+
+        <div class="invite-role-row">
+          <span class="invite-role-label" [class.active]="inviteRole === 'VIEWER'">Solo vista</span>
+          <div class="invite-switch" [class.on]="inviteRole === 'EDITOR'" (click)="toggleInviteRole()">
+            <div class="invite-switch-knob"></div>
+          </div>
+          <span class="invite-role-label" [class.active]="inviteRole === 'EDITOR'">Editor</span>
+        </div>
+
+        <button class="invite-send-btn" [disabled]="sendingInvite || !inviteEmail" (click)="sendInvite()">
+          {{ sendingInvite ? 'Enviando...' : 'Enviar invitación' }}
+        </button>
+      </div>
+    </div>
+  </div>
 
 </ion-content>

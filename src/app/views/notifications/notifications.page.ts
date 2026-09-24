@@ -7,9 +7,14 @@ import { NotificationService } from 'src/app/services/NotificationService/notifi
 import { PetService } from 'src/app/services/PetService/pet';
 import { SharedProfileService } from 'src/app/services/SharedProfileService/shared-profile';
 import { AppNotificationDto } from 'src/app/models/notification.model';
+import { PetInvitation } from 'src/app/models/shared-profile.model';
 import { dedupeByContent, humanizeNotification, isNoiseNotification } from 'src/app/shared/utils/notification-text.util';
 
 
+
+// Prefijo para distinguir las tarjetas que salen de invitaciones pendientes
+// (GET /pets/invitations/pending) de las notificaciones normales.
+const INVITATION_PREFIX = 'inv:';
 
 @Component({
   selector: 'app-notifications',
@@ -64,8 +69,16 @@ export class NotificationsPage implements OnInit {
         })
       ),
       myPets: this.petService.getPets().pipe(catchError(() => of([]))),
-      petsInCare: this.sharedProfileService.getPetsInMyCare().pipe(catchError(() => of([])))
-    }).subscribe(({ notifications, myPets, petsInCare }) => {
+      petsInCare: this.sharedProfileService.getPetsInMyCare().pipe(catchError(() => of([]))),
+      // El backend guarda la invitación solo con el email y no crea una
+      // notificación para el invitado, así que se traen aparte.
+      invitations: this.sharedProfileService.getMyPendingInvitations().pipe(
+        catchError((err) => {
+          console.error('❌ Error cargando invitaciones pendientes:', err);
+          return of([] as PetInvitation[]);
+        })
+      )
+    }).subscribe(({ notifications, myPets, petsInCare, invitations }) => {
       this.loading = false;
 
       if (notifications === null) {
@@ -82,7 +95,8 @@ export class NotificationsPage implements OnInit {
         .map(n => this.toAppNotification(n, idToName));
 
       const { deduped, redundantIds } = dedupeByContent(mapped);
-      this.notifications = deduped;
+      const invitationCards = invitations.map(i => this.invitationToAppNotification(i, idToName));
+      this.notifications = [...invitationCards, ...deduped];
       this.visibleCount = this.pageSize;
 
       // El backend a veces mete varias copias exactas de la misma
@@ -119,6 +133,25 @@ export class NotificationsPage implements OnInit {
     };
   }
 
+  private invitationToAppNotification(i: PetInvitation, idToName: Map<string, string>): AppNotification {
+    const petName = i.petName || idToName.get(i.petId) || 'una mascota';
+    const role = i.accessRole === 'EDITOR' ? 'editor' : 'solo vista';
+    return {
+      id: INVITATION_PREFIX + i.id,
+      type: 'PET_INVITATION',
+      title: 'Invitación para cuidar una mascota',
+      message: `Te invitaron a cuidar a ${petName} con permiso de ${role}.`,
+      date: i.createdAt ? new Date(i.createdAt) : new Date(),
+      isRead: false,
+      hidden: false,
+      actions: 'invitation'
+    };
+  }
+
+  private isInvitation(id: string): boolean {
+    return id.startsWith(INVITATION_PREFIX);
+  }
+
   private get filteredNotifications(): AppNotification[] {
     const list = this.showHidden
       ? this.notifications
@@ -150,11 +183,15 @@ export class NotificationsPage implements OnInit {
   }
 
   markAllAsRead() {
-    const unread = this.notifications.filter(n => !n.isRead);
+    // Las invitaciones no son notificaciones del backend: siguen sin leer
+    // hasta que se acepten o rechacen.
+    const unread = this.notifications.filter(n => !n.isRead && !this.isInvitation(n.id));
     if (unread.length === 0) return;
 
     // Optimista: se ve el cambio de inmediato en la UI.
-    this.notifications = this.notifications.map(n => ({ ...n, isRead: true }));
+    this.notifications = this.notifications.map(n =>
+      this.isInvitation(n.id) ? n : { ...n, isRead: true }
+    );
 
     this.notificationService.markManyAsRead(unread.map(n => n.id)).subscribe({
       next: (results) => {
@@ -172,19 +209,39 @@ export class NotificationsPage implements OnInit {
   }
 
   onAccepted(id: string) {
-    // TODO: cuando el backend exponga el id de la invitación dentro de la
-    // notificación, conectar con SharedProfileService.acceptInvitation.
-    this.notifications = this.notifications.filter(n => n.id !== id);
+    this.respondInvitation(id, true);
   }
 
   onRejected(id: string) {
-    // TODO: ver comentario de onAccepted().
-    this.notifications = this.notifications.filter(n => n.id !== id);
+    this.respondInvitation(id, false);
+  }
+
+  private respondInvitation(id: string, accept: boolean) {
+    if (!this.isInvitation(id)) {
+      this.notifications = this.notifications.filter(n => n.id !== id);
+      return;
+    }
+
+    const invitationId = id.slice(INVITATION_PREFIX.length);
+    const request$ = accept
+      ? this.sharedProfileService.acceptInvitation(invitationId)
+      : this.sharedProfileService.rejectInvitation(invitationId);
+
+    request$.subscribe({
+      next: () => {
+        this.notifications = this.notifications.filter(n => n.id !== id);
+        this.notificationService.refreshUnreadCount();
+      },
+      error: (err) => {
+        console.error(`❌ Error ${accept ? 'aceptando' : 'rechazando'} invitación:`, err);
+        alert(`No se pudo ${accept ? 'aceptar' : 'rechazar'} la invitación.`);
+      }
+    });
   }
 
   onMarkRead(id: string) {
     const notif = this.notifications.find(n => n.id === id);
-    if (!notif || notif.isRead) return;
+    if (!notif || notif.isRead || this.isInvitation(id)) return;
 
     this.notifications = this.notifications.map(n =>
       n.id === id ? { ...n, isRead: true } : n
