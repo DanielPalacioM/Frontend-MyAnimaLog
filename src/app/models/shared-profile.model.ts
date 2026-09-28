@@ -1,5 +1,8 @@
 export type AccessRole = 'EDITOR' | 'VIEWER';
 
+// Rol efectivo del usuario logueado sobre una mascota.
+export type PetRole = 'OWNER' | AccessRole;
+
 export interface PetAccess {
   userId: string;
   userName?: string;
@@ -26,8 +29,16 @@ export interface SharedPet {
 
 export interface PetInvitation {
   id: string;
+  // Accept / reject / expired se hacen con este token, no con el id.
+  token: string;
   petId: string;
   petName?: string;
+  petImageUrl?: string | null;
+  // Quién envía la invitación (el dueño). Si el backend no lo manda, el
+  // front lo intenta resolver con la mascota + el perfil del dueño.
+  ownerId?: string;
+  ownerName?: string;
+  ownerAvatarUrl?: string | null;
   email: string;
   accessRole: AccessRole;
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED';

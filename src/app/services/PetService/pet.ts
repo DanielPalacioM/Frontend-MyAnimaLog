@@ -22,6 +22,9 @@ export interface Pet {
   vetName: string;
   sharedWith: { avatarUrl: string }[];
   createdAt: string;
+  // true = mascota de otro usuario que me compartieron ("A mi cuidado").
+  inCare?: boolean;
+  accessRole?: 'EDITOR' | 'VIEWER';
 }
 
 export interface PetDocument {

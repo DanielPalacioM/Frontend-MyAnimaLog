@@ -27,19 +27,19 @@
         <img src="assets/images/PetProfileSidebar/FiltrarVacunasIcon.png" alt="" />
         <span>Filtrar vacunas</span>
       </div>
-      <div class="sidebar-item" (click)="onPersonasAcceso()">
+      <div class="sidebar-item" *ngIf="isOwner" (click)="onPersonasAcceso()">
         <img src="assets/images/PetProfileSidebar/PersonasAccesoCompartidoIcon.png" alt="" />
         <span>Ver personas con acceso compartido</span>
       </div>
-      <div class="sidebar-item" (click)="onAgendarCita()">
+      <div class="sidebar-item" *ngIf="canEdit" (click)="onAgendarCita()">
         <img src="assets/images/PetProfileSidebar/AgendarCitaIcon.png" alt="" />
         <span>Agendar cita rápida</span>
       </div>
-      <div class="sidebar-item" (click)="onEditarInfo()">
+      <div class="sidebar-item" *ngIf="canEdit" (click)="onEditarInfo()">
         <img src="assets/images/PetProfileSidebar/EditarInfoIcon.png" alt="" />
         <span>Editar información de mascota</span>
       </div>
-      <div class="sidebar-item danger" (click)="onEliminarMascota()">
+      <div class="sidebar-item danger" *ngIf="isOwner" (click)="onEliminarMascota()">
         <img src="assets/images/PetProfileSidebar/EliminarMascotaIcon.png" alt="" />
         <span>Eliminar mascota</span>
       </div>
@@ -94,6 +94,7 @@
        </div>
         <p class="pet-name">{{ pet.name }}</p>
         <p class="pet-breed">{{ pet.breed }} · {{ petStats.age }}</p>
+        <span class="role-tag" *ngIf="role && !isOwner">A mi cuidado · {{ roleLabel }}</span>
       </div>
 
     </div>
@@ -113,13 +114,14 @@
        <app-vaccine-card
   *ngIf="vaccineSummary"
   [summary]="vaccineSummary"
+  [canEdit]="canEdit"
   (addVaccine)="goToRegisterVaccine()"
   (viewTimeline)="goToVaccineLine()">
 </app-vaccine-card>
 
 <div class="empty-card" *ngIf="!vaccineSummary">
   <p>No hay vacunas registradas.</p>
-  <button (click)="goToRegisterVaccine()">Registrar vacuna</button>
+  <button *ngIf="canEdit" (click)="goToRegisterVaccine()">Registrar vacuna</button>
 </div>
 
       <!-- ANUNCIOS -->
@@ -134,7 +136,9 @@
         <app-pet-calendar
           [events]="calendarEvents"
           [petName]="pet.name"
-          [petAvatarUrl]="pet.imageUrl || ''"          (dateSelected)="onDateSelected($event)"
+          [petAvatarUrl]="pet.imageUrl || ''"
+          [canEdit]="canEdit"
+          (dateSelected)="onDateSelected($event)"
           (editEvent)="onEditEvent($event)"
           (deleteEvent)="onDeleteEvent($event)"
           (addEvent)="onAddCalendarEvent()">
@@ -146,6 +150,7 @@
   <app-documents-section
     [petId]="pet.id"
     [documents]="documents"
+    [canEdit]="canEdit"
     (viewAll)="goToAllDocuments()"
     (upload)="goToAddDocument()"
     (docClick)="onDocClick($event)">

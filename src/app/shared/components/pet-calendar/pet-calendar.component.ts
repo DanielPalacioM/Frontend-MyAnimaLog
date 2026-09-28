@@ -24,6 +24,8 @@ export class PetCalendarComponent implements OnInit {
   @Input() selectedDate: string | null = null;
   @Input() petName: string = '';
   @Input() petAvatarUrl: string = '';
+  // false = rol "solo vista": se ocultan crear / editar / eliminar.
+  @Input() canEdit: boolean = true;
 
   @Output() dateSelected = new EventEmitter<string>();
   @Output() editEvent = new EventEmitter<CalendarEvent>();

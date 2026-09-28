@@ -1,14 +1,29 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map, shareReplay } from 'rxjs/operators';
 import { AuthService } from '../authServices/auth';
 import { environment } from 'src/environments/environment';
+
+// Datos públicos mínimos de OTRO usuario (dueño, cuidador, quien invita).
+export interface UserSummary {
+  id: string;
+  username: string;
+  avatarUrl: string | null;
+}
+
+// Ruta (tras el gateway) para buscar un usuario por correo.
+const USER_BY_EMAIL_PATH = '/user/by-email';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProfileService {
   private baseUrl = environment.apiUrl;
+
+  // Cache por userId: la misma persona aparece en varias cards/pantallas y
+  // no tiene sentido pedir su perfil cada vez.
+  private userCache = new Map<string, Observable<UserSummary | null>>();
   constructor(
     private http: HttpClient,
     private authService: AuthService
@@ -40,6 +55,56 @@ export class ProfileService {
     return this.http.get(`${this.baseUrl}/user/profile/${userId}`, { 
       headers: this.getAuthHeaders() 
     });
+  }
+
+  // GET /user/profile/{userId} de OTRO usuario -> nombre y foto.
+  // Si falla (o el backend no deja verlo) devuelve null en vez de romper.
+  getUserById(userId: string): Observable<UserSummary | null> {
+    if (!userId) return of(null);
+    if (!this.userCache.has(userId)) {
+      const req$ = this.http.get<any>(`${this.baseUrl}/user/profile/${userId}`, {
+        headers: this.getAuthHeaders()
+      }).pipe(
+        map(p => ({
+          id: userId,
+          username: p?.username || p?.name || '',
+          avatarUrl: p?.profileImageUrl || p?.avatarUrl || null
+        })),
+        catchError(err => {
+          console.error(`❌ No se pudo cargar el perfil del usuario ${userId}:`, err);
+          this.userCache.delete(userId);
+          return of(null);
+        }),
+        shareReplay(1)
+      );
+      this.userCache.set(userId, req$);
+    }
+    return this.userCache.get(userId)!;
+  }
+
+  // Busca una cuenta ACTIVA por correo (para invitar a compartir una mascota).
+  // Devuelve null si no existe / no está activa (404) o si falla.
+  // TODO: confirmar la ruta con el backend; está en USER_BY_EMAIL_PATH.
+  findUserByEmail(email: string): Observable<UserSummary | null> {
+    return this.http.get<any>(`${this.baseUrl}${USER_BY_EMAIL_PATH}`, {
+      headers: this.getAuthHeaders(),
+      params: { email }
+    }).pipe(
+      map(u => {
+        const user = u?.data ?? u;
+        const id = user?.id ?? user?.userId;
+        if (!id || user?.active === false || user?.enabled === false) return null;
+        return {
+          id,
+          username: user.username || user.name || email,
+          avatarUrl: user.profileImageUrl || user.avatarUrl || null
+        };
+      }),
+      catchError(err => {
+        if (err.status !== 404) console.error('❌ Error buscando usuario por correo:', err);
+        return of(null);
+      })
+    );
   }
 
   // ✅ Subir imagen con token en el header

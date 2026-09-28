@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { MedicalHistoryService } from 'src/app/services/MedicalHistoryService/medical-history';
 import { PetService } from 'src/app/services/PetService/pet';
+import { SharedProfileService } from 'src/app/services/SharedProfileService/shared-profile';
 import {
   Visit,
   Treatment,
@@ -34,12 +35,16 @@ export class MedicalHistoryPage implements OnInit {
 
   loading = true;
 
+  // false mientras se resuelve el rol o si es "solo vista".
+  canEdit = false;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private location: Location,
     private medicalHistoryService: MedicalHistoryService,
-    private petService: PetService
+    private petService: PetService,
+    private sharedProfileService: SharedProfileService
   ) {}
 
   ngOnInit() {
@@ -57,6 +62,8 @@ export class MedicalHistoryPage implements OnInit {
 
     if (this.petId) {
       this.loadPetInfo();
+      this.sharedProfileService.getMyRoleForPet(this.petId)
+        .subscribe(role => this.canEdit = role !== 'VIEWER');
     }
   }
 

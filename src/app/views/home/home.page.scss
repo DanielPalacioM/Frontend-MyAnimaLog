@@ -16,6 +16,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
 }
 
 .user-avatar{
@@ -40,6 +41,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 
 .app-logo {
@@ -52,16 +54,20 @@
   font-size: 15px;
   font-weight: 600;
   color: #1a1a2e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .header-icons {
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .icon-card {
-  width: 52px;
-  height: 52px;
+  width: clamp(44px, 13vw, 52px);
+  height: clamp(44px, 13vw, 52px);
   position: relative;
 
   background: white;
@@ -162,7 +168,7 @@
 .welcome-line {
   margin: 0;
   color: white;
-  font-size: 28px;
+  font-size: clamp(22px, 7vw, 28px);
   font-weight: 700;
   font-family: 'Jua', sans-serif;
   line-height: 1.2;
@@ -174,7 +180,7 @@
 }
 
 .brand-myAnima {
-  font-size: 28px;
+  font-size: clamp(22px, 7vw, 28px);
   font-weight: 800;
   color: #1a1a2e;
   line-height: 1;
@@ -189,7 +195,7 @@
 }
 
 .brand-log {
-  font-size: 28px;
+  font-size: clamp(22px, 7vw, 28px);
   font-weight: 800;
   color: white;
   line-height: 1;
@@ -200,7 +206,7 @@
   position: absolute !important;
   right: 10px !important;
   bottom: 0px !important;
-  width: 180px !important;
+  width: clamp(110px, 42vw, 180px) !important;
   height: auto !important;
   object-fit: contain !important;
   z-index: 2;
@@ -213,6 +219,7 @@
 .quick-access {
   display: flex;
   justify-content: space-between;
+  gap: 4px;
   align-items: flex-start;
 }
 
@@ -223,16 +230,20 @@
   gap: 6px;
   position: relative;
 
+  flex: 1 1 0;
+  min-width: 0;
+
   span {
-    font-size: 11px;
+    font-size: clamp(10px, 2.9vw, 11px);
     color: #555;
     text-align: center;
+    line-height: 1.2;
   }
 }
 
 .quick-icon-wrap {
-  width: 52px;
-  height: 52px;
+  width: clamp(44px, 13vw, 52px);
+  height: clamp(44px, 13vw, 52px);
 
   background: white;
 
@@ -256,8 +267,8 @@
 }
 
 .quick-icon-wrap.add {
-  width: 60px;
-  height: 60px;
+  width: clamp(50px, 15vw, 60px);
+  height: clamp(50px, 15vw, 60px);
   border-radius: 50%;
   background: #f5a623;
 
@@ -375,6 +386,7 @@
 
 .pet-info-side {
   flex: 1;
+  min-width: 0;
   padding: 18px 16px;
   display: flex;
   flex-direction: column;
@@ -384,7 +396,8 @@
 
 .pet-name {
   margin: 0;
-  font-size: 26px;
+  font-size: clamp(20px, 6.5vw, 26px);
+  overflow-wrap: anywhere;
   font-weight: 700;
   color: #1a1a2e;
   font-family: 'Jua', sans-serif;
@@ -423,35 +436,57 @@
   width: fit-content;
 }
 
-.shared-avatar {
+.shared-avatars {
+  position: relative;
   display: inline-flex;
+  align-items: center;
+  padding-right: 8px;
+}
 
-  img {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid white;
-    margin-left: -8px;
+// Fotos encimadas, como una pila.
+.shared-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
+  margin-left: -10px;
 
-    &:first-child {
-      margin-left: 0;
-    }
+  &:first-child {
+    margin-left: 0;
   }
 }
 
+// Burbuja roja con el total de cuidadores, arriba a la derecha.
 .shared-count {
+  position: absolute;
+  top: -8px;
+  right: -4px;
   background: #FD0D0D;
   color: white;
   font-size: 10px;
   font-weight: 700;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 4px;
+}
+
+.in-care-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background: #2E7FD8;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
 .swipe-arrow {
@@ -506,6 +541,7 @@
 
 .calendar-card .card-content {
   width: 55%;
+  min-width: 0;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -518,7 +554,7 @@
 .card-title {
   margin: 0 0 14px;
   color: white;
-  font-size: 24px;
+  font-size: clamp(19px, 6vw, 24px);
   font-weight: 700;
   font-family: 'Jua', sans-serif;
   text-align: left;
@@ -600,8 +636,10 @@
 }
 
 .vet-btn {
-  width: 95px;
-  height: 85px;
+  width: clamp(76px, 24vw, 95px);
+  height: clamp(72px, 22vw, 85px);
+  position: relative;
+  z-index: 1;
 
   background: white;
 
@@ -634,41 +672,16 @@
   right: -10px;
   bottom: -5px;
 
-  width: 145px;
+  width: clamp(105px, 36vw, 145px);
 
   object-fit: contain;
 }
 
 /* ==========================
-   RESPONSIVE
+   TUTORIAL OVERLAY
 ========================== */
 
-@media (max-width: 390px) {
-
-  .brand-myAnima,
-  .brand-log {
-    font-size: 28px;
-  }
-
-  .promo-dog {
-    width: 120px;
-    height: 120px;
-  }
-
-  .calendar-side-img {
-    width: 45%;
-  }
-
-  .dog-decoration {
-    width: 120px;
-  }
-
-  .vet-btn {
-    width: 80px;
-    height: 75px;
-  }
-
-  // TUTORIAL OVERLAY
+// TUTORIAL OVERLAY
 .tutorial-overlay {
   position: fixed;
   top: 0;
@@ -763,4 +776,59 @@
 // cards
 .tip-calendar-card { top: 68%; left: 5%; }
 .tip-vet-card      { top: 82%; left: 5%; }
+
+/* ==========================
+   RESPONSIVE
+========================== */
+
+// Teléfonos pequeños (iPhone SE, Galaxy A0x, etc.)
+@media (max-width: 360px) {
+  .home-container {
+    padding: 12px;
+    gap: 14px;
+  }
+
+  .promo-ad-text {
+    max-width: 55%;
+    padding: 10px;
+
+    p { font-size: 10px; }
+  }
+
+  .pet-info-side {
+    padding: 14px 12px;
+    gap: 8px;
+  }
+
+  .pet-birthdate,
+  .pet-sex {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .calendar-card .card-content {
+    padding: 14px;
+  }
+
+  .cal-btn {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .vet-card {
+    padding: 16px;
+  }
+
+  .tip-bubble {
+    max-width: 110px;
+    font-size: 11px;
+  }
+}
+
+// Tablets / pantallas anchas: el contenido no se estira de lado a lado.
+@media (min-width: 600px) {
+  .home-container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
 }

@@ -1,0 +1,38 @@
+<ion-content fullscreen>
+  <div class="verify-container">
+    <button class="back-btn" type="button" (click)="goToLogin()">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+    </button>
+
+    <div class="verify-card">
+      <div class="verify-icon">
+        <ion-icon name="mail-unread-outline"></ion-icon>
+      </div>
+      <h1>Verifica tu correo</h1>
+      <p class="verify-text">
+        Te enviamos un código de 6 dígitos a<br>
+        <strong>{{ email }}</strong>
+      </p>
+
+      <div class="code-inputs">
+        <input *ngFor="let d of digits; let i = index; trackBy: trackByIndex"
+               #digitInput
+               type="text"
+               inputmode="numeric"
+               autocomplete="one-time-code"
+               maxlength="6"
+               [value]="d"
+               [class.filled]="!!d"
+               [class.error]="!!errorMessage"
+               (input)="onDigitInput(i, $event)"
+               (keydown)="onDigitKeydown(i, $event)" />
+      </div>
+
+      <p class="verify-error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <button class="btn-verify" type="button" [disabled]="!isComplete || verifying" (click)="verify()">
+        {{ verifying ? 'Verificando...' : 'Verificar' }}
+      </button>
+    </div>
+  </div>
+</ion-content>

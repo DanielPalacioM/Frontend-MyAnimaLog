@@ -26,6 +26,8 @@
   .field {
     flex: 1;
   }
+
+  > * { min-width: 0; }
 }
 
 .input-wrap {
@@ -125,6 +127,8 @@
   display: flex;
   gap: 10px;
   align-items: center;
+
+  > * { min-width: 0; }
 }
 
 .date-input {

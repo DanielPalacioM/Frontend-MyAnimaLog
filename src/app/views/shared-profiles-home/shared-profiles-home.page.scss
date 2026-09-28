@@ -5,7 +5,7 @@ ion-content {
 .sp-wrapper {
   position: relative;
   min-height: 100%;
-  padding-bottom: 100px;
+  padding-bottom: calc(110px + env(safe-area-inset-bottom)); // espacio para la tab bar
 }
 
 // ── BOTÓN ATRÁS ──
@@ -423,29 +423,113 @@ ion-content {
 }
 
 
+.invite-search-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  .invite-input { flex: 1; min-width: 0; }
+}
+
+.invite-search-btn {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 12px;
+  background: #2B83D1;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.invite-error {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: #E53935;
+  font-family: 'Actor', sans-serif;
+}
+
+.invitee-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 20px;
+  background: #F5F8FC;
+
+  img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .invitee-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+  }
+
+  .invitee-email {
+    font-size: 12px;
+    color: #888;
+    font-family: 'Actor', sans-serif;
+    word-break: break-all;
+  }
+
+  .invitee-actions {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    margin-top: 10px;
+
+    button { flex: 1; margin: 0; }
+  }
+}
+
+.invitee-cancel {
+  padding: 12px;
+  border: 1.5px solid #ccc;
+  border-radius: 20px;
+  background: white;
+  color: #555;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Actor', sans-serif;
+  cursor: pointer;
+}
+
 .pet-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .pet-card {
   background: white;
-  border-radius: 16px;
-  padding: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border-radius: 28px;
+  padding: 18px 16px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
 }
 
 .pet-card-top {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .pet-avatar {
-  width: 48px;
-  height: 48px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
@@ -455,15 +539,7 @@ ion-content {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
-}
-
-.pet-img {
-  width: 100px;
-  height: 100px;
-  border-radius: 12px;
-  object-fit: cover;
-  flex-shrink: 0;
+  font-size: 36px;
 }
 
 .pet-info {
@@ -471,17 +547,21 @@ ion-content {
   min-width: 0;
 
   .pet-name {
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 28px;
+    line-height: 1.1;
     color: #1a1a2e;
     margin: 0 0 2px;
     font-family: 'Actor', sans-serif;
     text-transform: capitalize;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .pet-breed {
-    font-size: 11px;
-    color: #888;
+    font-size: 12px;
+    line-height: 1.25;
+    color: #777;
     margin: 0;
     font-family: 'Actor', sans-serif;
   }
@@ -490,7 +570,7 @@ ion-content {
 .pet-stats {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
 }
 
 .pstat {
@@ -501,47 +581,76 @@ ion-content {
   flex: 1;
 
   .pstat-label {
-    font-size: 10px;
-    color: #888;
+    font-size: 11px;
+    color: #777;
     font-family: 'Actor', sans-serif;
     text-align: center;
   }
 
   .pstat-val {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 700;
     color: #1a1a2e;
     font-family: 'Actor', sans-serif;
+    white-space: nowrap;
   }
 }
 
-.pet-caregivers {
+// Pastillas de color con foto + nombre (cuidadores o mascotas).
+.pill-row {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
-  padding-top: 8px;
-  border-top: 0.5px solid #f0f0f0;
+  gap: 8px;
+  margin-top: 14px;
 
-  .caregiver {
+  .pill {
     display: flex;
     align-items: center;
-    gap: 6px;
-    background: #f5f5f5;
-    border-radius: 20px;
-    padding: 4px 10px 4px 4px;
+    gap: 8px;
+    border-radius: 999px;
+    padding: 3px 16px 3px 3px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    min-width: 0;
+    max-width: 100%;
 
-    img {
-      width: 26px;
-      height: 26px;
+    img, .pill-emoji {
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       object-fit: cover;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.35);
     }
 
-    span {
-      font-size: 11px;
-      font-weight: 600;
-      color: #1a1a2e;
+    .pill-emoji {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    span:last-child {
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
       font-family: 'Actor', sans-serif;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &.pill-row-small {
+    justify-content: center;
+    gap: 4px;
+    margin-top: 10px;
+
+    .pill {
+      padding-right: 10px;
+      gap: 4px;
+
+      img, .pill-emoji { width: 28px; height: 28px; font-size: 16px; }
+      span:last-child { font-size: 12px; }
     }
   }
 }
@@ -550,103 +659,141 @@ ion-content {
   font-size: 11px;
   color: #aaa;
   font-family: 'Actor', sans-serif;
-  padding-top: 8px;
-  border-top: 0.5px solid #f0f0f0;
-  margin: 8px 0 0;
+  margin: 14px 0 0;
   font-style: italic;
 }
 
 .personas-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
 .persona-card {
   background: white;
-  border-radius: 16px;
-  padding: 16px;
+  border-radius: 24px;
+  padding: 18px 10px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  min-width: 0;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
 
   .persona-avatar {
-    width: 60px;
-    height: 60px;
+    width: 76px;
+    height: 76px;
     border-radius: 50%;
     object-fit: cover;
+    margin-bottom: 6px;
   }
 
   .persona-name {
-    font-size: 13px;
+    font-size: 20px;
     font-weight: 700;
     color: #1a1a2e;
     font-family: 'Actor', sans-serif;
-    margin: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .persona-role {
     font-size: 11px;
     color: #888;
     font-family: 'Actor', sans-serif;
-    margin: 0;
+  }
+}
+
+// "Mascotas a mi cuidado": mascota a la izquierda, dueño a la derecha.
+.care-top {
+  justify-content: space-between;
+  gap: 8px;
+
+  .care-pet {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
   }
 
-  .persona-pets {
-    display: flex;
-    gap: 4px;
-    flex-wrap: wrap;
-    justify-content: center;
+  .pet-avatar { width: 68px; height: 68px; }
+  .pet-info .pet-name { font-size: 24px; }
+}
 
-    .persona-pet-img {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
+.care-owner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+
+  img {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  div { min-width: 0; }
+
+  .owner-name {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a2e;
+    font-family: 'Actor', sans-serif;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .owner-label {
+    margin: 0;
+    font-size: 12px;
+    color: #777;
+    font-family: 'Actor', sans-serif;
   }
 }
 
 .ver-btn {
-  margin-top: 8px;
-  padding: 6px 24px;
-  background: #4037BE;
+  align-self: center;
+  margin-top: 14px;
+  padding: 6px 36px;
+  background: #F2262C;
   border: none;
   border-radius: 20px;
   color: white;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   font-family: 'Actor', sans-serif;
   cursor: pointer;
 }
 
-.pet-owner {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-top: 8px;
-  border-top: 0.5px solid #f0f0f0;
+/* ==========================
+   RESPONSIVE
+========================== */
+// Teléfonos pequeños: avatares y nombres más compactos para que la
+// fila mascota + dueño quepa sin cortarse tanto.
+@media (max-width: 360px) {
+  .pet-avatar { width: 64px; height: 64px; }
+  .pet-info .pet-name { font-size: 22px; }
+  .pstat .pstat-val { font-size: 17px; }
 
-  img {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    object-fit: cover;
+  .care-top {
+    .pet-avatar { width: 52px; height: 52px; }
+    .pet-info .pet-name { font-size: 19px; }
   }
 
-  span {
-    font-size: 12px;
-    font-weight: 600;
-    color: #1a1a2e;
-    font-family: 'Actor', sans-serif;
+  .care-owner {
+    img { width: 52px; height: 52px; }
+    .owner-name { font-size: 17px; }
   }
 
-  .owner-role {
-    font-size: 11px;
-    color: #888;
-    margin-left: auto;
-    font-weight: 400;
+  .persona-card {
+    .persona-avatar { width: 62px; height: 62px; }
+    .persona-name { font-size: 17px; }
   }
 }

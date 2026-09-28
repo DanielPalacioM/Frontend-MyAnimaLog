@@ -45,7 +45,7 @@
           </button>
         </div>
 
-        <button class="btn-danger" [disabled]="deleting" (click)="onDelete()">
+        <button class="btn-danger" *ngIf="canEdit" [disabled]="deleting" (click)="onDelete()">
           {{ deleting ? 'Eliminando...' : 'Eliminar documento' }}
         </button>
       </div>

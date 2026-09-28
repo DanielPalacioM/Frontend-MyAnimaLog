@@ -11,6 +11,10 @@ export interface AppNotification {
   isRead: boolean;
   hidden?: boolean;
   actions?: 'invitation';
+  // Solo invitaciones: foto de la mascota y quién la envía.
+  petImageUrl?: string | null;
+  senderName?: string;
+  senderAvatarUrl?: string | null;
 }
 
 @Component({

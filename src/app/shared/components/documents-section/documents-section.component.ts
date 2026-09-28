@@ -11,6 +11,8 @@ import { PetDocument } from 'src/app/models/pet-document.model';
 export class DocumentsSectionComponent implements OnChanges {
   @Input() documents: PetDocument[] = [];
   @Input() petId!: string;
+  // false = rol "solo vista": no se puede subir.
+  @Input() canEdit: boolean = true;
 
   @Output() viewAll = new EventEmitter<void>();
   @Output() upload = new EventEmitter<void>();

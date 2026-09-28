@@ -36,7 +36,7 @@ ion-content {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 52px 16px 20px;
+  padding: max(52px, calc(env(safe-area-inset-top) + 16px)) 16px 20px; // respeta el notch
 }
 
 .sidebar-avatar {
@@ -268,8 +268,8 @@ ion-content {
 }
 
 .pet-avatar-wrap {
-  width: 130px;
-  height: 130px;
+  width: clamp(104px, 34vw, 130px);
+  height: clamp(104px, 34vw, 130px);
   border-radius: 50%;
   overflow: hidden;
   border: 3px solid #FFB84F;
@@ -316,6 +316,7 @@ ion-content {
 
 .stat-box {
   flex: 1;
+  min-width: 0;
   background: white;
   border-radius: 14px;
   padding: 10px 6px;
@@ -379,7 +380,7 @@ ion-content {
 // MEDICAL GRID
 .medical-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -711,4 +712,22 @@ ion-content {
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+// Teléfonos pequeños
+@media (max-width: 360px) {
+  .orange-zone { padding: 16px 12px 28px; }
+  .pet-stats { gap: 6px; }
+  .stat-box { padding: 8px 4px; }
+  .medical-card { padding: 10px; }
+}
+
+.role-tag {
+  display: inline-block;
+  margin-top: 6px;
+  background: #2E7FD8;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 10px;
 }

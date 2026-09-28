@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
-import { catchError, retry } from 'rxjs/operators';
+import { catchError, map, retry, switchMap } from 'rxjs/operators';
 import { AppNotification } from 'src/app/shared/components/notification-card/notification-card.component';
 import { NotificationService } from 'src/app/services/NotificationService/notification';
-import { PetService } from 'src/app/services/PetService/pet';
+import { PetService, Pet } from 'src/app/services/PetService/pet';
+import { ProfileService } from 'src/app/services/ProfileService/profile';
 import { SharedProfileService } from 'src/app/services/SharedProfileService/shared-profile';
 import { AppNotificationDto } from 'src/app/models/notification.model';
 import { PetInvitation } from 'src/app/models/shared-profile.model';
@@ -38,7 +39,8 @@ export class NotificationsPage implements OnInit {
     private router: Router,
     private notificationService: NotificationService,
     private petService: PetService,
-    private sharedProfileService: SharedProfileService
+    private sharedProfileService: SharedProfileService,
+    private profileService: ProfileService
   ) {}
 
   ngOnInit() {
@@ -97,6 +99,7 @@ export class NotificationsPage implements OnInit {
       const { deduped, redundantIds } = dedupeByContent(mapped);
       const invitationCards = invitations.map(i => this.invitationToAppNotification(i, idToName));
       this.notifications = [...invitationCards, ...deduped];
+      invitations.forEach(i => this.enrichInvitation(i));
       this.visibleCount = this.pageSize;
 
       // El backend a veces mete varias copias exactas de la misma
@@ -134,18 +137,60 @@ export class NotificationsPage implements OnInit {
   }
 
   private invitationToAppNotification(i: PetInvitation, idToName: Map<string, string>): AppNotification {
-    const petName = i.petName || idToName.get(i.petId) || 'una mascota';
-    const role = i.accessRole === 'EDITOR' ? 'editor' : 'solo vista';
+    const petName = i.petName || idToName.get(i.petId);
     return {
-      id: INVITATION_PREFIX + i.id,
+      // Se guarda el token (no el id): es lo que piden accept/reject.
+      id: INVITATION_PREFIX + i.token,
       type: 'PET_INVITATION',
-      title: 'Invitación para cuidar una mascota',
-      message: `Te invitaron a cuidar a ${petName} con permiso de ${role}.`,
+      ...this.invitationTexts(petName, i.ownerName, i.accessRole),
       date: i.createdAt ? new Date(i.createdAt) : new Date(),
       isRead: false,
       hidden: false,
-      actions: 'invitation'
+      actions: 'invitation',
+      petImageUrl: i.petImageUrl ?? null,
+      senderName: i.ownerName,
+      senderAvatarUrl: i.ownerAvatarUrl ?? null
     };
+  }
+
+  private invitationTexts(petName: string | undefined, senderName: string | undefined, role: string) {
+    const roleText = role === 'EDITOR' ? 'editor' : 'solo vista';
+    const who = senderName || 'Alguien';
+    return {
+      title: petName ? `Invitación para cuidar a ${petName}` : 'Invitación para cuidar una mascota',
+      message: `${who} te invitó a cuidar a ${petName || 'su mascota'} con permiso de ${roleText}.`
+    };
+  }
+
+  // Completa la tarjeta con lo que la invitación no trae: nombre y foto de
+  // la mascota (GET /pets/{id}) y nombre y foto de quien invita (perfil del
+  // dueño). Si el backend ya lo manda en la invitación, no se pide nada.
+  private enrichInvitation(i: PetInvitation) {
+    const needPet = !i.petName || !i.petImageUrl || !i.ownerId;
+    const pet$ = needPet
+      ? this.petService.getPetById(i.petId).pipe(catchError(() => of(null as Pet | null)))
+      : of(null as Pet | null);
+
+    pet$.pipe(
+      switchMap(pet => {
+        const ownerId = i.ownerId || pet?.ownerId || '';
+        const owner$ = i.ownerName
+          ? of({ id: ownerId, username: i.ownerName, avatarUrl: i.ownerAvatarUrl ?? null })
+          : this.profileService.getUserById(ownerId);
+        return owner$.pipe(map(owner => ({ pet, owner })));
+      })
+    ).subscribe(({ pet, owner }) => {
+      const id = INVITATION_PREFIX + i.token;
+      const petName = i.petName || pet?.name;
+      const senderName = owner?.username || undefined;
+      this.notifications = this.notifications.map(n => n.id !== id ? n : {
+        ...n,
+        ...this.invitationTexts(petName, senderName, i.accessRole),
+        petImageUrl: i.petImageUrl || pet?.imageUrl || null,
+        senderName,
+        senderAvatarUrl: owner?.avatarUrl ?? null
+      });
+    });
   }
 
   private isInvitation(id: string): boolean {
@@ -222,10 +267,10 @@ export class NotificationsPage implements OnInit {
       return;
     }
 
-    const invitationId = id.slice(INVITATION_PREFIX.length);
+    const invitationToken = id.slice(INVITATION_PREFIX.length);
     const request$ = accept
-      ? this.sharedProfileService.acceptInvitation(invitationId)
-      : this.sharedProfileService.rejectInvitation(invitationId);
+      ? this.sharedProfileService.acceptInvitation(invitationToken)
+      : this.sharedProfileService.rejectInvitation(invitationToken);
 
     request$.subscribe({
       next: () => {

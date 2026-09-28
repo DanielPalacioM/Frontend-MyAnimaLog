@@ -35,7 +35,7 @@ ion-content {
 }
 
 .empty-img {
-  width: 260px;
+  width: min(260px, 70vw);
   object-fit: contain;
   margin-bottom: 8px;
 }

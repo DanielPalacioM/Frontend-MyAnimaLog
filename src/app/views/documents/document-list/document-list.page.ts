@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DocumentService } from 'src/app/services/DocumentService/document-service/document-service';
 import { PetService } from 'src/app/services/PetService/pet';
+import { SharedProfileService } from 'src/app/services/SharedProfileService/shared-profile';
 import { PetDocument, DocumentType } from 'src/app/models/pet-document.model';
 
 
@@ -25,6 +26,8 @@ export class DocumentListPage implements OnInit {
   documents: PetDocument[] = [];
   activeFilter: FilterTab = 'ALL';
   loading = true;
+  // false mientras se resuelve el rol o si es "solo vista".
+  canEdit = false;
 
   tabs: { key: FilterTab; label: string }[] = [
   { key: 'ALL',              label: 'Todos' },
@@ -42,12 +45,15 @@ export class DocumentListPage implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private documentService: DocumentService,
-    private petService: PetService
+    private petService: PetService,
+    private sharedProfileService: SharedProfileService
   ) {}
 
   ngOnInit() {
     this.petId = this.route.snapshot.paramMap.get('petId') || '';
     if (!this.petId) return;
+    this.sharedProfileService.getMyRoleForPet(this.petId)
+      .subscribe(role => this.canEdit = role !== 'VIEWER');
     this.loadPetInfo();
     this.loadDocuments();
   }

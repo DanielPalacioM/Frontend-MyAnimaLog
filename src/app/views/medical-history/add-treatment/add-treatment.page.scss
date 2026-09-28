@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 52px 14px 10px;
+  padding: max(52px, calc(env(safe-area-inset-top) + 16px)) 14px 10px; // respeta el notch
   background: #FFB84F;
 }
 
@@ -109,7 +109,7 @@
 
 .row2 {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 

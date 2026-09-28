@@ -34,7 +34,54 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import "@ionic/angular/css/palettes/dark.system.css";
+/* Sin modo oscuro: la app no tiene diseño oscuro y, con el teléfono en modo
+   oscuro, Ionic cambiaba fondos, textos e inputs y deformaba las vistas. */
+/* @import "@ionic/angular/css/palettes/dark.system.css"; */
+
+:root {
+  color-scheme: light;
+}
+
+/* ===================================
+   BASE RESPONSIVE
+   Reglas para que ninguna vista se desborde en teléfonos pequeños
+   ni se estire de más en pantallas grandes.
+   =================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+img,
+video,
+canvas {
+  max-width: 100%;
+}
+
+// Los inputs tienen un ancho mínimo propio (~20 caracteres) que desbordaba
+// las filas de dos campos en teléfonos angostos.
+input,
+select,
+textarea {
+  min-width: 0;
+  max-width: 100%;
+}
+
+// Nunca scroll horizontal: si algo se pasa de ancho, se corta en vez de mover la vista.
+ion-content::part(scroll) {
+  overflow-x: hidden;
+}
+
+// Textos largos (nombres, correos, URLs) se parten en vez de romper el layout.
+h1, h2, h3, h4, h5, h6, p, span, label {
+  overflow-wrap: break-word;
+}
+
+// Alertas y action sheets nunca más anchos que la pantalla.
+ion-alert.custom-alert {
+  --max-width: min(340px, 92vw);
+}
 @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Jua&family=Actor:wght@400;700&display=swap');
 
@@ -171,11 +218,11 @@
 }
 
 ion-modal.datetime-modal.visit-modal {
-  --width: 360px;
+  --width: min(360px, 92vw);
 }
 
 ion-modal.datetime-modal {
-  --width: 320px;
+  --width: min(320px, 92vw);
   --max-width: 90vw;
   --height: auto;
   --border-radius: 24px;

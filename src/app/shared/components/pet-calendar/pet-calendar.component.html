@@ -5,7 +5,7 @@
     <img *ngIf="petAvatarUrl" [src]="petAvatarUrl" [alt]="petName" class="cal-pet-avatar" />
     <span class="cal-pet-name">{{ petName }} - eventos en el mes</span>
     <span class="cal-event-count">{{ totalEventsThisMonth }}</span>
-    <button class="cal-add-btn" (click)="onAddEvent()">
+    <button class="cal-add-btn" *ngIf="canEdit" (click)="onAddEvent()">
       <ion-icon name="add-outline"></ion-icon>
     </button>
   </div>
@@ -75,7 +75,7 @@
        <p class="event-card-time">
           {{ ev.time }}<span *ngIf="ev.endTime"> - {{ ev.endTime }}</span>
       </p>        
-      <div class="event-actions" (click)="$event.stopPropagation()">
+      <div class="event-actions" *ngIf="canEdit" (click)="$event.stopPropagation()">
           <button class="action-btn edit" (click)="onEdit(ev, $event)"><ion-icon name="create-outline"></ion-icon></button>
           <button class="action-btn delete" (click)="onDelete(ev, $event)"><ion-icon name="trash-outline"></ion-icon></button>
         </div>
@@ -97,7 +97,7 @@
           <p class="event-card-desc" *ngIf="ev.description">{{ ev.description }}</p>
           <p class="event-card-time">
               {{ ev.time }}<span *ngIf="ev.endTime"> - {{ ev.endTime }}</span>
-        </p>          <div class="event-actions" (click)="$event.stopPropagation()">
+        </p>          <div class="event-actions" *ngIf="canEdit" (click)="$event.stopPropagation()">
             <button class="action-btn edit" (click)="onEdit(ev, $event)"><ion-icon name="create-outline"></ion-icon></button>
             <button class="action-btn delete" (click)="onDelete(ev, $event)"><ion-icon name="trash-outline"></ion-icon></button>
           </div>
@@ -153,7 +153,7 @@
 
     </div>
 
-    <div class="event-modal-actions">
+    <div class="event-modal-actions" *ngIf="canEdit">
       <button class="modal-btn edit" (click)="onEdit(selectedEvent, $event); closeEventModal()">
         <ion-icon name="create-outline"></ion-icon> Editar
       </button>

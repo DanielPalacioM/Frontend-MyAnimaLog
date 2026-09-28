@@ -1,10 +1,13 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { CalendarEvent } from '../../shared/components/calendar-widget/calendar-widget.component';
 import { ProfileService } from 'src/app/services/ProfileService/profile';
 import { PetService, Pet } from 'src/app/services/PetService/pet';
 import { NotificationService } from 'src/app/services/NotificationService/notification';
+import { SharedProfileService } from 'src/app/services/SharedProfileService/shared-profile';
+import { SharedPet } from 'src/app/models/shared-profile.model';
 
 @Component({
   selector: 'app-home',
@@ -15,7 +18,7 @@ import { NotificationService } from 'src/app/services/NotificationService/notifi
 export class HomePage implements OnInit, AfterViewInit, OnDestroy {
 
   username: string = 'Username';
-  userAvatar: string = 'assets/images/default-avatar.png';
+  userAvatar: string = 'assets/images/default-avatar.svg';
   hasPets: boolean = false;
   currentPetIndex: number = 0;
   showTutorial: boolean = false;
@@ -55,7 +58,8 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     public router: Router,
     private profileService: ProfileService,
     private petService: PetService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private sharedProfileService: SharedProfileService
   ) {}
 
   ngOnInit() {
@@ -112,10 +116,21 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  // Mis mascotas + las que me compartieron ("A mi cuidado"), en un solo carrusel.
   loadPets() {
-    this.petService.getPets().subscribe({
-      next: (pets) => {
+    forkJoin({
+      mine: this.petService.getPets(),
+      inCare: this.sharedProfileService.getPetsInMyCare().pipe(
+        catchError((err) => {
+          console.error('❌ Error cargando mascotas a mi cuidado:', err);
+          return of([] as SharedPet[]);
+        })
+      )
+    }).subscribe({
+      next: ({ mine, inCare }) => {
+        const pets = [...mine, ...inCare.map(p => this.sharedPetToPet(p))];
         this.pets = pets;
+        this.loadCaregivers(mine);
         this.hasPets = this.pets.length > 0;
         this.showTutorial = !this.hasPets;
         this.checkFirstTime();
@@ -128,6 +143,51 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
         this.pets = [];
         this.hasPets = false;
       }
+    });
+  }
+
+  private sharedPetToPet(p: SharedPet): Pet {
+    return {
+      id: p.id,
+      ownerId: p.ownerId,
+      name: p.name,
+      species: p.species,
+      breed: p.breed,
+      birthDate: p.birthDate || '',
+      ageMonths: p.ageMonths ?? null,
+      imageUrl: p.imageUrl,
+      sex: p.sex,
+      weight: p.weight ?? null,
+      height: p.height ?? null,
+      vaccine: null,
+      documentIds: [],
+      vetName: '',
+      sharedWith: [],
+      createdAt: '',
+      inCare: true,
+      accessRole: p.accessRole
+    };
+  }
+
+  // "También lo cuida": fotos de las personas que aceptaron la invitación
+  // de cada una de MIS mascotas.
+  private loadCaregivers(myPets: Pet[]) {
+    myPets.forEach(pet => {
+      this.sharedProfileService.getPeopleWithAccessToPet(pet.id).pipe(
+        switchMap(list => list.length === 0
+          ? of([] as string[])
+          : forkJoin(list.map(a => a.userAvatarUrl
+              ? of(a.userAvatarUrl)
+              : this.profileService.getUserById(a.userId).pipe(map(u => u?.avatarUrl || ''))
+            ))
+        ),
+        catchError(() => of([] as string[]))
+      ).subscribe(avatars => {
+        const target = this.pets.find(p => p.id === pet.id && !p.inCare);
+        if (target) {
+          target.sharedWith = avatars.map(a => ({ avatarUrl: a || 'assets/images/default-avatar.svg' }));
+        }
+      });
     });
   }
 

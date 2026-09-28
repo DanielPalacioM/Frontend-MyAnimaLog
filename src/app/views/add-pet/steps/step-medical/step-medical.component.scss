@@ -94,6 +94,8 @@
 .field-row {
   display: flex;
   gap: 8px;
+
+  > * { min-width: 0; }
 }
 
 .select-wrap {

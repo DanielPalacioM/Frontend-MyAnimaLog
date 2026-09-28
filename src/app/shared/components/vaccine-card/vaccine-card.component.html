@@ -26,7 +26,7 @@
   </ng-template>
 
   <div class="card-actions">
-    <button class="btn-secondary" (click)="onAdd()">Agregar</button>
+    <button class="btn-secondary" *ngIf="canEdit" (click)="onAdd()">Agregar</button>
     <button class="btn-primary" (click)="onViewTimeline()">Ver vacunas</button>
   </div>
 </div>

@@ -21,6 +21,12 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/user/register`, userData);
   }
 
+  // POST /auth/verify-email { email, code } -> confirma el PIN que llega al
+  // correo después de registrarse (solo la primera vez).
+  verifyEmail(email: string, code: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/auth/verify-email`, { email, code });
+  }
+
   // ✅ Login con Google - Envía objeto JSON { idToken }
   loginWithGoogle(idToken: string): Observable<any> {
     return this.http.post(

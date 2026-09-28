@@ -22,6 +22,18 @@ const routes: Routes = [
     loadChildren: () => import('./views/register/register.module').then( m => m.RegisterPageModule)
   },
   {
+    path: 'verify-email',
+    loadChildren: () => import('./views/verify-email/verify-email.module').then( m => m.VerifyEmailPageModule)
+  },
+  {
+    path: 'reset-password',
+    loadChildren: () => import('./views/reset-password/reset-password.module').then( m => m.ResetPasswordPageModule)
+  },
+  {
+    path: 'reset-password/:token',
+    loadChildren: () => import('./views/reset-password/reset-password.module').then( m => m.ResetPasswordPageModule)
+  },
+  {
     path: 'recover-password',
     loadChildren: () => import('./views/recover-password/recover-password.module').then( m => m.RecoverPasswordPageModule)
   },
@@ -104,7 +116,8 @@ const routes: Routes = [
 {
   path: 'pets/:petId/documents/:docId',
   loadChildren: () => import('./views/documents/document-info/document-info.module').then(m => m.DocumentInfoPageModule)
-},  {
+},
+  {
     path: 'document-list',
     loadChildren: () => import('./views/documents/document-list/document-list.module').then( m => m.DocumentListPageModule)
   },
@@ -126,6 +139,11 @@ const routes: Routes = [
   
 
   
+  // Cualquier ruta desconocida vuelve al login en vez de quedar en negro.
+  {
+    path: '**',
+    redirectTo: 'login'
+  }
 ];
 
 @NgModule({

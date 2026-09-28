@@ -11,7 +11,7 @@
 
 // HEADER
 .calendar-header {
-  padding: 52px 16px 12px;
+  padding: max(52px, calc(env(safe-area-inset-top) + 16px)) 16px 12px; // respeta el notch
 }
 
 .header-top {
@@ -100,6 +100,7 @@
   display: flex;
   flex-direction: column;
   min-width: 180px;
+  max-width: calc(100vw - 32px);
   z-index: 100;
 }
 
@@ -155,7 +156,7 @@
 // DÍAS DE LA SEMANA
 .cal-days-header {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   padding: 0 16px;
   margin-bottom: 4px;
 
@@ -172,7 +173,7 @@
 // GRID DE DÍAS
 .cal-week {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   padding: 0 16px;
 }
 
@@ -408,7 +409,7 @@
 
 .week-scroll {
   overflow-y: auto;
-  max-height: 500px; // ajusta según espacio disponible en pantalla
+  max-height: min(500px, 60vh); // se ajusta al alto disponible de la pantalla
   position: relative;
 }
 

@@ -15,6 +15,8 @@ export interface VaccineSummary {
   standalone: false
 })
 export class VaccineCardComponent {
+  // false = rol "solo vista": no se puede agregar.
+  @Input() canEdit: boolean = true;
 
   @Input() summary: VaccineSummary = {
     appliedCount: 0,

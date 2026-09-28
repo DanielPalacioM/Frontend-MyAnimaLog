@@ -45,7 +45,7 @@
         </p>
       </div>
 
-      <button class="upload-btn" (click)="onUpload()">
+      <button class="upload-btn" *ngIf="canEdit" (click)="onUpload()">
         <ion-icon name="cloud-upload-outline"></ion-icon> Subir documento
       </button>
 

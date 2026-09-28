@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DocumentService } from 'src/app/services/DocumentService/document-service/document-service';
 import { PetDocument, DocumentType } from 'src/app/models/pet-document.model';
+import { SharedProfileService } from 'src/app/services/SharedProfileService/shared-profile';
 
 @Component({
   selector: 'app-document-info',
@@ -16,17 +17,22 @@ export class DocumentInfoPage implements OnInit {
   doc: PetDocument | null = null;
   loading = true;
   deleting = false;
+  // Solo dueño y editor pueden eliminar; false mientras se resuelve el rol.
+  canEdit = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    private sharedProfileService: SharedProfileService
   ) {}
 
   ngOnInit() {
     this.petId = this.route.snapshot.paramMap.get('petId') || '';
     this.docId = this.route.snapshot.paramMap.get('docId') || '';
     if (!this.petId || !this.docId) return;
+    this.sharedProfileService.getMyRoleForPet(this.petId)
+      .subscribe(role => this.canEdit = role !== 'VIEWER');
     this.loadDoc();
   }
 

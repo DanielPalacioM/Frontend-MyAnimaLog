@@ -6,14 +6,14 @@
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  padding-bottom: 80px;
+  padding-bottom: calc(110px + env(safe-area-inset-bottom)); // espacio para la tab bar
 }
 
 .info-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 52px 16px 8px;
+  padding: max(52px, calc(env(safe-area-inset-top) + 16px)) 16px 8px; // respeta el notch
   background: #FFB84F;
 }
 

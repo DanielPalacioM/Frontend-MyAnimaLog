@@ -13,6 +13,8 @@ import { MedicalHistoryService } from '../../services/MedicalHistoryService/medi
 import { VaccineService } from '../../services/VaccineService/vaccine/vaccine';
 import { DocumentService } from 'src/app/services/DocumentService/document-service/document-service';
 import { CalendarService } from 'src/app/services/CalendarService/calendar';
+import { SharedProfileService } from 'src/app/services/SharedProfileService/shared-profile';
+import { PetRole } from 'src/app/models/shared-profile.model';
 
 interface PetStats {
   age: string;
@@ -39,9 +41,17 @@ export class PetProfilePage implements OnInit {
 
   pet: PetModel | null = null;
 
+  // Rol del usuario sobre esta mascota: OWNER (es suya), EDITOR o VIEWER
+  // (se la compartieron). VIEWER solo puede ver. Mientras se resuelve
+  // (null) no se muestra ningún botón de edición.
+  role: PetRole | null = null;
+  get isOwner(): boolean { return this.role === 'OWNER'; }
+  get canEdit(): boolean { return this.role === 'OWNER' || this.role === 'EDITOR'; }
+  get roleLabel(): string { return this.role === 'EDITOR' ? 'Editor' : 'Solo vista'; }
+
   userName = '';
   userEmail = '';
-  userAvatar = 'assets/images/default-avatar.png';
+  userAvatar = 'assets/images/default-avatar.svg';
 
   petStats: PetStats = {
     age: '—',
@@ -71,7 +81,8 @@ export class PetProfilePage implements OnInit {
     private medicalHistoryService: MedicalHistoryService,
     private vaccineService: VaccineService,
     private documentService: DocumentService,
-    private calendarService: CalendarService
+    private calendarService: CalendarService,
+    private sharedProfileService: SharedProfileService
   ) {}
 
   ngOnInit(): void {
@@ -124,6 +135,7 @@ closePhotoViewer(): void {
     this.petService.getPetById(id).subscribe({
       next: (pet) => {
         this.pet = pet;
+        this.loadRole(pet);
         this.petStats = this.buildStats(pet);
         this.loading = false;
         this.loadMedicalHistoryCounts(id);
@@ -137,6 +149,15 @@ closePhotoViewer(): void {
         this.loading = false;
       }
     });
+  }
+
+  private loadRole(pet: PetModel): void {
+    const myId = localStorage.getItem('userId') || '';
+    if (pet.ownerId && pet.ownerId === myId) {
+      this.role = 'OWNER';
+      return;
+    }
+    this.sharedProfileService.getMyRoleForPet(pet.id).subscribe(role => this.role = role);
   }
 
   private loadDocuments(petId: string): void {

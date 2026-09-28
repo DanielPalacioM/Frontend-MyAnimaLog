@@ -48,7 +48,7 @@ export class AddEventPage implements OnInit {
   selectedPetId: string | null = null;
   selectedPet: Pet | null = null;
 
-  userAvatar = 'assets/images/default-avatar.png';
+  userAvatar = 'assets/images/default-avatar.svg';
 
   selectedType: EventType = 'VET_APPOINTMENT';
   title = '';

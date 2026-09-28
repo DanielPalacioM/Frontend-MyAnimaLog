@@ -6,6 +6,17 @@
      <span class="notif-date">{{ getNotifDate() }}</span>    </div>
     <p class="notif-message">{{ notification.message }}</p>
 
+    <div class="invite-info" *ngIf="notification.actions === 'invitation'">
+      <div class="invite-pet-photo">
+        <img *ngIf="notification.petImageUrl" [src]="notification.petImageUrl" alt="" />
+        <span *ngIf="!notification.petImageUrl">🐾</span>
+      </div>
+      <div class="invite-sender" *ngIf="notification.senderName">
+        <img [src]="notification.senderAvatarUrl || 'assets/images/default-avatar.svg'" alt="" />
+        <span>Enviada por <strong>{{ notification.senderName }}</strong></span>
+      </div>
+    </div>
+
     <div class="notif-actions" *ngIf="notification.actions === 'invitation'">
       <button class="btn-reject" (click)="$event.stopPropagation(); onReject()">Cancelar</button>
       <button class="btn-accept" (click)="$event.stopPropagation(); onAccept()">Aceptar</button>

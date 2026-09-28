@@ -13,7 +13,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 52px 16px 12px;
+  padding: max(52px, calc(env(safe-area-inset-top) + 16px)) 16px 12px; // respeta el notch
   background: #FFB84F;
 }
 
@@ -173,6 +173,8 @@
 .date-lot-row {
   display: flex;
   gap: 10px;
+
+  > * { min-width: 0; }
 }
 
 .date-wrap { flex: 1.2; }
@@ -526,6 +528,8 @@
   gap: 10px;
   width: 100%;
   box-sizing: border-box;
+
+  > * { min-width: 0; }
 }
 
 .date-wrap {

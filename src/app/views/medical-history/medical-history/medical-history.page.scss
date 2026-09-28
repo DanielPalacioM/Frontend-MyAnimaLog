@@ -4,14 +4,14 @@
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  padding-bottom: 80px;
+  padding-bottom: calc(110px + env(safe-area-inset-bottom)); // espacio para la tab bar
 }
 
 .mh-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 52px 14px 10px;
+  padding: max(52px, calc(env(safe-area-inset-top) + 16px)) 14px 10px; // respeta el notch
   background: #FFB84F;
 }
 
@@ -476,6 +476,7 @@
 }
 
 .chips-row {
+  flex-wrap: wrap;
   display: flex;
   gap: 10px;
   margin-top: 6px;

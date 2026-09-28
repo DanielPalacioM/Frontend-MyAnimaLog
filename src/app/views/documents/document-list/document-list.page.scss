@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 52px 14px 10px;
+  padding: max(52px, calc(env(safe-area-inset-top) + 16px)) 14px 10px;
   background: #FFB84F;
 }
 
@@ -66,7 +66,7 @@
   background: #fff;
   border-radius: 20px 20px 0 0;
   flex: 1;
-  padding: 20px 14px 32px;
+  padding: 20px 14px calc(110px + env(safe-area-inset-bottom)); // espacio para la tab bar
   display: flex;
   flex-direction: column;
   gap: 14px;

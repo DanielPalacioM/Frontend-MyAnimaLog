@@ -25,8 +25,11 @@ import { VaccineTimelineCardComponent } from './components/vaccine-timeline-card
 import { DatePickerFieldComponent } from './components/date-picker-field/date-picker-field.component';
 import { VisitPickerFieldComponent } from './components/visit-picker-field/visit-picker-field.component';
 
+import { ImgFallbackDirective } from './directives/img-fallback.directive';
+
 @NgModule({
   declarations: [
+    ImgFallbackDirective,
     DatePickerFieldComponent,
     VisitPickerFieldComponent,
     InputComponent,
@@ -54,6 +57,7 @@ import { VisitPickerFieldComponent } from './components/visit-picker-field/visit
     RouterModule,
   ],
   exports: [
+    ImgFallbackDirective,
     DatePickerFieldComponent,
     VisitPickerFieldComponent,
     InputComponent,

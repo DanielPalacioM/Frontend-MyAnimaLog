@@ -1,9 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ProfileService } from 'src/app/services/ProfileService/profile';
+import { ProfileService, UserSummary } from 'src/app/services/ProfileService/profile';
 import { PetService, Pet,  } from 'src/app/services/PetService/pet';
 import { PetAccess, SharedPet } from 'src/app/models/shared-profile.model';
 import { SharedProfileService } from 'src/app/services/SharedProfileService/shared-profile';
+import { VaccineService } from 'src/app/services/VaccineService/vaccine/vaccine';
+import { MedicalHistoryService } from 'src/app/services/MedicalHistoryService/medical-history';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 
 interface PersonaCompartida {
@@ -11,7 +15,7 @@ interface PersonaCompartida {
   name: string;
   role: string;
   avatarUrl: string;
-  pets: { imageUrl: string | null }[];
+  pets: { imageUrl: string | null; name: string; species: string }[];
 }
 
 @Component({
@@ -23,7 +27,7 @@ interface PersonaCompartida {
 export class SharedProfilesHomePage implements OnInit {
 
   username: string = '';
-  userAvatar: string = 'assets/images/default-avatar.png';
+  userAvatar: string = 'assets/images/default-avatar.svg';
   activeTab: string = 'mis-mascotas';
 
   myPets: Pet[] = [];
@@ -35,9 +39,12 @@ export class SharedProfilesHomePage implements OnInit {
   inviteRole: 'EDITOR' | 'VIEWER' = 'VIEWER';
   inviteSelectedPetId: string | null = null;
   sendingInvite = false;
+  // Búsqueda del correo invitado: solo se puede invitar a una cuenta existente.
+  searchingInvitee = false;
+  invitee: UserSummary | null = null;
+  inviteeError = '';
   petCaregivers: { [petId: string]: PersonaCompartida[] } = {};
-
-  
+  petCounts: { [petId: string]: { vaccines?: number | null; visits?: number | null } } = {};
 
   loading = true;
 
@@ -45,7 +52,9 @@ export class SharedProfilesHomePage implements OnInit {
     private router: Router,
     private profileService: ProfileService,
     private petService: PetService,
-    private sharedProfileService: SharedProfileService
+    private sharedProfileService: SharedProfileService,
+    private vaccineService: VaccineService,
+    private medicalHistoryService: MedicalHistoryService
   ) {}
 
   ngOnInit() {
@@ -82,6 +91,26 @@ export class SharedProfilesHomePage implements OnInit {
   };
   const key = (species || '').toLowerCase().trim();
   return speciesMap[key] || '🐾';
+}
+
+sexLabel(sex: string | undefined): string {
+  const s = (sex || '').toLowerCase().trim();
+  if (s === 'macho' || s === 'male') return 'Macho';
+  if (s === 'hembra' || s === 'female') return 'Hembra';
+  return sex || '';
+}
+
+// "Pastor alemán - Macho - 60 cm"
+petDetails(pet: { breed?: string; sex?: string; height?: number | null }): string {
+  return [pet.breed, this.sexLabel(pet.sex), pet.height ? `${pet.height} cm` : '']
+    .filter(Boolean)
+    .join(' - ');
+}
+
+private readonly pillColors = ['#FF6F7B', '#FF7A3D', '#FFB84F', '#5FA3DC'];
+
+pillColor(index: number): string {
+  return this.pillColors[index % this.pillColors.length];
 }
 
 getSexColor(sex: string | undefined): string {
@@ -136,6 +165,7 @@ get showEmptyPetsInCare(): boolean {
       next: (pets) => {
         this.myPets = pets;
         this.loadSharedPersons(pets);
+        this.loadCounts(pets.map(p => p.id));
       },
       error: (err) => {
         console.error('❌ Error cargando mis mascotas:', err);
@@ -147,6 +177,8 @@ get showEmptyPetsInCare(): boolean {
       next: (pets) => {
         this.petsInCare = pets;
         this.loading = false;
+        this.loadOwners(pets);
+        this.loadCounts(pets.map(p => p.id));
       },
       error: (err) => {
         console.error('❌ Error cargando mascotas a mi cuidado:', err);
@@ -157,56 +189,89 @@ get showEmptyPetsInCare(): boolean {
   }
 
   private loadSharedPersons(pets: Pet[]) {
-  if (pets.length === 0) {
-    this.sharedPersons = [];
-    this.petCaregivers = {};
-    return;
+    if (pets.length === 0) {
+      this.sharedPersons = [];
+      this.petCaregivers = {};
+      return;
+    }
+
+    forkJoin(pets.map(pet =>
+      this.sharedProfileService.getPeopleWithAccessToPet(pet.id).pipe(
+        catchError(err => {
+          console.error(`❌ Error cargando acceso de mascota ${pet.id}:`, err);
+          return of([] as PetAccess[]);
+        }),
+        map(accessList => ({ pet, accessList }))
+      )
+    )).subscribe(results => {
+      const personMap = new Map<string, PersonaCompartida>();
+      const caregivers: { [petId: string]: PersonaCompartida[] } = {};
+
+      results.forEach(({ pet, accessList }) => {
+        caregivers[pet.id] = accessList.map(access => {
+          if (!personMap.has(access.userId)) {
+            personMap.set(access.userId, {
+              id: access.userId,
+              name: access.userName || 'Usuario',
+              role: access.accessRole === 'EDITOR' ? 'Editor' : 'Solo vista',
+              avatarUrl: access.userAvatarUrl || 'assets/images/default-avatar.svg',
+              pets: []
+            });
+          }
+          const persona = personMap.get(access.userId)!;
+          persona.pets.push({ imageUrl: pet.imageUrl, name: pet.name, species: pet.species });
+          return persona;
+        });
+      });
+
+      this.petCaregivers = caregivers;
+      this.sharedPersons = Array.from(personMap.values());
+
+      // El acceso normalmente solo trae el userId: nombre y foto salen del
+      // perfil de cada persona. Es el mismo objeto en "Mis mascotas" y en
+      // "Personas compartidas", así que se actualiza en las dos a la vez.
+      this.sharedPersons.forEach(persona => {
+        this.profileService.getUserById(persona.id).subscribe(user => {
+          if (!user) return;
+          if (user.username) persona.name = user.username;
+          if (user.avatarUrl) persona.avatarUrl = user.avatarUrl;
+        });
+      });
+    });
   }
 
-  const personMap = new Map<string, PersonaCompartida>();
-  this.petCaregivers = {};
-
-  let completed = 0;
-  pets.forEach((pet) => {
-    this.sharedProfileService.getPeopleWithAccessToPet(pet.id).subscribe({
-      next: (accessList: PetAccess[]) => {
-        const caregiversForThisPet: PersonaCompartida[] = [];
-
-        accessList.forEach((access) => {
-          const persona: PersonaCompartida = {
-            id: access.userId,
-            name: access.userName || 'Usuario',
-            role: access.accessRole === 'EDITOR' ? 'Editor' : 'Solo vista',
-            avatarUrl: access.userAvatarUrl || 'assets/images/default-avatar.png',
-            pets: []
-          };
-
-          caregiversForThisPet.push(persona);
-
-          if (!personMap.has(access.userId)) {
-            personMap.set(access.userId, { ...persona, pets: [] });
-          }
-          personMap.get(access.userId)!.pets.push({ imageUrl: pet.imageUrl });
-        });
-
-        this.petCaregivers[pet.id] = caregiversForThisPet;
-
-        completed++;
-        if (completed === pets.length) {
-          this.sharedPersons = Array.from(personMap.values());
-        }
-      },
-      error: (err) => {
-        console.error(`❌ Error cargando acceso de mascota ${pet.id}:`, err);
-        this.petCaregivers[pet.id] = [];
-        completed++;
-        if (completed === pets.length) {
-          this.sharedPersons = Array.from(personMap.values());
-        }
-      }
+  // Vacunas y visitas al veterinario de cada mascota (para las cards).
+  private loadCounts(petIds: string[]) {
+    petIds.forEach(id => {
+      this.vaccineService.getVaccinesByPet(id).pipe(catchError(() => of(null))).subscribe(list => {
+        this.petCounts[id] = { ...this.petCounts[id], vaccines: list ? list.length : null };
+      });
+      this.medicalHistoryService.getVisitsByPet(id).pipe(catchError(() => of(null))).subscribe(list => {
+        this.petCounts[id] = { ...this.petCounts[id], visits: list ? list.length : null };
+      });
     });
-  });
-}
+  }
+
+  countOf(petId: string, key: 'vaccines' | 'visits'): string {
+    const value = this.petCounts[petId]?.[key];
+    return value === null || value === undefined ? '—' : String(value);
+  }
+
+  // Nombre y foto del dueño de cada mascota a mi cuidado.
+  private loadOwners(pets: SharedPet[]) {
+    pets.forEach(pet => {
+      if (!pet.ownerId || (pet.ownerName && pet.ownerAvatarUrl)) return;
+      this.profileService.getUserById(pet.ownerId).subscribe(user => {
+        if (!user) return;
+        pet.ownerName = pet.ownerName || user.username;
+        pet.ownerAvatarUrl = pet.ownerAvatarUrl || user.avatarUrl || undefined;
+      });
+    });
+  }
+
+  getRoleLabel(role: string | undefined): string {
+    return role === 'EDITOR' ? 'Editor' : 'Solo vista';
+  }
 
   setTab(tab: string) {
     this.activeTab = tab;
@@ -216,6 +281,7 @@ get showEmptyPetsInCare(): boolean {
   this.inviteEmail = '';
   this.inviteRole = 'VIEWER';
   this.inviteSelectedPetId = this.myPets.length > 0 ? this.myPets[0].id : null;
+  this.resetInvitee();
   this.showInviteModal = true;
 }
 
@@ -227,8 +293,41 @@ toggleInviteRole() {
   this.inviteRole = this.inviteRole === 'EDITOR' ? 'VIEWER' : 'EDITOR';
 }
 
+// Al cambiar el correo se descarta la persona encontrada antes.
+onInviteEmailChange() {
+  this.resetInvitee();
+}
+
+private resetInvitee() {
+  this.invitee = null;
+  this.inviteeError = '';
+  this.searchingInvitee = false;
+}
+
+// Busca el correo: si existe una cuenta activa se muestra su foto y nombre
+// para confirmar antes de enviar la invitación.
+searchInvitee() {
+  const email = this.inviteEmail.trim();
+  this.resetInvitee();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    this.inviteeError = 'Ingresa un correo electrónico válido.';
+    return;
+  }
+  this.searchingInvitee = true;
+  this.profileService.findUserByEmail(email).subscribe(user => {
+    this.searchingInvitee = false;
+    if (!user) {
+      this.inviteeError = 'No encontramos una cuenta activa con ese correo.';
+    } else if (user.id === localStorage.getItem('userId')) {
+      this.inviteeError = 'No puedes invitarte a ti mismo.';
+    } else {
+      this.invitee = user;
+    }
+  });
+}
+
 sendInvite() {
-  if (!this.inviteSelectedPetId || !this.inviteEmail.trim()) return;
+  if (!this.inviteSelectedPetId || !this.invitee) return;
   this.sendingInvite = true;
   this.sharedProfileService.sendInvitation(this.inviteSelectedPetId, this.inviteEmail.trim(), this.inviteRole)
     .subscribe({

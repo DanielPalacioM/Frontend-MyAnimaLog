@@ -100,7 +100,7 @@
   <div class="pet-list" *ngIf="myPets.length > 0">
     <div class="pet-card" *ngFor="let pet of myPets">
       <div class="pet-card-top">
-        <img *ngIf="pet.imageUrl" [src]="pet.imageUrl" alt=""
+        <img *ngIf="pet.imageUrl" [src]="pet.imageUrl" alt="" appImgFallback
              class="pet-avatar"
              [style.border]="'3px solid ' + getSexColor(pet.sex)" />
         <div *ngIf="!pet.imageUrl"
@@ -111,7 +111,8 @@
         </div>
         <div class="pet-info">
           <p class="pet-name">{{ pet.name }}</p>
-          <p class="pet-breed">{{ pet.breed }}{{ pet.sex ? ' - ' + pet.sex : '' }}{{ pet.height ? ' - ' + pet.height + ' cm' : '' }}</p>        </div>
+          <p class="pet-breed">{{ petDetails(pet) }}</p>
+        </div>
       </div>
 
       <div class="pet-stats">
@@ -121,21 +122,22 @@
         </div>
         <div class="pstat">
           <span class="pstat-label">Vacunas</span>
-          <span class="pstat-val">0</span>
+          <span class="pstat-val">{{ countOf(pet.id, 'vaccines') }}</span>
         </div>
         <div class="pstat">
           <span class="pstat-label">Visitas al veterinario</span>
-          <span class="pstat-val">0</span>
+          <span class="pstat-val">{{ countOf(pet.id, 'visits') }}</span>
         </div>
         <div class="pstat">
           <span class="pstat-label">Peso</span>
-          <span class="pstat-val">{{ pet.weight ?? '—' }} kg</span>
+          <span class="pstat-val">{{ pet.weight != null ? pet.weight + ' kg' : '—' }}</span>
         </div>
       </div>
 
-      <div class="pet-caregivers" *ngIf="petCaregivers[pet.id]?.length">
-        <div class="caregiver" *ngFor="let c of petCaregivers[pet.id]">
-          <img [src]="c.avatarUrl" alt="" />
+      <div class="pill-row" *ngIf="petCaregivers[pet.id]?.length">
+        <div class="pill" *ngFor="let c of petCaregivers[pet.id]; let i = index"
+             [style.background]="pillColor(i)">
+          <img [src]="c.avatarUrl" appImgFallback alt="" />
           <span>{{ c.name }}</span>
         </div>
       </div>
@@ -154,13 +156,15 @@
         <ng-container *ngIf="activeTab === 'personas'">
   <div class="personas-grid" *ngIf="sharedPersons.length > 0">
     <div class="persona-card" *ngFor="let p of sharedPersons">
-      <img [src]="p.avatarUrl" alt="" class="persona-avatar" />
+      <img class="persona-avatar" [src]="p.avatarUrl" appImgFallback alt="" />
       <span class="persona-name">{{ p.name }}</span>
       <span class="persona-role">{{ p.role }}</span>
-      <div class="persona-pets">
-        <img *ngFor="let pet of p.pets"
-          [src]="pet.imageUrl" alt=""
-          class="persona-pet-img" />
+      <div class="pill-row pill-row-small">
+        <div class="pill" *ngFor="let pet of p.pets; let i = index" [style.background]="pillColor(i)">
+          <img *ngIf="pet.imageUrl" [src]="pet.imageUrl" appImgFallback [alt]="pet.name" />
+          <span *ngIf="!pet.imageUrl" class="pill-emoji">{{ getPetIconFallback(pet.species) }}</span>
+          <span>{{ pet.name }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -173,47 +177,55 @@
         <ng-container *ngIf="activeTab === 'a-mi-cuidado'">
   <div class="pet-list" *ngIf="petsInCare.length > 0">
     <div class="pet-card" *ngFor="let pet of petsInCare">
-      <div class="pet-card-top">
-        <img *ngIf="pet.imageUrl" [src]="pet.imageUrl" alt=""
-             class="pet-avatar"
-             [style.border]="'3px solid ' + getSexColor(pet.sex)" />
-        <div *ngIf="!pet.imageUrl"
-             class="pet-avatar pet-avatar-fallback"
-             [style.background]="getSexColor(pet.sex)"
-             [style.border]="'3px solid ' + getSexColor(pet.sex)">
-          {{ getPetIconFallback(pet.species) }}
+      <div class="pet-card-top care-top">
+        <div class="care-pet">
+          <img *ngIf="pet.imageUrl" [src]="pet.imageUrl" alt="" appImgFallback
+               class="pet-avatar"
+               [style.border]="'3px solid ' + getSexColor(pet.sex)" />
+          <div *ngIf="!pet.imageUrl"
+               class="pet-avatar pet-avatar-fallback"
+               [style.background]="getSexColor(pet.sex)"
+               [style.border]="'3px solid ' + getSexColor(pet.sex)">
+            {{ getPetIconFallback(pet.species) }}
+          </div>
+          <div class="pet-info">
+            <p class="pet-name">{{ pet.name }}</p>
+            <p class="pet-breed" *ngIf="pet.breed">{{ pet.breed }}</p>
+            <p class="pet-breed" *ngIf="pet.sex">{{ sexLabel(pet.sex) }}</p>
+            <p class="pet-breed" *ngIf="pet.height">{{ pet.height }} cm</p>
+          </div>
         </div>
-        <div class="pet-info">
-          <p class="pet-name">{{ pet.name }}</p>
-          <p class="pet-breed">{{ pet.breed }}</p>
+        <div class="care-owner">
+          <img [src]="pet.ownerAvatarUrl || 'assets/images/default-avatar.svg'" appImgFallback alt="" />
+          <div>
+            <p class="owner-name">{{ pet.ownerName || 'Dueño' }}</p>
+            <p class="owner-label">Dueño</p>
+          </div>
         </div>
       </div>
 
       <div class="pet-stats">
         <div class="pstat">
           <span class="pstat-label">Edad</span>
-          <span class="pstat-val">—</span>
+          <span class="pstat-val">{{ formatAge(pet.ageMonths, pet.birthDate) }}</span>
         </div>
         <div class="pstat">
           <span class="pstat-label">Vacunas</span>
-          <span class="pstat-val">—</span>
+          <span class="pstat-val">{{ countOf(pet.id, 'vaccines') }}</span>
         </div>
         <div class="pstat">
           <span class="pstat-label">Visitas al veterinario</span>
-          <span class="pstat-val">—</span>
+          <span class="pstat-val">{{ countOf(pet.id, 'visits') }}</span>
         </div>
         <div class="pstat">
           <span class="pstat-label">Peso</span>
-          <span class="pstat-val">—</span>
+          <span class="pstat-val">{{ pet.weight != null ? pet.weight + ' kg' : '—' }}</span>
         </div>
       </div>
 
-      <button class="ver-btn" (click)="onViewPet(pet.id)">Ver</button>
-
-      <div class="pet-owner">
-        <img [src]="pet.ownerAvatarUrl || 'assets/images/default-avatar.png'" alt="" />
-        <span>{{ pet.ownerName || 'Dueño' }}</span>
-      </div>
+      <button class="ver-btn" (click)="onViewPet(pet.id)">
+        {{ pet.accessRole === 'EDITOR' ? 'Editar' : 'Ver' }}
+      </button>
     </div>
   </div>
 
@@ -248,7 +260,16 @@
         </select>
 
         <label class="invite-label">Correo del invitado</label>
-        <input type="email" class="invite-input" placeholder="correo@ejemplo.com" [(ngModel)]="inviteEmail" />
+        <div class="invite-search-row">
+          <input type="email" class="invite-input" placeholder="correo@ejemplo.com"
+                 [(ngModel)]="inviteEmail" (ngModelChange)="onInviteEmailChange()"
+                 (keyup.enter)="searchInvitee()" />
+          <button class="invite-search-btn" [disabled]="searchingInvitee || !inviteEmail"
+                  (click)="searchInvitee()">
+            {{ searchingInvitee ? '...' : 'Buscar' }}
+          </button>
+        </div>
+        <p class="invite-error" *ngIf="inviteeError">{{ inviteeError }}</p>
 
         <div class="invite-role-row">
           <span class="invite-role-label" [class.active]="inviteRole === 'VIEWER'">Solo vista</span>
@@ -258,9 +279,18 @@
           <span class="invite-role-label" [class.active]="inviteRole === 'EDITOR'">Editor</span>
         </div>
 
-        <button class="invite-send-btn" [disabled]="sendingInvite || !inviteEmail" (click)="sendInvite()">
-          {{ sendingInvite ? 'Enviando...' : 'Enviar invitación' }}
-        </button>
+        <!-- Persona encontrada: confirmar antes de enviar -->
+        <div class="invitee-card" *ngIf="invitee">
+          <img [src]="invitee.avatarUrl || 'assets/images/default-avatar.svg'" appImgFallback alt="" />
+          <span class="invitee-name">{{ invitee.username }}</span>
+          <span class="invitee-email">{{ inviteEmail }}</span>
+          <div class="invitee-actions">
+            <button class="invitee-cancel" (click)="closeInviteModal()">Cancelar</button>
+            <button class="invite-send-btn" [disabled]="sendingInvite" (click)="sendInvite()">
+              {{ sendingInvite ? 'Enviando...' : 'Enviar invitación' }}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

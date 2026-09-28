@@ -75,9 +75,26 @@ export class RegisterPage implements OnInit {
   this.authService.register(userData).subscribe({
     next: (response) => {
       console.log('✅ Registro exitoso:', response);
-      this.router.navigate(['/login']);
+      // El backend envía un PIN al correo: se confirma antes del primer login.
+      this.router.navigate(['/verify-email'], { queryParams: { email: userData.email } });
     },
     error: (error) => {
+
+      // El correo ya tiene cuenta. Puede que se haya registrado antes y no
+      // alcanzó a poner el PIN: se le deja ir a verificar o al login.
+      if (error.status === 409) {
+        const goVerify = confirm(
+          'Este correo ya está registrado.\n\n' +
+          '¿Aún no has verificado tu cuenta? Pulsa "Aceptar" para ingresar el código que te enviamos.\n' +
+          'Pulsa "Cancelar" para ir a iniciar sesión.'
+        );
+        if (goVerify) {
+          this.router.navigate(['/verify-email'], { queryParams: { email: userData.email } });
+        } else {
+          this.router.navigate(['/login']);
+        }
+        return;
+      }
 
       // Si el backend devuelve errores de validación
       if (error.status === 400 && error.error?.errors) {

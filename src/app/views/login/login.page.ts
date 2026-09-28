@@ -155,6 +155,12 @@ export class LoginPage implements AfterViewInit {
       },
       error: (err: any) => {
         console.error(err);
+        // Cuenta registrada pero sin confirmar el PIN del correo.
+        if (this.isUnverifiedError(err)) {
+          alert('Debes verificar tu correo con el código que te enviamos.');
+          this.router.navigate(['/verify-email'], { queryParams: { email: this.email } });
+          return;
+        }
         switch (err.status) {
           case 400:
             alert('Verifica que el correo y la contraseña sean válidos.');
@@ -180,6 +186,11 @@ export class LoginPage implements AfterViewInit {
         }
       }
     });
+  }
+
+  private isUnverifiedError(err: any): boolean {
+    const msg = `${err?.error?.message ?? err?.error?.error ?? err?.error ?? ''}`.toLowerCase();
+    return /verif|not enabled|disabled|inactiv|no activ/.test(msg);
   }
 
   handleGoogleLogin(response: any) {
