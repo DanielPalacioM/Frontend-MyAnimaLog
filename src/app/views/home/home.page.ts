@@ -8,6 +8,8 @@ import { PetService, Pet } from 'src/app/services/PetService/pet';
 import { NotificationService } from 'src/app/services/NotificationService/notification';
 import { SharedProfileService } from 'src/app/services/SharedProfileService/shared-profile';
 import { SharedPet } from 'src/app/models/shared-profile.model';
+import { TutorialService, TutorialKey, TutorialStep, TutorialSlide } from 'src/app/services/TutorialService/tutorial';
+import { ActionSheetController, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
@@ -21,23 +23,14 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   userAvatar: string = 'assets/images/default-avatar.svg';
   hasPets: boolean = false;
   currentPetIndex: number = 0;
-  showTutorial: boolean = false;
-  isFirstTime: boolean = false;
   activeQuickItem: string | null = null;
-  tutorialStep: number = 0;
 
-  tutorialSteps = [
-    { key: 'vet',           text: 'Consulta veterinarias cercanas' },
-    { key: 'shared',        text: 'Comparte el cuidado de tu mascota' },
-    { key: 'add',           text: '¡Agrega tu primera mascota aquí!' },
-    { key: 'calendar-quick',text: 'Agenda citas y eventos' },
-    { key: 'maps',          text: 'Encuentra lugares pet-friendly' },
-    { key: 'calendar-card', text: 'Desde aquí creas y ves tus eventos' },
-    { key: 'vet-card',      text: 'Asocia o busca una veterinaria' },
-  ];
-
-  get totalSteps() { return this.tutorialSteps.length; }
-  get currentTutorialStep() { return this.tutorialSteps[this.tutorialStep]; }
+  // Tutorial interactivo y con imágenes
+  tourOpen = false;
+  tourSteps: TutorialStep[] = [];
+  private tourKeys: TutorialKey[] = [];
+  galleryOpen = false;
+  gallerySlides: TutorialSlide[] = [];
 
   pets: Pet[] = [];
   upcomingEvents: CalendarEvent[] = [];
@@ -59,14 +52,16 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     private profileService: ProfileService,
     private petService: PetService,
     private notificationService: NotificationService,
-    private sharedProfileService: SharedProfileService
+    private sharedProfileService: SharedProfileService,
+    private tutorialService: TutorialService,
+    private actionSheetCtrl: ActionSheetController,
+    private toastCtrl: ToastController
   ) {}
 
   ngOnInit() {
     this.loadUserData();
     this.loadPets();
     this.loadEvents();
-    this.checkFirstTime();
 
     // El contador se mantiene al día solo: si desde Notificaciones (u otra
     // pantalla) se marca algo como leído, este valor baja de inmediato sin
@@ -93,13 +88,73 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  checkFirstTime() {
-    const visited = localStorage.getItem('hasVisited');
-    if (!visited && !this.hasPets) {
-      this.isFirstTime = true;
-      this.showTutorial = true;
-      localStorage.setItem('hasVisited', 'true');
+  /**
+   * Usuario nuevo: explica botones y secciones. Si aún no tiene mascotas
+   * cierra señalando "Add pet"; cuando agregue la primera, al volver al Home
+   * se explica la tarjeta de la mascota (una sola vez).
+   */
+  private maybeStartTutorial() {
+    if (this.tourOpen || this.galleryOpen) return;
+
+    const keys: TutorialKey[] = [];
+    if (!this.tutorialService.hasSeen('home-general')) {
+      keys.push('home-general');
+      if (!this.hasPets) keys.push('home-no-pets');
     }
+    if (this.hasPets && !this.tutorialService.hasSeen('home-pets')) {
+      keys.push('home-pets');
+    }
+    if (keys.length) this.startTour(keys);
+  }
+
+  private startTour(keys: TutorialKey[]) {
+    this.tourKeys = keys;
+    this.tourSteps = this.tutorialService.getSteps(...keys);
+    this.tourOpen = true;
+  }
+
+  onTourClosed() {
+    this.tourKeys.forEach(key => this.tutorialService.markSeen(key));
+    this.tourKeys = [];
+    this.tourOpen = false;
+  }
+
+  async openTutorialMenu() {
+    const sheet = await this.actionSheetCtrl.create({
+      header: 'Tutorial',
+      buttons: [
+        {
+          text: 'Tutorial interactivo',
+          icon: 'hand-left-outline',
+          handler: () => {
+            this.startTour(['home-general', this.hasPets ? 'home-pets' : 'home-no-pets']);
+          }
+        },
+        {
+          text: 'Tutorial con imágenes',
+          icon: 'images-outline',
+          handler: () => {
+            this.gallerySlides = this.tutorialService.getGallery();
+            this.galleryOpen = true;
+          }
+        },
+        {
+          text: 'Volver a ver las guías de cada sección',
+          icon: 'refresh-outline',
+          handler: () => {
+            this.tutorialService.resetSections();
+            this.showToast('Las guías se mostrarán de nuevo al entrar a cada sección.');
+          }
+        },
+        { text: 'Cancelar', role: 'cancel' }
+      ]
+    });
+    await sheet.present();
+  }
+
+  private async showToast(message: string) {
+    const toast = await this.toastCtrl.create({ message, duration: 2500, position: 'bottom' });
+    await toast.present();
   }
 
   loadUserData() {
@@ -132,16 +187,16 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
         this.pets = pets;
         this.loadCaregivers(mine);
         this.hasPets = this.pets.length > 0;
-        this.showTutorial = !this.hasPets;
-        this.checkFirstTime();
         if (this.currentPetIndex >= this.pets.length) {
           this.currentPetIndex = 0;
         }
+        this.maybeStartTutorial();
       },
       error: (err) => {
         console.error('❌ Error cargando mascotas:', err);
         this.pets = [];
         this.hasPets = false;
+        this.maybeStartTutorial();
       }
     });
   }
@@ -220,19 +275,6 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
       (this.currentPetIndex - 1 + this.pets.length) % this.pets.length;
   }
 
-  nextTutorialStep() {
-    if (this.tutorialStep < this.totalSteps - 1) {
-      this.tutorialStep++;
-    } else {
-      this.closeTutorial();
-    }
-  }
-
-  closeTutorial() {
-    this.isFirstTime = false;
-    this.tutorialStep = 0;
-  }
-
   // --- Touch events ---
   onTouchStart(event: TouchEvent) {
     this.touchStartX = event.changedTouches[0].screenX;
@@ -261,7 +303,6 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
 
   onMouseMove(event: MouseEvent) {
   if (!this.isDragging) return;
-  console.log('drag %', this.currentTranslateX);
   const deltaPx = event.screenX - this.touchStartX;
   this.currentTranslateX = (deltaPx / this.containerWidth) * 100;
 }

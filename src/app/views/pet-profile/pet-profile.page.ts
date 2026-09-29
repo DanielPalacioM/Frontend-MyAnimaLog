@@ -15,6 +15,7 @@ import { DocumentService } from 'src/app/services/DocumentService/document-servi
 import { CalendarService } from 'src/app/services/CalendarService/calendar';
 import { SharedProfileService } from 'src/app/services/SharedProfileService/shared-profile';
 import { PetRole } from 'src/app/models/shared-profile.model';
+import { TutorialService, TutorialStep } from 'src/app/services/TutorialService/tutorial';
 
 interface PetStats {
   age: string;
@@ -37,6 +38,9 @@ export class PetProfilePage implements OnInit {
   loading = true;
   loadError = false;
   showPhotoViewer = false;
+
+  tourOpen = false;
+  tourSteps: TutorialStep[] = [];
 
 
   pet: PetModel | null = null;
@@ -82,7 +86,8 @@ export class PetProfilePage implements OnInit {
     private vaccineService: VaccineService,
     private documentService: DocumentService,
     private calendarService: CalendarService,
-    private sharedProfileService: SharedProfileService
+    private sharedProfileService: SharedProfileService,
+    private tutorialService: TutorialService
   ) {}
 
   ngOnInit(): void {
@@ -142,6 +147,7 @@ closePhotoViewer(): void {
         this.loadVaccineSummary(id);
         this.loadDocuments(id);
         this.loadCalendarEvents(id);
+        this.maybeStartTutorial();
       },
       error: (err) => {
         console.error('❌ Error cargando mascota:', err);
@@ -149,6 +155,17 @@ closePhotoViewer(): void {
         this.loading = false;
       }
     });
+  }
+
+  private maybeStartTutorial(): void {
+    if (this.tourOpen || this.tutorialService.hasSeen('pet-profile')) return;
+    this.tourSteps = this.tutorialService.getSteps('pet-profile');
+    this.tourOpen = true;
+  }
+
+  onTourClosed(): void {
+    this.tutorialService.markSeen('pet-profile');
+    this.tourOpen = false;
   }
 
   private loadRole(pet: PetModel): void {

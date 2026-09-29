@@ -1,8 +1,14 @@
 <ion-content [fullscreen]="true" class="calendar-content">
+
+  <app-tutorial-overlay slot="fixed"
+    [steps]="tourSteps"
+    [open]="tourOpen"
+    (closed)="onTourClosed()">
+  </app-tutorial-overlay>
   <div class="calendar-wrap">
 
     <!-- HEADER -->
-    <div class="calendar-header">
+    <div class="calendar-header" data-tour="cal-header">
       <div class="header-top">
         <button class="back-btn" (click)="goHome()">
           <ion-icon name="arrow-back-outline"></ion-icon>
@@ -25,7 +31,7 @@
          </div>
           
 
-        <button class="menu-btn" (click)="toggleOptionsMenu()">
+        <button class="menu-btn" data-tour="cal-menu" (click)="toggleOptionsMenu()">
           <ion-icon name="menu-outline"></ion-icon>
         </button>
       </div>
@@ -60,13 +66,13 @@
 
   <!-- ============ VISTA POR DÍA ============ -->
   <ng-container *ngIf="viewMode === 'day'">
-    <div class="cal-nav">
+    <div class="cal-nav" data-tour="cal-nav">
       <button (click)="prevDay()"><ion-icon name="chevron-back-outline"></ion-icon></button>
       <span class="cal-month-label">{{ selectedDayNavLabel }}</span>
       <button (click)="nextDay()"><ion-icon name="chevron-forward-outline"></ion-icon></button>
     </div>
 
-    <div class="events-card">
+    <div class="events-card" data-tour="cal-events">
       <span class="events-card-title">
         {{ selectedDateLabel }}, {{ currentYear }}
       </span>
@@ -97,13 +103,13 @@
   </ng-container>
 
   <ng-container *ngIf="viewMode === 'week'">
-  <div class="cal-nav">
+  <div class="cal-nav" data-tour="cal-nav">
     <button (click)="prevWeek()"><ion-icon name="chevron-back-outline"></ion-icon></button>
     <span class="cal-month-label">{{ selectedDateLabel }}</span>
     <button (click)="nextWeek()"><ion-icon name="chevron-forward-outline"></ion-icon></button>
   </div>
 
-  <div class="week-view-card" *ngIf="weekHasEvents; else emptyWeek">
+  <div class="week-view-card" data-tour="cal-events" *ngIf="weekHasEvents; else emptyWeek">
     <div class="week-days-header">
       <span class="week-day-col" *ngFor="let d of currentWeekDays" [class.today]="isToday(d)">
         {{ dayNames[getDayIndex(d)] }}<br>{{ d.getDate() }}
@@ -135,7 +141,7 @@
   </div>
 
   <ng-template #emptyWeek>
-    <div class="week-view-card empty">
+    <div class="week-view-card empty" data-tour="cal-events">
       <img src="assets/images/Calendar/CalendarioVacioSemana.png" alt="" class="empty-week-img" />
       <p class="empty-events">Agenda vacía</p>
     </div>
@@ -144,7 +150,7 @@
 
   <!-- ============ VISTA POR MES ============ -->
   <ng-container *ngIf="viewMode === 'month'">
-    <div class="cal-nav">
+    <div class="cal-nav" data-tour="cal-nav">
       <button (click)="prevMonth()"><ion-icon name="chevron-back-outline"></ion-icon></button>
       <span class="cal-month-label">{{ monthNames[currentMonth] }}, {{ currentYear }}</span>
       <button (click)="nextMonth()"><ion-icon name="chevron-forward-outline"></ion-icon></button>
@@ -171,7 +177,7 @@
       </div>
     </div>
 
-    <div class="events-card" *ngIf="monthHasEvents; else emptyMonth">
+    <div class="events-card" data-tour="cal-events" *ngIf="monthHasEvents; else emptyMonth">
       <span class="events-card-title">
         {{ selectedDateLabel }}, {{ currentYear }}
       </span>
@@ -194,7 +200,7 @@
     </div>
 
     <ng-template #emptyMonth>
-      <div class="events-card empty">
+      <div class="events-card empty" data-tour="cal-events">
         <img src="assets/images/Calendar/CalendarioVacioSemana.png" alt="" class="empty-week-img" />
         <p class="empty-events">Agenda vacía</p>
       </div>

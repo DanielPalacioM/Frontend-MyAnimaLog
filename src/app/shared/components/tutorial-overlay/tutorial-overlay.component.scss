@@ -1,0 +1,175 @@
+// Dentro de <ion-content slot="fixed"> Ionic pone el host en position:absolute con
+// transform, y eso hace que "fixed" se mida contra él. Se estira a toda la
+// pantalla y solo captura toques cuando el tutorial está abierto.
+:host {
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.tour-overlay {
+  position: absolute;
+  pointer-events: auto;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+
+  &.ready { opacity: 1; }
+}
+
+.tour-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 12, 40, 0.72);
+}
+
+.tour-spot {
+  position: absolute;
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 3px #f5a623,
+    0 0 0 9999px rgba(15, 12, 40, 0.72);
+  transition: top 0.3s ease, left 0.3s ease, width 0.3s ease, height 0.3s ease;
+  pointer-events: none;
+}
+
+.tour-bubble {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 340px;
+  box-sizing: border-box;
+  background: white;
+  border-radius: 18px;
+  padding: 14px 16px 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+  font-family: 'Actor', sans-serif;
+  transition: top 0.3s ease, bottom 0.3s ease;
+
+  &.centered {
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.tour-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  margin-left: -8px;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+
+  &.up {
+    top: -8px;
+    border-bottom: 8px solid white;
+  }
+
+  &.down {
+    bottom: -8px;
+    border-top: 8px solid white;
+  }
+}
+
+.tour-bubble-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.tour-step-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4037BE;
+  letter-spacing: 0.3px;
+}
+
+.tour-skip {
+  background: none;
+  border: none;
+  padding: 2px 0;
+  font-size: 12px;
+  color: #888;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.tour-title {
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a1a2e;
+  font-family: 'Jua', sans-serif;
+}
+
+.tour-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #444;
+}
+
+.tour-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.tour-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-width: 0;
+}
+
+.tour-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(64, 55, 190, 0.2);
+  transition: all 0.25s;
+
+  &.active {
+    width: 14px;
+    border-radius: 3px;
+    background: #4037BE;
+  }
+}
+
+.tour-buttons {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.tour-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+
+  &.primary {
+    background: #f5a623;
+    color: white;
+  }
+
+  &.ghost {
+    background: #F1F0FB;
+    color: #4037BE;
+  }
+}
+
+@media (max-width: 360px) {
+  .tour-text { font-size: 12px; }
+  .tour-btn { padding: 8px 12px; }
+}

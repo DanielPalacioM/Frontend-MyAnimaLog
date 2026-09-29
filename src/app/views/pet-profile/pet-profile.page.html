@@ -1,5 +1,11 @@
 <ion-content [fullscreen]="true">
 
+  <app-tutorial-overlay slot="fixed"
+    [steps]="tourSteps"
+    [open]="tourOpen"
+    (closed)="onTourClosed()">
+  </app-tutorial-overlay>
+
   <!-- SIDEBAR OVERLAY -->
   <div class="sidebar-backdrop" *ngIf="sidebarOpen" (click)="closeSidebar()"></div>
   <div class="sidebar" [class.open]="sidebarOpen">
@@ -76,7 +82,7 @@
 
       <!-- HEADER -->
       <div class="pet-header">
-        <button class="menu-btn" (click)="toggleSidebar()">
+        <button class="menu-btn" data-tour="pp-menu" (click)="toggleSidebar()">
           <ion-icon name="menu-outline"></ion-icon>
         </button>
         <h1 class="pet-title">Pet profile</h1>
@@ -87,7 +93,7 @@
       </div>
 
       <!-- PET CARD -->
-      <div class="pet-card">
+      <div class="pet-card" data-tour="pp-card">
         <div class="pet-avatar-wrap" [style.background-color]="!pet.imageUrl ? getSexColor(pet.sex) : null" (click)="openPhotoViewer()">
            <img *ngIf="pet.imageUrl" [src]="pet.imageUrl" alt="" class="pet-avatar" />
            <span *ngIf="!pet.imageUrl" class="pet-avatar-fallback">{{ getPetIconFallback(pet.species) }}</span>
@@ -102,16 +108,16 @@
     <!-- ZONA NARANJA -->
     <div class="orange-zone">
 
-      <app-pet-stats-card [stats]="petStats"></app-pet-stats-card>
+      <app-pet-stats-card data-tour="pp-stats" [stats]="petStats"></app-pet-stats-card>
 
-      <app-medical-history-card
+      <app-medical-history-card data-tour="pp-medical"
         [items]="historyItems"
         (sectionSelected)="onHistorySection($event)"
         (viewAll)="goToMedicalHistory()">
       </app-medical-history-card>
 
       <!-- VACUNAS: mensaje si no hay ninguna registrada -->
-       <app-vaccine-card
+       <app-vaccine-card data-tour="pp-vaccines"
   *ngIf="vaccineSummary"
   [summary]="vaccineSummary"
   [canEdit]="canEdit"
@@ -119,7 +125,7 @@
   (viewTimeline)="goToVaccineLine()">
 </app-vaccine-card>
 
-<div class="empty-card" *ngIf="!vaccineSummary">
+<div class="empty-card" data-tour="pp-vaccines" *ngIf="!vaccineSummary">
   <p>No hay vacunas registradas.</p>
   <button *ngIf="canEdit" (click)="goToRegisterVaccine()">Registrar vacuna</button>
 </div>
@@ -147,7 +153,7 @@
 
       <!-- DOCUMENTOS -->
 <div class="section" *ngIf="pet">
-  <app-documents-section
+  <app-documents-section data-tour="pp-docs"
     [petId]="pet.id"
     [documents]="documents"
     [canEdit]="canEdit"

@@ -10,6 +10,7 @@ import {
   LabResult,
   Surgery
 } from 'src/app/models/medical-history.model';
+import { TutorialService, TutorialStep } from 'src/app/services/TutorialService/tutorial';
 
 export type MHTab = 'consultas' | 'tratamientos' | 'lab' | 'cirugias';
 
@@ -38,13 +39,17 @@ export class MedicalHistoryPage implements OnInit {
   // false mientras se resuelve el rol o si es "solo vista".
   canEdit = false;
 
+  tourOpen = false;
+  tourSteps: TutorialStep[] = [];
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private location: Location,
     private medicalHistoryService: MedicalHistoryService,
     private petService: PetService,
-    private sharedProfileService: SharedProfileService
+    private sharedProfileService: SharedProfileService,
+    private tutorialService: TutorialService
   ) {}
 
   ngOnInit() {
@@ -63,7 +68,11 @@ export class MedicalHistoryPage implements OnInit {
     if (this.petId) {
       this.loadPetInfo();
       this.sharedProfileService.getMyRoleForPet(this.petId)
-        .subscribe(role => this.canEdit = role !== 'VIEWER');
+        .subscribe(role => {
+          this.canEdit = role !== 'VIEWER';
+          // Se espera al rol para saber si el botón "Registrar" existe.
+          this.maybeStartTutorial();
+        });
     }
   }
 
@@ -84,6 +93,17 @@ export class MedicalHistoryPage implements OnInit {
         console.error('❌ Error cargando datos de mascota:', err);
       }
     });
+  }
+
+  private maybeStartTutorial(): void {
+    if (this.tourOpen || this.tutorialService.hasSeen('medical-history')) return;
+    this.tourSteps = this.tutorialService.getSteps('medical-history');
+    this.tourOpen = true;
+  }
+
+  onTourClosed(): void {
+    this.tutorialService.markSeen('medical-history');
+    this.tourOpen = false;
   }
 
   private loadAll() {

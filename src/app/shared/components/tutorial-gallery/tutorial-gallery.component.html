@@ -1,0 +1,42 @@
+<div class="gallery-backdrop" *ngIf="open">
+  <div class="gallery-card">
+
+    <div class="gallery-head">
+      <span class="gallery-count">{{ index + 1 }} de {{ slides.length }}</span>
+      <button class="gallery-close" (click)="closed.emit()" aria-label="Cerrar">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+
+    <div class="gallery-viewport"
+      (touchstart)="onTouchStart($event)"
+      (touchend)="onTouchEnd($event)">
+      <div class="gallery-track" [style.transform]="'translateX(-' + index * 100 + '%)'">
+        <div class="gallery-slide" *ngFor="let slide of slides">
+          <div class="gallery-image">
+            <img *ngIf="!missing.has(slide.image)" [src]="slide.image" [alt]="slide.title" (error)="onImageError(slide)" />
+            <div class="gallery-placeholder" *ngIf="missing.has(slide.image)">
+              <ion-icon name="image-outline"></ion-icon>
+            </div>
+          </div>
+          <p class="gallery-title">{{ slide.title }}</p>
+          <p class="gallery-text">{{ slide.text }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="gallery-dots">
+      <span class="gallery-dot"
+        *ngFor="let s of slides; let i = index"
+        [class.active]="i === index"
+        (click)="goTo(i)">
+      </span>
+    </div>
+
+    <div class="gallery-actions">
+      <button class="gallery-btn ghost" [disabled]="index === 0" (click)="prev()">Atrás</button>
+      <button class="gallery-btn primary" (click)="next()">{{ isLast ? 'Terminar' : 'Siguiente' }}</button>
+    </div>
+
+  </div>
+</div>

@@ -1,60 +1,22 @@
 <ion-content [fullscreen]="true">
+
+  <app-tutorial-overlay slot="fixed"
+    [steps]="tourSteps"
+    [open]="tourOpen"
+    (closed)="onTourClosed()">
+  </app-tutorial-overlay>
+
+  <app-tutorial-gallery slot="fixed"
+    [slides]="gallerySlides"
+    [open]="galleryOpen"
+    (closed)="galleryOpen = false">
+  </app-tutorial-gallery>
+
   <div class="home-container">
-
-    <!-- TUTORIAL OVERLAY -->
-<div class="tutorial-overlay" *ngIf="isFirstTime">
-  <div class="tutorial-backdrop" (click)="nextTutorialStep()"></div>
-
-  <div class="tutorial-tip tip-vet" *ngIf="currentTutorialStep.key === 'vet'">
-    <div class="tip-bubble">{{ currentTutorialStep.text }}</div>
-    <div class="tip-arrow"></div>
-  </div>
-
-  <div class="tutorial-tip tip-shared" *ngIf="currentTutorialStep.key === 'shared'">
-    <div class="tip-bubble">{{ currentTutorialStep.text }}</div>
-    <div class="tip-arrow"></div>
-  </div>
-
-  <div class="tutorial-tip tip-add" *ngIf="currentTutorialStep.key === 'add'">
-    <div class="tip-bubble">{{ currentTutorialStep.text }}</div>
-    <div class="tip-arrow"></div>
-  </div>
-
-  <div class="tutorial-tip tip-calendar-quick" *ngIf="currentTutorialStep.key === 'calendar-quick'">
-    <div class="tip-bubble">{{ currentTutorialStep.text }}</div>
-    <div class="tip-arrow"></div>
-  </div>
-
-  <div class="tutorial-tip tip-maps" *ngIf="currentTutorialStep.key === 'maps'">
-    <div class="tip-bubble">{{ currentTutorialStep.text }}</div>
-    <div class="tip-arrow"></div>
-  </div>
-
-  <div class="tutorial-tip tip-calendar-card" *ngIf="currentTutorialStep.key === 'calendar-card'">
-    <div class="tip-bubble">{{ currentTutorialStep.text }}</div>
-    <div class="tip-arrow"></div>
-  </div>
-
-  <div class="tutorial-tip tip-vet-card" *ngIf="currentTutorialStep.key === 'vet-card'">
-    <div class="tip-bubble">{{ currentTutorialStep.text }}</div>
-    <div class="tip-arrow"></div>
-  </div>
-
-  <div class="tutorial-footer">
-    <div class="tutorial-dots">
-      <span *ngFor="let step of tutorialSteps; let i = index"
-        class="t-dot" [class.active]="i === tutorialStep">
-      </span>
-    </div>
-    <button class="tutorial-next" (click)="nextTutorialStep()">
-      {{ tutorialStep < totalSteps - 1 ? 'Siguiente →' : 'Entendido ✓' }}
-    </button>
-  </div>
-</div>
 
     <!-- HEADER -->
     <div class="home-header" >
-      <div class="user-info" (click)="goToProfile()">
+      <div class="user-info" data-tour="home-profile" (click)="goToProfile()">
         <img
            [src]="userAvatar || 'assets/images/Home/ImageUser.png'"
            class="user-avatar"
@@ -62,15 +24,18 @@
         <span class="username">{{ username }}</span>
       </div>
       <div class="header-icons">
-        <div class="icon-card" (click)="navigate('/notifications')">
+        <div class="icon-card" data-tour="home-notifications" (click)="navigate('/notifications')">
           <img src="assets/images/Home_icons/NotificationIcon.png" alt="notifications" />
           <span class="notif-badge" *ngIf="unreadNotificationsCount > 0">{{ unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount }}</span>
         </div>
-        <div class="icon-card">
+        <div class="icon-card" data-tour="home-ia">
           <img src="assets/images/Home_icons/IA icon.png" alt="IA" />
         </div>
-        <div class="icon-card">
+        <div class="icon-card" data-tour="home-ads">
           <img src="assets/images/Home_icons/AD blocker icon.png" alt="ad blocker" />
+        </div>
+        <div class="icon-card" data-tour="home-tutorial" (click)="openTutorialMenu()">
+          <ion-icon name="videocam-outline" class="tutorial-icon"></ion-icon>
         </div>
       </div>
     </div>
@@ -98,7 +63,7 @@
 
     <!-- QUICK ACCESS -->
     <div class="quick-access">
-      <div class="quick-item"
+      <div class="quick-item" data-tour="home-quick-vet"
         [class.active]="activeQuickItem === 'vet'"
         (click)="onQuickItemTap('vet', '/vet')">
         <div class="quick-icon-wrap">
@@ -106,7 +71,7 @@
         </div>
         <span>Vet</span>
       </div>
-      <div class="quick-item"
+      <div class="quick-item" data-tour="home-quick-shared"
         [class.active]="activeQuickItem === 'shared'"
         (click)="onQuickItemTap('shared', '/shared-profiles')">
         <div class="quick-icon-wrap">
@@ -114,19 +79,19 @@
         </div>
         <span>Shared pet</span>
       </div>
-      <div class="quick-item"
-        [class.pulse]="showTutorial"
+      <div class="quick-item" data-tour="home-quick-add"
+        [class.pulse]="!hasPets"
         [class.active]="activeQuickItem === 'add'"
         (click)="onAddPet()">
         <div class="quick-icon-wrap add">
           <img src="assets/images/Home_icons/addPet.png" alt="add pet" />
         </div>
         <span>Add pet</span>
-        <div class="tutorial-tooltip" *ngIf="showTutorial && !isFirstTime">
+        <div class="tutorial-tooltip" *ngIf="!hasPets && !tourOpen">
           ¡Agrega tu mascota!
         </div>
       </div>
-      <div class="quick-item"
+      <div class="quick-item" data-tour="home-quick-calendar"
         [class.active]="activeQuickItem === 'calendar'"
         (click)="onQuickItemTap('calendar', '/calendar')">
         <div class="quick-icon-wrap">
@@ -134,7 +99,7 @@
         </div>
         <span>Calendar</span>
       </div>
-      <div class="quick-item"
+      <div class="quick-item" data-tour="home-quick-maps"
         [class.active]="activeQuickItem === 'maps'"
         (click)="onQuickItemTap('maps', '/maps')">
         <div class="quick-icon-wrap">
@@ -147,7 +112,7 @@
     <!-- PET CARD — solo si hay mascotas -->
 <ng-container *ngIf="hasPets">
   
-<div class="pet-swipe-container" #swipeContainer
+<div class="pet-swipe-container" #swipeContainer data-tour="home-pet-card"
    (touchstart)="onTouchStart($event)"
    (touchmove)="onTouchMove($event)"
    (touchend)="onTouchEnd($event)"
@@ -228,7 +193,7 @@
 </ng-container>
 
     <!-- CALENDAR CARD -->
-<div class="calendar-card">
+<div class="calendar-card" data-tour="home-calendar-card">
   <div class="card-content">
     <p class="card-title">Calendar</p>
     <div class="calendar-actions">
@@ -245,7 +210,7 @@
 </div>
 
     <!-- VET ASSOCIATION CARD -->
-    <div class="vet-card">
+    <div class="vet-card" data-tour="home-vet-card">
       <img src="assets/images/Home_icons/dalmataVet.png" class="dog-decoration" alt="" />
       <div class="card-content">
         <img src="assets/images/Home_icons/MyAnimaLogVetLogo.png" alt="MyAnimalogVet" class="vet-logo" />

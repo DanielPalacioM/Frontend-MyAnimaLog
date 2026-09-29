@@ -24,6 +24,8 @@ import { DocumentsSectionComponent } from './components/documents-section/docume
 import { VaccineTimelineCardComponent } from './components/vaccine-timeline-card/vaccine-timeline-card.component';
 import { DatePickerFieldComponent } from './components/date-picker-field/date-picker-field.component';
 import { VisitPickerFieldComponent } from './components/visit-picker-field/visit-picker-field.component';
+import { TutorialOverlayComponent } from './components/tutorial-overlay/tutorial-overlay.component';
+import { TutorialGalleryComponent } from './components/tutorial-gallery/tutorial-gallery.component';
 
 import { ImgFallbackDirective } from './directives/img-fallback.directive';
 
@@ -48,7 +50,9 @@ import { ImgFallbackDirective } from './directives/img-fallback.directive';
     PetStatsCardComponent,
     VaccineCardComponent,
     DocumentsSectionComponent,
-    VaccineTimelineCardComponent
+    VaccineTimelineCardComponent,
+    TutorialOverlayComponent,
+    TutorialGalleryComponent
   ],
   imports: [
     CommonModule,
@@ -77,7 +81,9 @@ import { ImgFallbackDirective } from './directives/img-fallback.directive';
     PetStatsCardComponent,
     VaccineCardComponent,
     DocumentsSectionComponent,
-    VaccineTimelineCardComponent
+    VaccineTimelineCardComponent,
+    TutorialOverlayComponent,
+    TutorialGalleryComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

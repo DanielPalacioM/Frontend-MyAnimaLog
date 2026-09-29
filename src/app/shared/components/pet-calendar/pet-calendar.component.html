@@ -1,7 +1,7 @@
 <div class="cal-wrap">
 
   <!-- HEADER -->
-  <div class="cal-header" *ngIf="petName">
+  <div class="cal-header" *ngIf="petName" data-tour="pc-header">
     <img *ngIf="petAvatarUrl" [src]="petAvatarUrl" [alt]="petName" class="cal-pet-avatar" />
     <span class="cal-pet-name">{{ petName }} - eventos en el mes</span>
     <span class="cal-event-count">{{ totalEventsThisMonth }}</span>
@@ -17,7 +17,8 @@
     <button (click)="nextMonth()"><ion-icon name="chevron-forward-outline"></ion-icon></button>
   </div>
 
-  <!-- DÍAS HEADER -->
+  <!-- DÍAS HEADER + SEMANAS -->
+  <div class="cal-grid" data-tour="pc-grid">
   <div class="cal-days-header">
     <span *ngFor="let d of dayNames">{{ d }}</span>
   </div>
@@ -39,6 +40,7 @@
       </div>
     </div>
   </div>
+  </div>
 
   <!-- DOS LÍNEAS DIVISORAS -->
   <div class="cal-divider-wrap">
@@ -54,7 +56,7 @@
     <span class="day-events-title" *ngIf="showAllEvents">
       Todos Los Eventos · {{ monthNames[currentMonth] }}
     </span>
-    <button class="cal-menu-btn" (click)="toggleShowAll()">
+    <button class="cal-menu-btn" data-tour="pc-menu" (click)="toggleShowAll()">
       <ion-icon name="menu-outline"></ion-icon>
     </button>
   </div>

@@ -48,6 +48,13 @@
   gap: 16px;
 }
 
+// Agrupa resumen, barra y leyenda (lo usa el tutorial); conserva el espaciado de la tarjeta.
+.summary-block {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 // RESUMEN
 .summary-row {
   text-align: center;

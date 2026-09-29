@@ -88,6 +88,13 @@
   }
 }
 
+// Envuelve encabezado + semanas (lo usa el tutorial); mismo espaciado que .cal-wrap.
+.cal-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .cal-days-header {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));

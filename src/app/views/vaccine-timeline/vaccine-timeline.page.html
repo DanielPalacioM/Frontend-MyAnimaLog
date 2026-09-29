@@ -1,4 +1,10 @@
 <ion-content [fullscreen]="true" class="timeline-content">
+
+  <app-tutorial-overlay slot="fixed"
+    [steps]="tourSteps"
+    [open]="tourOpen"
+    (closed)="onTourClosed()">
+  </app-tutorial-overlay>
   <div class="timeline-wrap">
 
     <!-- HEADER -->
@@ -12,7 +18,8 @@
     <!-- CARD BLANCA -->
     <div class="timeline-card-wrap">
 
-      <!-- RESUMEN -->
+      <!-- RESUMEN + BARRA + LEYENDA -->
+      <div class="summary-block" data-tour="vt-summary">
       <div class="summary-row">
         <span class="summary-text">
           <strong>{{ appliedCount }} aplicadas</strong> ·
@@ -45,9 +52,10 @@
           <span>Pendiente</span>
         </div>
       </div>
+      </div>
 
       <!-- SELECTOR DE AÑO -->
-      <div class="year-selector">
+      <div class="year-selector" data-tour="vt-years">
         <button
           class="year-btn"
           *ngFor="let y of years"
@@ -58,7 +66,7 @@
       </div>
 
       <!-- LÍNEA DE TIEMPO -->
-      <div class="timeline-list">
+      <div class="timeline-list" data-tour="vt-list">
         <app-vaccine-timeline-card
           *ngFor="let v of filteredVaccines; let last = last"
           [vaccine]="v"

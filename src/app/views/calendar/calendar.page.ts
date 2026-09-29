@@ -5,6 +5,7 @@ import { CalendarService } from 'src/app/services/CalendarService/calendar';
 import { CalendarEvent as BackendCalendarEvent } from 'src/app/models/calendar-event.model';
 import { EVENT_TYPE_DEFAULTS, EventType } from 'src/app/models/calendar-event.model';
 import { CalendarEvent as WidgetCalendarEvent } from '../../shared/components/pet-calendar/pet-calendar.component';
+import { TutorialService, TutorialStep } from 'src/app/services/TutorialService/tutorial';
 
 @Component({
   selector: 'app-calendar',
@@ -35,6 +36,9 @@ export class CalendarPage implements OnInit {
   // Modal de detalle
   selectedEvent: WidgetCalendarEvent | null = null;
 
+  tourOpen = false;
+  tourSteps: TutorialStep[] = [];
+
   private pets: Pet[] = [];
   private rawEvents: BackendCalendarEvent[] = [];
 
@@ -45,7 +49,8 @@ export class CalendarPage implements OnInit {
   constructor(
     private router: Router,
     private petService: PetService,
-    private calendarService: CalendarService
+    private calendarService: CalendarService,
+    private tutorialService: TutorialService
   ) {}
 
   ngOnInit(): void {
@@ -72,6 +77,17 @@ export class CalendarPage implements OnInit {
     });
   }
 
+  private maybeStartTutorial(): void {
+    if (this.tourOpen || this.tutorialService.hasSeen('calendar')) return;
+    this.tourSteps = this.tutorialService.getSteps('calendar');
+    this.tourOpen = true;
+  }
+
+  onTourClosed(): void {
+    this.tutorialService.markSeen('calendar');
+    this.tourOpen = false;
+  }
+
   private loadEvents(): void {
     this.calendarService.getAllUserEvents().subscribe({
       next: (events) => {
@@ -79,6 +95,7 @@ export class CalendarPage implements OnInit {
         this.events = events.map(e => this.mapToWidgetEvent(e));
         this.buildMonthGrid();
         this.loading = false;
+        this.maybeStartTutorial();
       },
       error: (err) => {
         console.error('❌ Error cargando eventos:', err);
@@ -86,6 +103,7 @@ export class CalendarPage implements OnInit {
         this.events = [];
         this.buildMonthGrid();
         this.loading = false;
+        this.maybeStartTutorial();
       }
     });
   }

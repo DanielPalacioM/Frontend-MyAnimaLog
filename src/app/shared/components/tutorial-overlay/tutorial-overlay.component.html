@@ -1,0 +1,43 @@
+<div class="tour-overlay" #overlay *ngIf="open" [class.ready]="ready">
+
+  <!-- Sin elemento que resaltar: fondo oscuro completo -->
+  <div class="tour-backdrop" *ngIf="!spot || placement === 'center'"></div>
+
+  <!-- Spotlight: el "hueco" se hace con una sombra enorme alrededor -->
+  <div class="tour-spot"
+    *ngIf="spot && placement !== 'center'"
+    [style.top.px]="spot.top"
+    [style.left.px]="spot.left"
+    [style.width.px]="spot.width"
+    [style.height.px]="spot.height">
+  </div>
+
+  <div class="tour-bubble"
+    *ngIf="current"
+    [class.centered]="placement === 'center'"
+    [style.top.px]="placement === 'bottom' ? bubbleTop : null"
+    [style.bottom.px]="placement === 'top' || placement === 'inside' ? bubbleBottom : null">
+
+    <span class="tour-arrow up" *ngIf="placement === 'bottom'" [style.left.px]="arrowLeft"></span>
+    <span class="tour-arrow down" *ngIf="placement === 'top'" [style.left.px]="arrowLeft"></span>
+
+    <div class="tour-bubble-head">
+      <span class="tour-step-count">{{ index + 1 }} de {{ activeSteps.length }}</span>
+      <button class="tour-skip" *ngIf="!isLast" (click)="finish()">Saltar</button>
+    </div>
+
+    <p class="tour-title">{{ current.title }}</p>
+    <p class="tour-text">{{ current.text }}</p>
+
+    <div class="tour-actions">
+      <div class="tour-dots">
+        <span class="tour-dot" *ngFor="let s of activeSteps; let i = index" [class.active]="i === index"></span>
+      </div>
+      <div class="tour-buttons">
+        <button class="tour-btn ghost" *ngIf="index > 0" (click)="prev()">Atrás</button>
+        <button class="tour-btn primary" (click)="next()">{{ isLast ? 'Entendido' : 'Siguiente' }}</button>
+      </div>
+    </div>
+  </div>
+
+</div>

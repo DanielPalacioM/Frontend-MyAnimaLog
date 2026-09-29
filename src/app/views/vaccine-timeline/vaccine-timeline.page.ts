@@ -4,6 +4,7 @@ import { VaccineTimelineItem } from '../../shared/components/vaccine-timeline-ca
 import { VaccineService } from 'src/app/services/VaccineService/vaccine/vaccine'; 
 import { PetService } from 'src/app/services/PetService/pet';
 import { Vaccine } from 'src/app/models/vaccine.model';
+import { TutorialService, TutorialStep } from 'src/app/services/TutorialService/tutorial';
 
 @Component({
   selector: 'app-vaccine-timeline',
@@ -28,11 +29,15 @@ export class VaccineTimelineComponent implements OnInit {
   vaccines: VaccineTimelineItem[] = [];
   loading = true;
 
+  tourOpen = false;
+  tourSteps: TutorialStep[] = [];
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private vaccineService: VaccineService,
-    private petService: PetService
+    private petService: PetService,
+    private tutorialService: TutorialService
   ) {}
 
   ngOnInit() {
@@ -57,12 +62,24 @@ ionViewWillEnter() {
     });
   }
 
+  private maybeStartTutorial(): void {
+    if (this.tourOpen || this.tutorialService.hasSeen('vaccine-timeline')) return;
+    this.tourSteps = this.tutorialService.getSteps('vaccine-timeline');
+    this.tourOpen = true;
+  }
+
+  onTourClosed(): void {
+    this.tutorialService.markSeen('vaccine-timeline');
+    this.tourOpen = false;
+  }
+
   private loadVaccines() {
     this.loading = true;
     this.vaccineService.getVaccinesByPet(this.petId).subscribe({
       next: (vaccines) => {
         this.buildTimeline(vaccines);
         this.loading = false;
+        this.maybeStartTutorial();
       },
       error: (err) => {
         console.error('❌ Error cargando vacunas:', err);

@@ -1,4 +1,10 @@
 <ion-content [fullscreen]="true" class="mh-content">
+
+  <app-tutorial-overlay slot="fixed"
+    [steps]="tourSteps"
+    [open]="tourOpen"
+    (closed)="onTourClosed()">
+  </app-tutorial-overlay>
   <div class="mh-wrap">
 
     <!-- HEADER -->
@@ -16,7 +22,7 @@
     </div>
 
     <!-- TABS -->
-    <div class="tabs-wrap">
+    <div class="tabs-wrap" data-tour="mh-tabs">
       <div class="tabs-row">
 
         <button class="tab" [class.active]="activeTab === 'consultas'" (click)="setTab('consultas')">
@@ -43,7 +49,7 @@
     </div>
 
     <!-- CONTENIDO -->
-    <div class="mh-card">
+    <div class="mh-card" data-tour="mh-card">
 
       <!-- CONSULTAS -->
 <div class="section" *ngIf="activeTab === 'consultas'">
@@ -69,7 +75,7 @@
     <div class="rc-row" *ngIf="c.weight"><span class="rl">Peso</span><span class="rv">{{ c.weight }} kg</span></div>
     <div class="rc-row" *ngIf="c.notes"><span class="rl">Notas</span><span class="rv">{{ c.notes }}</span></div>
   </div>
-  <button class="add-btn" *ngIf="canEdit" (click)="goToAddConsultation()">
+  <button class="add-btn" data-tour="mh-add" *ngIf="canEdit" (click)="goToAddConsultation()">
     <ion-icon name="add-outline"></ion-icon> Registrar consulta
   </button>
 </div>
@@ -102,7 +108,7 @@
       </div>
     </div>
   </div>
-  <button class="add-btn" *ngIf="canEdit" (click)="goToAddTreatment()">
+  <button class="add-btn" data-tour="mh-add" *ngIf="canEdit" (click)="goToAddTreatment()">
     <ion-icon name="add-outline"></ion-icon> Registrar tratamiento
   </button>
 </div>
@@ -131,7 +137,7 @@
     </div>
     <div class="rc-row" *ngIf="l.notes"><span class="rl">Notas</span><span class="rv">{{ l.notes }}</span></div>
   </div>
-  <button class="add-btn" *ngIf="canEdit" (click)="goToAddLab()">
+  <button class="add-btn" data-tour="mh-add" *ngIf="canEdit" (click)="goToAddLab()">
     <ion-icon name="add-outline"></ion-icon> Registrar examen
   </button>
 </div>
@@ -182,7 +188,7 @@
       </div>
     </div>
   </div>
-  <button class="add-btn" *ngIf="canEdit" (click)="goToAddSurgery()">
+  <button class="add-btn" data-tour="mh-add" *ngIf="canEdit" (click)="goToAddSurgery()">
     <ion-icon name="add-outline"></ion-icon> Registrar cirugía
   </button>
 </div>
