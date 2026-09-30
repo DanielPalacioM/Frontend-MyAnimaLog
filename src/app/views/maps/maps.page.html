@@ -16,14 +16,57 @@
       <button class="round-btn" (click)="goBack()" aria-label="Volver">
         <ion-icon name="arrow-back-outline"></ion-icon>
       </button>
-      <div class="title-pill">
-        <span class="title">Veterinarias cerca</span>
-        <span class="subtitle">Radio de 5 km</span>
+      <div class="search-box" data-tour="maps-search" [class.focused]="searchFocused">
+        <ion-icon name="search-outline" class="search-icon"></ion-icon>
+        <input
+          type="search"
+          class="search-input"
+          placeholder="Buscar veterinaria por nombre"
+          autocomplete="off"
+          enterkeyhint="search"
+          [ngModel]="query"
+          (ngModelChange)="onQueryChange($event)"
+          (focus)="searchFocused = true"
+          (blur)="searchFocused = false" />
+        <button class="search-clear" *ngIf="query" (mousedown)="$event.preventDefault()" (click)="clearSearch()" aria-label="Borrar">
+          <ion-icon name="close-circle"></ion-icon>
+        </button>
       </div>
     </div>
 
+    <!-- SUGERENCIAS -->
+    <!-- mousedown.preventDefault evita que el input pierda el foco antes del click -->
+    <div class="suggestions" *ngIf="showSuggestions" (mousedown)="$event.preventDefault()">
+
+      <button class="suggestion" *ngFor="let vet of localMatches" (click)="pickLocal(vet)">
+        <span class="sg-icon local"><ion-icon name="paw"></ion-icon></span>
+        <span class="sg-text">
+          <span class="sg-main">{{ vet.name }}</span>
+          <span class="sg-sub">{{ vet.address }}</span>
+        </span>
+        <span class="sg-distance" *ngIf="vet.distanceMeters !== null">{{ distanceLabel(vet) }}</span>
+      </button>
+
+      <button class="suggestion" *ngFor="let s of suggestions" (click)="pickSuggestion(s)">
+        <span class="sg-icon"><ion-icon name="location-outline"></ion-icon></span>
+        <span class="sg-text">
+          <span class="sg-main">{{ s.main }}</span>
+          <span class="sg-sub">{{ s.secondary }}</span>
+        </span>
+        <span class="sg-distance" *ngIf="s.distanceMeters !== null">{{ maps.formatDistance(s.distanceMeters) }}</span>
+      </button>
+
+      <p class="sg-status" *ngIf="suggestLoading">Buscando...</p>
+      <p class="sg-status" *ngIf="!suggestLoading && !localMatches.length && !suggestions.length && query.trim().length >= 3">
+        No encontramos veterinarias con ese nombre.
+      </p>
+      <p class="sg-status" *ngIf="!suggestLoading && !localMatches.length && query.trim().length < 3">
+        Escribe al menos 3 letras.
+      </p>
+    </div>
+
     <!-- AVISOS -->
-    <div class="map-chips">
+    <div class="map-chips" *ngIf="!showSuggestions">
       <button class="chip search-here" *ngIf="showSearchHere && !searching" (click)="searchHere()">
         <ion-icon name="search-outline"></ion-icon> Buscar en esta zona
       </button>
@@ -41,7 +84,7 @@
     </div>
 
     <!-- HOJA INFERIOR -->
-    <div class="sheet" [class.expanded]="sheetExpanded" *ngIf="status !== 'error'">
+    <div class="sheet" #sheetEl [class.expanded]="sheetExpanded" *ngIf="status !== 'error'">
 
       <button class="recenter-btn" data-tour="maps-recenter" (click)="recenter()" aria-label="Mi ubicación">
         <ion-icon name="locate-outline"></ion-icon>
@@ -138,7 +181,7 @@
             <ion-icon name="calendar-outline"></ion-icon>
             <span>Agendar cita</span>
           </button>
-          <button class="action" (click)="openDirections(selected)">
+          <button class="action" [class.active]="route || routeLoading" (click)="showRoute(selected)">
             <ion-icon name="navigate-outline"></ion-icon>
             <span>Cómo llegar</span>
           </button>
@@ -150,6 +193,32 @@
             <ion-icon name="globe-outline"></ion-icon>
             <span>Sitio web</span>
           </button>
+        </div>
+
+        <!-- RUTA -->
+        <div class="route-card" *ngIf="route || routeLoading || routeError">
+          <div class="route-modes">
+            <button class="route-mode"
+              *ngFor="let m of routeModes"
+              [class.active]="m.mode === routeMode"
+              [disabled]="routeLoading"
+              (click)="changeRouteMode(m.mode)">
+              {{ m.label }}
+            </button>
+          </div>
+
+          <p class="route-summary" *ngIf="route && !routeLoading">
+            <ion-icon name="time-outline"></ion-icon> {{ routeSummary(route) }}
+          </p>
+          <p class="route-status" *ngIf="routeLoading">Calculando ruta...</p>
+          <p class="route-status error" *ngIf="routeError && !routeLoading">{{ routeError }}</p>
+
+          <div class="route-actions" *ngIf="route && !routeLoading">
+            <button class="route-link" (click)="openInGoogleMaps(selected)">
+              <ion-icon name="open-outline"></ion-icon> Navegar en Google Maps
+            </button>
+            <button class="route-link muted" (click)="clearRoute()">Quitar ruta</button>
+          </div>
         </div>
       </div>
 

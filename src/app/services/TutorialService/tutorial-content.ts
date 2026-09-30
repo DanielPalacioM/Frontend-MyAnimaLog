@@ -209,6 +209,11 @@ export const TUTORIAL_STEPS: Record<TutorialKey, TutorialStep[]> = {
 
   'maps': [
     {
+      target: 'maps-search',
+      title: 'Buscar por nombre',
+      text: 'Escribe el nombre de una veterinaria y elige una de las sugerencias para verla en el mapa.',
+    },
+    {
       target: 'maps-map',
       title: 'Veterinarias cerca de ti',
       text: 'Cada pin morado es una veterinaria en un radio de 5 km. Tócalo para ver su información. Si mueves el mapa, toca "Buscar en esta zona" para buscar ahí.',
@@ -216,7 +221,7 @@ export const TUTORIAL_STEPS: Record<TutorialKey, TutorialStep[]> = {
     {
       target: 'maps-list',
       title: 'Lista por distancia',
-      text: 'Las mismas veterinarias ordenadas de la más cercana a la más lejana. Al tocar una puedes agendar una cita en tu calendario, ver cómo llegar o llamar.',
+      text: 'Las mismas veterinarias ordenadas de la más cercana a la más lejana. Al tocar una puedes agendar una cita en tu calendario, llamar o ver cómo llegar: la ruta se dibuja en morado en el mapa, en carro, moto o a pie.',
     },
     {
       target: 'maps-recenter',

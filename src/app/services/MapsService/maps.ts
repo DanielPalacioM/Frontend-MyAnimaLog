@@ -20,6 +20,22 @@ export interface VetDetails {
   website: string | null;
 }
 
+export interface VetSuggestion {
+  placeId: string;
+  main: string;
+  secondary: string;
+  distanceMeters: number | null;
+  prediction: google.maps.places.PlacePrediction;
+}
+
+export type RouteMode = 'DRIVING' | 'TWO_WHEELER' | 'WALKING';
+
+export interface VetRoute {
+  path: google.maps.LatLngLiteral[];
+  distanceMeters: number;
+  durationMillis: number;
+}
+
 // La búsqueda solo pide campos básicos (más baratos). Teléfono, horario y
 // calificación se piden al tocar una veterinaria.
 const SEARCH_FIELDS = ['id', 'displayName', 'formattedAddress', 'location', 'businessStatus'];
@@ -90,6 +106,92 @@ export class MapsService {
       .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0));
   }
 
+  newSessionToken(): Promise<google.maps.places.AutocompleteSessionToken> {
+    this.configure();
+    return importLibrary('places').then(({ AutocompleteSessionToken }) => new AutocompleteSessionToken());
+  }
+
+  /**
+   * Sugerencias mientras el usuario escribe, solo veterinarias y priorizando
+   * las cercanas. Con el mismo sessionToken Google cobra la búsqueda como una
+   * sola sesión al elegir una sugerencia.
+   */
+  async suggestVets(
+    input: string,
+    center: google.maps.LatLngLiteral,
+    origin: google.maps.LatLngLiteral | null,
+    sessionToken: google.maps.places.AutocompleteSessionToken
+  ): Promise<VetSuggestion[]> {
+    this.configure();
+    const { AutocompleteSuggestion } = await importLibrary('places');
+
+    const { suggestions } = await AutocompleteSuggestion.fetchAutocompleteSuggestions({
+      input,
+      sessionToken,
+      includedPrimaryTypes: ['veterinary_care'],
+      locationBias: { center, radius: 20000 },
+      origin: origin || undefined,
+      includedRegionCodes: ['co'],
+      language: 'es',
+    });
+
+    return suggestions
+      .map(s => s.placePrediction)
+      .filter((p): p is google.maps.places.PlacePrediction => !!p)
+      .map(p => ({
+        placeId: p.placeId,
+        main: p.mainText?.text || p.text.text,
+        secondary: p.secondaryText?.text || '',
+        distanceMeters: p.distanceMeters ?? null,
+        prediction: p,
+      }));
+  }
+
+  /** Convierte una sugerencia elegida en una veterinaria del mapa (cierra la sesión). */
+  async vetFromSuggestion(
+    suggestion: VetSuggestion,
+    origin: google.maps.LatLngLiteral | null
+  ): Promise<VetPlace | null> {
+    const { place } = await suggestion.prediction.toPlace().fetchFields({ fields: SEARCH_FIELDS });
+    if (!place.location) return null;
+    const location = place.location.toJSON();
+    return {
+      id: place.id,
+      name: place.displayName || suggestion.main,
+      address: place.formattedAddress || suggestion.secondary,
+      location,
+      distanceMeters: origin ? this.distanceMeters(origin, location) : null,
+      place,
+    };
+  }
+
+  /** Ruta real por calles (Routes API), sin tráfico para mantener el costo bajo. */
+  async computeRoute(
+    origin: google.maps.LatLngLiteral,
+    destination: google.maps.LatLngLiteral,
+    mode: RouteMode
+  ): Promise<VetRoute | null> {
+    this.configure();
+    const { Route } = await importLibrary('routes');
+
+    const { routes } = await Route.computeRoutes({
+      origin,
+      destination,
+      travelMode: mode,
+      fields: ['path', 'distanceMeters', 'durationMillis'],
+      language: 'es',
+      region: 'co',
+    });
+
+    const route = routes?.[0];
+    if (!route?.path?.length) return null;
+    return {
+      path: route.path.map(p => ({ lat: p.lat, lng: p.lng })),
+      distanceMeters: route.distanceMeters ?? 0,
+      durationMillis: route.durationMillis ?? 0,
+    };
+  }
+
   async getVetDetails(vet: VetPlace): Promise<VetDetails> {
     const { place } = await vet.place.fetchFields({ fields: DETAIL_FIELDS });
 
@@ -114,12 +216,14 @@ export class MapsService {
     };
   }
 
-  /** Abre la ruta en Google Maps (app o web). No consume cuota de la API. */
-  directionsUrl(vet: VetPlace): string {
+  /** Navegación paso a paso en la app de Google Maps. No consume cuota de la API. */
+  directionsUrl(vet: VetPlace, mode: RouteMode = 'DRIVING'): string {
+    const travelmode = mode === 'WALKING' ? 'walking' : mode === 'TWO_WHEELER' ? 'two-wheeler' : 'driving';
     const params = new URLSearchParams({
       api: '1',
       destination: `${vet.location.lat},${vet.location.lng}`,
       destination_place_id: vet.id,
+      travelmode,
     });
     return `https://www.google.com/maps/dir/?${params.toString()}`;
   }
@@ -133,6 +237,14 @@ export class MapsService {
     const h = Math.sin(dLat / 2) ** 2 +
       Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
     return 2 * R * Math.asin(Math.sqrt(h));
+  }
+
+  formatDuration(millis: number): string {
+    const minutes = Math.max(1, Math.round(millis / 60000));
+    if (minutes < 60) return `${minutes} min`;
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return m ? `${h} h ${m} min` : `${h} h`;
   }
 
   formatDistance(meters: number | null): string {

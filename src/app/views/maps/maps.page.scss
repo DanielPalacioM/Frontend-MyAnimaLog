@@ -58,27 +58,150 @@
   }
 }
 
-.title-pill {
+.search-box {
   flex: 1;
   min-width: 0;
-  background: #4037BE;
-  color: white;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 0 14px;
+  background: white;
   border-radius: 16px;
-  padding: 8px 16px;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  transition: border-color 0.2s;
+
+  &.focused { border-color: #4037BE; }
+}
+
+.search-icon {
+  font-size: 18px;
+  color: #4037BE;
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  color: #1a1a2e;
+
+  &::placeholder { color: #999; }
+
+  // Oculta la "x" nativa del input search; usamos la nuestra.
+  &::-webkit-search-cancel-button { display: none; }
+}
+
+.search-clear {
+  border: none;
+  background: none;
+  padding: 4px;
+  display: flex;
+  color: #B8B5DA;
+  cursor: pointer;
+
+  ion-icon { font-size: 20px; }
+}
+
+/* ==========================
+   SUGERENCIAS
+========================== */
+
+.suggestions {
+  position: absolute;
+  top: calc(64px + env(safe-area-inset-top));
+  left: 16px;
+  right: 16px;
+  z-index: 7;
+  max-height: 50%;
+  overflow-y: auto;
+  background: white;
+  border-radius: 18px;
+  padding: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+.suggestion {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 12px;
+  background: none;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+
+  &:active { background: #F1F0FB; }
+
+  & + .suggestion { border-top: 1px solid #F1F0FB; }
+}
+
+.sg-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: #F1F0FB;
+  color: #4037BE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ion-icon { font-size: 16px; }
+
+  &.local {
+    background: #4037BE;
+    color: white;
+  }
+}
+
+.sg-text {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 14px rgba(64, 55, 190, 0.35);
+  gap: 2px;
+}
 
-  .title {
-    font-family: 'Jua', sans-serif;
-    font-size: 17px;
-    line-height: 1.2;
-  }
+.sg-main,
+.sg-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-  .subtitle {
-    font-size: 11px;
-    opacity: 0.8;
-  }
+.sg-main {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.sg-sub {
+  font-size: 12px;
+  color: #888;
+}
+
+.sg-distance {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: #4037BE;
+}
+
+.sg-status {
+  margin: 0;
+  padding: 12px;
+  font-size: 13px;
+  color: #888;
+  text-align: center;
 }
 
 /* ==========================
@@ -486,6 +609,97 @@
     background: #f5a623;
     color: white;
   }
+
+  &.active {
+    background: #4037BE;
+    color: white;
+  }
+}
+
+/* ==========================
+   RUTA
+========================== */
+
+.route-card {
+  border-radius: 16px;
+  background: #F7F6FF;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.route-modes {
+  display: flex;
+  gap: 4px;
+  background: white;
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.route-mode {
+  flex: 1;
+  border: none;
+  border-radius: 9px;
+  padding: 8px 4px;
+  background: none;
+  color: #4037BE;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+
+  &.active {
+    background: #4037BE;
+    color: white;
+  }
+
+  &:disabled { opacity: 0.6; }
+}
+
+.route-summary {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Jua', sans-serif;
+  font-size: 20px;
+  color: #1a1a2e;
+
+  ion-icon { color: #4037BE; font-size: 20px; }
+}
+
+.route-status {
+  margin: 0;
+  font-size: 13px;
+  color: #777;
+
+  &.error { color: #D64545; }
+}
+
+.route-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.route-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4037BE;
+  cursor: pointer;
+
+  &.muted { color: #999; font-weight: 400; }
 }
 
 /* ==========================
