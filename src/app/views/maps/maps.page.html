@@ -1,0 +1,158 @@
+<ion-content [fullscreen]="true" [scrollY]="false" class="maps-content">
+
+  <app-tutorial-overlay slot="fixed"
+    [steps]="tourSteps"
+    [open]="tourOpen"
+    (closed)="onTourClosed()">
+  </app-tutorial-overlay>
+
+  <div class="maps-wrap">
+
+    <!-- MAPA -->
+    <div class="map-el" #mapEl data-tour="maps-map"></div>
+
+    <!-- HEADER FLOTANTE -->
+    <div class="maps-header">
+      <button class="round-btn" (click)="goBack()" aria-label="Volver">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <div class="title-pill">
+        <span class="title">Veterinarias cerca</span>
+        <span class="subtitle">Radio de 5 km</span>
+      </div>
+    </div>
+
+    <!-- AVISOS -->
+    <div class="map-chips">
+      <button class="chip search-here" *ngIf="showSearchHere && !searching" (click)="searchHere()">
+        <ion-icon name="search-outline"></ion-icon> Buscar en esta zona
+      </button>
+      <div class="chip warning" *ngIf="locationDenied && status === 'ready'">
+        <ion-icon name="location-outline"></ion-icon> Activa tu ubicación para ver las más cercanas
+      </div>
+    </div>
+
+    <!-- ERROR AL CARGAR EL MAPA -->
+    <div class="map-error" *ngIf="status === 'error'">
+      <ion-icon name="map-outline"></ion-icon>
+      <p class="error-title">No pudimos cargar el mapa</p>
+      <p class="error-text">Revisa tu conexión e inténtalo de nuevo.</p>
+      <button class="primary-btn" (click)="goBack()">Volver al inicio</button>
+    </div>
+
+    <!-- HOJA INFERIOR -->
+    <div class="sheet" [class.expanded]="sheetExpanded" *ngIf="status !== 'error'">
+
+      <button class="recenter-btn" data-tour="maps-recenter" (click)="recenter()" aria-label="Mi ubicación">
+        <ion-icon name="locate-outline"></ion-icon>
+      </button>
+
+      <button class="sheet-handle" (click)="toggleSheet()" aria-label="Expandir lista">
+        <span></span>
+      </button>
+
+      <!-- LISTA -->
+      <ng-container *ngIf="!selected">
+        <div class="sheet-head">
+          <p class="sheet-title">
+            <ng-container *ngIf="!searching && status === 'ready'">
+              {{ vets.length }} {{ vets.length === 1 ? 'veterinaria' : 'veterinarias' }}
+            </ng-container>
+            <ng-container *ngIf="searching || status === 'loading'">Buscando veterinarias...</ng-container>
+          </p>
+          <span class="sheet-sub" *ngIf="!searching && vets.length">Ordenadas por distancia</span>
+        </div>
+
+        <div class="sheet-body" data-tour="maps-list">
+
+          <ng-container *ngIf="searching || status === 'loading'">
+            <div class="vet-card skeleton" *ngFor="let i of [1, 2, 3]">
+              <div class="sk-icon"></div>
+              <div class="sk-lines"><span></span><span></span></div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="!searching && status === 'ready'">
+            <div class="vet-card" *ngFor="let vet of vets" (click)="selectVet(vet)">
+              <div class="vet-icon">
+                <ion-icon name="paw"></ion-icon>
+              </div>
+              <div class="vet-info">
+                <span class="vet-name">{{ vet.name }}</span>
+                <span class="vet-address">{{ vet.address }}</span>
+              </div>
+              <span class="vet-distance" *ngIf="vet.distanceMeters !== null">{{ distanceLabel(vet) }}</span>
+            </div>
+
+            <div class="empty-state" *ngIf="!vets.length && !searchError">
+              <ion-icon name="paw-outline"></ion-icon>
+              <p>No encontramos veterinarias en esta zona. Mueve el mapa y toca "Buscar en esta zona".</p>
+            </div>
+
+            <div class="empty-state" *ngIf="searchError">
+              <ion-icon name="cloud-offline-outline"></ion-icon>
+              <p>No pudimos buscar veterinarias. Inténtalo de nuevo.</p>
+              <button class="primary-btn small" (click)="searchHere()">Reintentar</button>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+
+      <!-- DETALLE -->
+      <div class="detail" *ngIf="selected">
+        <div class="detail-head">
+          <button class="round-btn small" (click)="closeDetail()" aria-label="Volver a la lista">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+          </button>
+          <div class="detail-title">
+            <p class="vet-name big">{{ selected.name }}</p>
+            <p class="vet-address">{{ selected.address }}</p>
+          </div>
+        </div>
+
+        <div class="detail-tags">
+          <span class="tag distance" *ngIf="selected.distanceMeters !== null">
+            <ion-icon name="navigate-outline"></ion-icon> A {{ distanceLabel(selected) }}
+          </span>
+          <ng-container *ngIf="details">
+            <span class="tag open" *ngIf="details.openNow === true">Abierto ahora</span>
+            <span class="tag closed" *ngIf="details.openNow === false">Cerrado ahora</span>
+            <span class="tag rating" *ngIf="details.rating !== null">
+              <span class="stars">
+                <span class="star" *ngFor="let fill of stars(details.rating)">
+                  <span class="star-fill" [style.width.%]="fill * 100">★</span>★
+                </span>
+              </span>
+              {{ details.rating | number:'1.1-1' }} ({{ details.ratingCount }})
+            </span>
+          </ng-container>
+          <span class="tag loading" *ngIf="detailsLoading">Cargando información...</span>
+        </div>
+
+        <p class="hours" *ngIf="details?.hoursToday">
+          <ion-icon name="time-outline"></ion-icon> {{ details?.hoursToday }}
+        </p>
+
+        <div class="detail-actions">
+          <button class="action main" (click)="bookAppointment(selected)">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span>Agendar cita</span>
+          </button>
+          <button class="action" (click)="openDirections(selected)">
+            <ion-icon name="navigate-outline"></ion-icon>
+            <span>Cómo llegar</span>
+          </button>
+          <button class="action" *ngIf="details?.phone" (click)="call(details!.phone!)">
+            <ion-icon name="call-outline"></ion-icon>
+            <span>Llamar</span>
+          </button>
+          <button class="action" *ngIf="details?.website" (click)="openWebsite(details!.website!)">
+            <ion-icon name="globe-outline"></ion-icon>
+            <span>Sitio web</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</ion-content>

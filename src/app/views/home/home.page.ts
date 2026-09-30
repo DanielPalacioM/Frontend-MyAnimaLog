@@ -390,6 +390,6 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
 
   navigate(route: string) { this.router.navigate([route]); }
   onAsociationVet() { this.router.navigate(['/vet']); }
-  onFindVet() { this.router.navigate(['/vet/find']); }
+  onFindVet() { this.router.navigate(['/maps']); }
   goToProfile() { this.router.navigate(['/profile']); }
 }

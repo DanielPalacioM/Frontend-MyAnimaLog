@@ -26,10 +26,11 @@ export type TutorialKey =
   | 'pet-profile'
   | 'medical-history'
   | 'vaccine-timeline'
-  | 'calendar';
+  | 'calendar'
+  | 'maps';
 
 // Guías de cada sección: se pueden volver a activar desde el botón de tutorial del Home.
-const SECTION_KEYS: TutorialKey[] = ['pet-profile', 'medical-history', 'vaccine-timeline', 'calendar'];
+const SECTION_KEYS: TutorialKey[] = ['pet-profile', 'medical-history', 'vaccine-timeline', 'calendar', 'maps'];
 
 @Injectable({ providedIn: 'root' })
 export class TutorialService {

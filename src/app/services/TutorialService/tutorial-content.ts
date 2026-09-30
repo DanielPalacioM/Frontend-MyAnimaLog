@@ -59,7 +59,7 @@ export const TUTORIAL_STEPS: Record<TutorialKey, TutorialStep[]> = {
     {
       target: 'home-quick-maps',
       title: 'Maps',
-      text: 'Encuentra lugares pet-friendly cerca de ti: parques, tiendas y veterinarias.',
+      text: 'Encuentra veterinarias cerca de ti, mira a cuánto están y agenda una cita.',
     },
     {
       target: 'home-calendar-card',
@@ -69,7 +69,7 @@ export const TUTORIAL_STEPS: Record<TutorialKey, TutorialStep[]> = {
     {
       target: 'home-vet-card',
       title: 'MyAnimaLogVet',
-      text: '"Asociar veterinaria" conecta tu veterinaria para que pueda consultar y actualizar el historial de tu mascota. "Buscar veterinaria" te muestra las más cercanas.',
+      text: '"Asociar veterinaria" conecta tu veterinaria para que pueda consultar y actualizar el historial de tu mascota. "Buscar veterinaria" abre el mapa con las más cercanas.',
     },
   ],
 
@@ -206,6 +206,24 @@ export const TUTORIAL_STEPS: Record<TutorialKey, TutorialStep[]> = {
       text: 'Cada evento tiene el color de su tipo. Tócalo para ver el detalle; con el lápiz lo editas y con la papelera lo eliminas.',
     },
   ],
+
+  'maps': [
+    {
+      target: 'maps-map',
+      title: 'Veterinarias cerca de ti',
+      text: 'Cada pin morado es una veterinaria en un radio de 5 km. Tócalo para ver su información. Si mueves el mapa, toca "Buscar en esta zona" para buscar ahí.',
+    },
+    {
+      target: 'maps-list',
+      title: 'Lista por distancia',
+      text: 'Las mismas veterinarias ordenadas de la más cercana a la más lejana. Al tocar una puedes agendar una cita en tu calendario, ver cómo llegar o llamar.',
+    },
+    {
+      target: 'maps-recenter',
+      title: 'Tu ubicación',
+      text: 'Vuelve a centrar el mapa donde estás y busca de nuevo.',
+    },
+  ],
 };
 
 // Tutorial con imágenes. Guarda las capturas en src/assets/images/Tutorial/
@@ -245,6 +263,11 @@ export const TUTORIAL_GALLERY: TutorialSlide[] = [
     image: 'assets/images/Tutorial/07-shared.png',
     title: 'Perfiles compartidos',
     text: 'Invita a otras personas a cuidar a tu mascota.',
+  },
+  {
+    image: 'assets/images/Tutorial/09-maps.png',
+    title: 'Veterinarias cerca',
+    text: 'Encuentra veterinarias, mira a cuánto están y agenda tu cita.',
   },
   {
     image: 'assets/images/Tutorial/08-vet.png',

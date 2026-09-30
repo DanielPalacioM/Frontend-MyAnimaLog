@@ -4,7 +4,7 @@ import { PetService, Pet } from 'src/app/services/PetService/pet';
 import { ProfileService } from 'src/app/services/ProfileService/profile';
 import { CalendarService } from 'src/app/services/CalendarService/calendar';
 import { CalendarEvent, CalendarEventPayload } from 'src/app/models/calendar-event.model';
-import { EventType } from 'src/app/models/calendar-event.model';
+import { EventType, EVENT_TYPE_DEFAULTS } from 'src/app/models/calendar-event.model';
 
 interface ActivityOption {
   type: EventType;
@@ -86,7 +86,19 @@ export class AddEventPage implements OnInit {
     if (this.isEditMode && this.eventIdParam) {
       this.loading = true;
       this.loadEventForEdit(this.eventIdParam);
+    } else {
+      this.applyPrefill();
     }
+  }
+
+  // Datos que llegan por URL al crear un evento desde otra pantalla
+  // (p. ej. "Agendar cita" en el mapa de veterinarias).
+  private applyPrefill(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const type = params.get('type') as EventType | null;
+    if (type && type in EVENT_TYPE_DEFAULTS) this.selectedType = type;
+    this.title = params.get('title') || this.title;
+    this.location = params.get('location') || this.location;
   }
 
   private loadUserAvatar(): void {

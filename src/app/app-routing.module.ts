@@ -133,6 +133,10 @@ const routes: Routes = [
     path: 'calendar',
     loadChildren: () => import('./views/calendar/calendar.module').then( m => m.CalendarPageModule)
   },
+  {
+    path: 'maps',
+    loadChildren: () => import('./views/maps/maps.module').then( m => m.MapsPageModule)
+  },
 
 
 
