@@ -29,6 +29,9 @@ export class VaccineTimelineComponent implements OnInit {
   vaccines: VaccineTimelineItem[] = [];
   loading = true;
 
+  // año de cada vacuna sacado de la fecha cruda (no del texto formateado en español)
+  private yearById = new Map<string, number | null>();
+
   tourOpen = false;
   tourSteps: TutorialStep[] = [];
 
@@ -92,6 +95,8 @@ ionViewWillEnter() {
   private buildTimeline(rawVaccines: Vaccine[]) {
     const today = new Date();
 
+    this.yearById.clear();
+
     const items: VaccineTimelineItem[] = rawVaccines.map((v) => {
       const applicationDate = new Date(v.applicationDate);
       const nextDoseDate = v.nextDoseDate ? new Date(v.nextDoseDate) : null;
@@ -104,6 +109,10 @@ ionViewWillEnter() {
       } else {
         status = 'pending';
       }
+
+      const yearDate = status === 'applied' ? applicationDate : (nextDoseDate ?? applicationDate);
+      const year = yearDate.getFullYear();
+      this.yearById.set(v.id, isNaN(year) ? null : year);
 
       return {
         id: v.id,
@@ -131,7 +140,8 @@ ionViewWillEnter() {
     this.pendingCount = items.filter(v => v.status === 'pending').length;
     this.lateCount = items.filter(v => v.status === 'late').length;
 
-    const yearsSet = new Set(rawVaccines.map(v => new Date(v.applicationDate).getFullYear()));
+    const yearsSet = new Set<number>();
+    this.yearById.forEach(y => { if (y !== null) yearsSet.add(y); });
     this.years = Array.from(yearsSet).sort();
     if (this.years.length > 0 && !this.years.includes(this.selectedYear)) {
       this.selectedYear = this.years[this.years.length - 1];
@@ -144,9 +154,9 @@ ionViewWillEnter() {
 
   get filteredVaccines(): VaccineTimelineItem[] {
     return this.vaccines.filter(v => {
-      const dateStr = v.applicationDate || v.dueDate;
-      if (!dateStr) return true; // sugeridas sin fecha
-      return new Date(dateStr).getFullYear() === this.selectedYear;
+      const year = this.yearById.get(v.id);
+      if (year == null) return true; // sin fecha válida: se muestra siempre
+      return year === this.selectedYear;
     });
   }
 
