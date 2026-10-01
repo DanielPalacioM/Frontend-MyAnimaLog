@@ -78,7 +78,7 @@ const routes: Routes = [
 },
   
   {
-    path: 'vaccine-info',
+    path: 'vaccine-info/:id',
     loadChildren: () => import('./views/vaccine-info/vaccine-info.module').then( m => m.VaccineInfoPageModule)
   },
   {

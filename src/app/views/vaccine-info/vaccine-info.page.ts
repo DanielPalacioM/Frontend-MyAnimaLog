@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { VaccineService } from 'src/app/services/VaccineService/vaccine/vaccine';
+import { Vaccine, VaccineStatus } from 'src/app/models/vaccine.model';
 
 @Component({
   selector: 'app-vaccine-info',
@@ -10,25 +12,25 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class VaccineInfoPage implements OnInit {
 
   vaccineId: string | null = null;
+  petId = '';
   docVisible = false;
+  loading = true;
+  notFound = false;
 
   vaccine = {
-    id: '1',
-    title: 'Parvovirus',
-    applicationDate: '15 ene 2026',
-    nextDose: '15 ene 2027',
-    lotNumber: 'PV-2026-001',
-    vet: 'Dr.Pet',
-    info: 'Primera dosis, sin reacciones adversas',
-    notes: 'Toleró bien la aplicación. Continuar con el esquema de vacunación normal',
-    status: 'applied',
-    attachment: true,
-    docName: 'Carnet_parvovirus.pdf',
-    docSize: '340 KB - VACCINE - activo',
+    id: '',
+    title: '',
+    applicationDate: '',
+    nextDose: '',
+    lotNumber: '',
+    vet: '',
+    notes: '',
+    status: 'applied' as VaccineStatus,
+    attachment: false,
+    docName: '',
+    docSize: '',
     reminderActive: true,
-    appointmentDate: '15 ene 2025',
-    appointmentVet: 'Dr.pet - Cartagena',
-    appointmentStatus: 'PENDING',
+    reminderDate: '',
   };
 
   get statusText(): string {
@@ -58,11 +60,69 @@ export class VaccineInfoPage implements OnInit {
     }
   }
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private vaccineService: VaccineService
+  ) {}
 
   ngOnInit() {
     this.vaccineId = this.route.snapshot.paramMap.get('id');
-    // TODO: VaccineService.getById(this.vaccineId)
+    this.petId = this.route.snapshot.queryParamMap.get('petId') || '';
+    this.loadVaccine();
+  }
+
+  // el backend no tiene GET por id: se piden las vacunas de la mascota y se busca la que toca
+  private loadVaccine() {
+    if (!this.vaccineId || !this.petId) {
+      this.loading = false;
+      this.notFound = true;
+      return;
+    }
+    this.loading = true;
+    this.vaccineService.getVaccinesByPet(this.petId).subscribe({
+      next: (vaccines) => {
+        const v = vaccines.find(x => x.id === this.vaccineId);
+        if (v) this.fillVaccine(v);
+        else this.notFound = true;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('❌ Error cargando la vacuna:', err);
+        this.notFound = true;
+        this.loading = false;
+      }
+    });
+  }
+
+  private fillVaccine(v: Vaccine) {
+    const today = new Date();
+    const applicationDate = new Date(v.applicationDate);
+    const nextDoseDate = v.nextDoseDate ? new Date(v.nextDoseDate) : null;
+    const isNext = this.route.snapshot.queryParamMap.get('kind') === 'next';
+
+    // mismo criterio de estado que la línea de vida
+    let status: VaccineStatus;
+    if (isNext && nextDoseDate) status = nextDoseDate < today ? 'late' : 'pending';
+    else status = applicationDate <= today ? 'applied' : 'pending';
+
+    this.vaccine = {
+      ...this.vaccine,
+      id: v.id,
+      title: v.name,
+      applicationDate: this.formatDate(applicationDate),
+      nextDose: nextDoseDate ? this.formatDate(nextDoseDate) : '',
+      lotNumber: v.lotNumber || '',
+      vet: v.veterinarian || '',
+      notes: v.notes || '',
+      status,
+      reminderDate: nextDoseDate ? this.formatDate(nextDoseDate) : '',
+    };
+  }
+
+  private formatDate(date: Date): string {
+    if (isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
   toggleDoc() {
@@ -83,7 +143,7 @@ export class VaccineInfoPage implements OnInit {
 
   edit() {
     this.router.navigate(['/register-vaccine'], {
-      queryParams: { id: this.vaccineId, mode: 'edit' }
+      queryParams: { id: this.vaccineId, petId: this.petId, mode: 'edit' }
     });
   }
 

@@ -9,6 +9,15 @@
       <h1 class="info-title">Info de la vacuna</h1>
     </div>
 
+    <div class="info-state" *ngIf="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+
+    <div class="info-state" *ngIf="!loading && notFound">
+      <p>No se encontró la información de esta vacuna.</p>
+    </div>
+
+    <ng-container *ngIf="!loading && !notFound">
     <!-- HERO -->
     <div class="info-hero">
       <div class="hero-icon-wrap">
@@ -26,38 +35,32 @@
 
       <div class="data-row">
         <span class="data-label">Fecha de aplicación</span>
-        <span class="data-value">{{ vaccine.applicationDate }}</span>
+        <span class="data-value">{{ vaccine.applicationDate || '—' }}</span>
       </div>
       <div class="data-divider"></div>
 
       <div class="data-row">
         <span class="data-label">Próxima dosis</span>
-        <span class="data-value highlight">{{ vaccine.nextDose }}</span>
+        <span class="data-value highlight">{{ vaccine.nextDose || 'Sin próxima dosis' }}</span>
       </div>
       <div class="data-divider"></div>
 
       <div class="data-row">
         <span class="data-label">N° Lote</span>
-        <span class="data-value">{{ vaccine.lotNumber }}</span>
+        <span class="data-value">{{ vaccine.lotNumber || '—' }}</span>
       </div>
       <div class="data-divider"></div>
 
       <div class="data-row">
         <span class="data-label">Veterinaria</span>
-        <span class="data-value">{{ vaccine.vet }}</span>
-      </div>
-      <div class="data-divider"></div>
-
-      <div class="data-row">
-        <span class="data-label">Informació</span>
-        <span class="data-value">{{ vaccine.info }}</span>
+        <span class="data-value">{{ vaccine.vet || '—' }}</span>
       </div>
       <div class="data-divider"></div>
 
       <!-- NOTAS -->
       <div class="notes-card">
         <h4 class="notes-title">Notas</h4>
-        <p class="notes-text">{{ vaccine.notes }}</p>
+        <p class="notes-text">{{ vaccine.notes || 'Sin notas' }}</p>
       </div>
 
       <!-- DOCUMENTO ADJUNTO -->
@@ -82,13 +85,14 @@
       <button class="add-doc-btn">Agregar otro documento</button>
 
       <!-- RECORDATORIO -->
+      <ng-container *ngIf="vaccine.reminderDate">
       <h3 class="section-title">Recordatorio</h3>
 
       <div class="reminder-card">
         <ion-icon name="notifications-outline" class="reminder-bell"></ion-icon>
         <div class="reminder-info">
           <span class="reminder-title">Vaccine_Due</span>
-          <span class="reminder-sub">Envío: {{ vaccine.appointmentDate }} - 1 día antes</span>
+          <span class="reminder-sub">Envío: {{ vaccine.reminderDate }} - 1 día antes</span>
         </div>
         <ion-icon
           [name]="vaccine.reminderActive ? 'toggle' : 'toggle-outline'"
@@ -97,19 +101,8 @@
           (click)="toggleReminder()">
         </ion-icon>
       </div>
+      </ng-container>
 
-      <!-- CITA -->
-      <div class="appointment-card" (click)="goToCalendar()">
-        <div class="apt-icon-wrap">
-          <img src="assets/images/AddVaccine/AgendarCitaIcon.png" alt="" class="apt-icon" />
-        </div>
-        <div class="apt-info">
-          <span class="apt-title">{{ vaccine.appointmentVet }}</span>
-          <span class="apt-sub">{{ vaccine.appointmentDate }} · Dr.pet</span>
-          <span class="apt-status">{{ vaccine.appointmentStatus }}</span>
-        </div>
-        <span class="apt-ver">Ver</span>
-      </div>
 
       <!-- BOTONES -->
       <div class="info-footer">
@@ -118,6 +111,7 @@
       </div>
 
     </div>
+    </ng-container>
   </div>
 
   <app-tab-bar activeTab="pet-profile"></app-tab-bar>

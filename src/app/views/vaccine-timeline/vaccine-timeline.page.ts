@@ -94,45 +94,68 @@ ionViewWillEnter() {
 
   private buildTimeline(rawVaccines: Vaccine[]) {
     const today = new Date();
-
     this.yearById.clear();
 
-    const items: VaccineTimelineItem[] = rawVaccines.map((v) => {
+    // cada vacuna da una fila por la dosis registrada y otra por su próxima dosis
+    const rows: { item: VaccineTimelineItem; date: Date }[] = [];
+
+    rawVaccines.forEach((v) => {
       const applicationDate = new Date(v.applicationDate);
       const nextDoseDate = v.nextDoseDate ? new Date(v.nextDoseDate) : null;
+      const applied = applicationDate <= today;
 
-      let status: 'applied' | 'pending' | 'late';
-      if (nextDoseDate && nextDoseDate < today) {
-        status = 'late';
-      } else if (applicationDate <= today) {
-        status = 'applied';
-      } else {
-        status = 'pending';
-      }
+      rows.push({
+        date: applicationDate,
+        item: {
+          id: v.id,
+          vaccineId: v.id,
+          kind: 'dose',
+          title: v.name,
+          applicationDate: applied ? this.formatDate(applicationDate) : undefined,
+          dueDate: applied ? undefined : this.formatDate(applicationDate),
+          veterinary: v.veterinarian,
+          batch: v.lotNumber,
+          status: applied ? 'applied' : 'pending',
+          attachment: false,
+          appointment: false,
+        }
+      });
 
-      const yearDate = status === 'applied' ? applicationDate : (nextDoseDate ?? applicationDate);
-      const year = yearDate.getFullYear();
-      this.yearById.set(v.id, isNaN(year) ? null : year);
+      if (!nextDoseDate || isNaN(nextDoseDate.getTime())) return;
 
-      return {
-        id: v.id,
-        title: v.name,
-        applicationDate: status === 'applied' ? this.formatDate(applicationDate) : undefined,
-        dueDate: nextDoseDate ? this.formatDate(nextDoseDate) : undefined,
-        veterinary: v.veterinarian,
-        batch: v.lotNumber,
-        status,
-        attachment: false,
-        appointment: !!v.nextDoseDate,
-      };
+      // si ya se registró una dosis posterior de la misma vacuna, la próxima dosis ya se cumplió
+      const name = (v.name || '').trim().toLowerCase();
+      const fulfilled = rawVaccines.some(o =>
+        o.id !== v.id &&
+        (o.name || '').trim().toLowerCase() === name &&
+        new Date(o.applicationDate) > applicationDate
+      );
+      if (fulfilled) return;
+
+      rows.push({
+        date: nextDoseDate,
+        item: {
+          id: `${v.id}-next`,
+          vaccineId: v.id,
+          kind: 'next',
+          title: v.name,
+          dueDate: this.formatDate(nextDoseDate),
+          veterinary: v.veterinarian,
+          status: nextDoseDate < today ? 'late' : 'pending',
+          attachment: false,
+          appointment: false,
+        }
+      });
     });
 
-    // más recientes primero
-    items.sort((a, b) => {
-      const dateA = rawVaccines.find(v => v.id === a.id)?.applicationDate || '';
-      const dateB = rawVaccines.find(v => v.id === b.id)?.applicationDate || '';
-      return dateB.localeCompare(dateA);
+    rows.forEach(({ item, date }) => {
+      const year = date.getFullYear();
+      this.yearById.set(item.id, isNaN(year) ? null : year);
     });
+
+    // más recientes primero (las próximas dosis futuras quedan arriba)
+    rows.sort((a, b) => (b.date.getTime() || 0) - (a.date.getTime() || 0));
+    const items = rows.map(r => r.item);
 
     this.vaccines = items;
     this.totalCount = items.length;
@@ -166,7 +189,9 @@ ionViewWillEnter() {
   }
 
   onOpenVaccine(vaccine: VaccineTimelineItem) {
-    this.router.navigate(['/vaccine-info', vaccine.id]);
+    this.router.navigate(['/vaccine-info', vaccine.vaccineId], {
+      queryParams: { petId: this.petId, kind: vaccine.kind }
+    });
   }
 
   goBack() {

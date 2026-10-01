@@ -10,6 +10,12 @@ export interface VaccineTimelineItem {
 
   id: string;
 
+  // id real de la vacuna en el backend (el id de arriba es unico por fila)
+  vaccineId: string;
+
+  // 'dose' = la dosis registrada, 'next' = la proxima dosis
+  kind: 'dose' | 'next';
+
   title: string;
 
   applicationDate?: string;
