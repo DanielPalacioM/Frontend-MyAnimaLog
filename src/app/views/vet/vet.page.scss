@@ -1,0 +1,81 @@
+.vet-content {
+  --background: #4037BE;
+  font-family: 'Actor', sans-serif;
+}
+
+.vet-wrap {
+  position: relative;
+  min-height: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 56px 24px 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: #ffffff;
+}
+
+.back-btn {
+  position: absolute;
+  top: 48px;
+  left: 16px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #ffffff;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.vet-logo {
+  width: 290px;
+  max-width: 80%;
+  margin-top: 56px;
+}
+
+.vet-illustration {
+  width: 300px;
+  max-width: 90%;
+  margin-top: 28px;
+}
+
+.vet-title {
+  font-family: 'Jua', sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.2;
+  max-width: 260px;
+  margin: 32px 0 0;
+}
+
+.vet-text {
+  font-size: 14px;
+  line-height: 1.3;
+  max-width: 240px;
+  margin: 16px 0 0;
+  opacity: 0.95;
+}
+
+.start-btn {
+  margin-top: 56px;
+  width: 190px;
+  height: 72px;
+  border: none;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #4037BE;
+  font-family: 'Jua', sans-serif;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(26, 26, 46, 0.18);
+
+  &:active {
+    transform: scale(0.97);
+  }
+}

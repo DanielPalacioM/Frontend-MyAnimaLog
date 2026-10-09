@@ -1,0 +1,21 @@
+<ion-content [fullscreen]="true" class="vet-content">
+
+  <div class="vet-wrap">
+
+    <button class="back-btn" (click)="goBack()" aria-label="Volver">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+    </button>
+
+    <img src="assets/images/Home_icons/MyAnimaLogVetLogo.png" alt="MyAnimaLogVet" class="vet-logo" />
+
+    <img src="assets/images/Vet/vet-empty-illustration.png" alt="" class="vet-illustration" />
+
+    <h1 class="vet-title">¿No estás asociado a una veterinaria aún?</h1>
+    <p class="vet-text">Encuentra y conecta con veterinarias locales que ya usan MyAnimaLog</p>
+
+    <button class="start-btn" (click)="onStart()">Empieza</button>
+
+  </div>
+
+  <app-tab-bar activeTab="veterinary"></app-tab-bar>
+</ion-content>

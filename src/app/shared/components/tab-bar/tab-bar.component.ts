@@ -60,7 +60,7 @@ export class TabBarComponent {
     label: 'Vet',
     icon: 'Veterinary.png',
     activeIcon: 'Veterinary.png',
-    route: '/veterinary'
+    route: '/vet'
   },
 ];
 
