@@ -96,7 +96,6 @@ Ese documento define el plan de todo el ecosistema. Lee la sección que toque an
 - **Dependencias:** casi todo esto depende de las fases de backend (VET Fase 4, PETS-04…06 y CAL-xx; ver la sección 5 del documento). Antes de conectar una pantalla, confirma que su endpoint ya está desplegado en el gateway.
 
 ## Pendientes generales
-- `git push origin dev`: hay commits locales sin subir (mapa y vacunas).
 - Poner cuotas diarias en Google Maps Platform y una alerta de presupuesto.
 - Agregar `.firebase/` al `.gitignore`.
 - Poner las imágenes del tutorial en `src/assets/images/Tutorial/` (`01-home.png` … `09-maps.png`).

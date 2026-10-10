@@ -73,6 +73,22 @@ Además existían antes: Login MyAnimaLogVet (`1828:2`) y, en la app móvil, "Ve
 
 Con estas tres, todas las opciones del menú lateral tienen pantalla. Están en la fila y = 8382, en x = 8246, 9566 y 10886.
 
+### Historia clínica del paciente (fila y = 9700, propuesta, 9 oct)
+
+Es la página a la que lleva "Ver historia completa" en la ficha de Pacientes. Usa el mismo paciente (Toby, de Carlos Mendoza). Todas comparten la cabecera del paciente (alergia visible, dueño, "Registrar visita") y las pestañas. Cada registro muestra su origen: Clínica Patitas, otra clínica (VetCentro Bocagrande) o el dueño desde la app.
+
+| Pantalla | Id |
+|---|---|
+| Resumen: línea de tiempo, alertas, vacunas, peso y de dónde viene la historia | `1997:225` |
+| Consultas: lista y detalle con signos vitales, motivo, anamnesis, examen, diagnóstico, plan y auditoría | `1998:225` |
+| Vacunas: carnet con lote, laboratorio, quién aplicó y próxima dosis; próximas y vencidas | `1998:710` |
+| Tratamientos: activos con medicación y progreso, finalizados e historial de medicamentos | `2001:225` |
+| Cirugías: detalle (anestesia, ASA, instrucciones), recorrido pre y posoperatorio, documentos | `2001:747` |
+| Laboratorio: lista de exámenes y parámetros con rango normal e interpretación | `2002:225` |
+| Peso: gráfica (clínica vs. dueño), registros y resumen | `2002:719` |
+
+**Campos propuestos que el backend todavía no tiene:** signos vitales además de peso y temperatura (frecuencia cardíaca y respiratoria, mucosas, condición corporal), anamnesis y examen físico separados, riesgo ASA, laboratorio (fabricante) de la vacuna (MED-02 lo agrega como `manufacturer`) y la interpretación del examen. Falta la pestaña Documentos.
+
 **Decisión (7 oct):** el registro manual no se quita, pero queda como última opción. Lo normal es que el dueño comparta con el código QR; el registro sin app sirve para atender hoy a quien no tiene la app, y la mascota pasa a su cuenta cuando la reclama. La solicitud de vinculación iniciada por la clínica quedó anotada en el maestro (§7.7.1) como fase posterior.
 
 Al 7 de octubre todos los frames del registro y del panel están en la fila y = 7038, separados 40 px.
