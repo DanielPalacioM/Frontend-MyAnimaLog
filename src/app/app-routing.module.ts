@@ -138,6 +138,10 @@ const routes: Routes = [
     loadChildren: () => import('./views/maps/maps.module').then( m => m.MapsPageModule)
   },
   {
+    path: 'pet-clinics/:id',
+    loadChildren: () => import('./views/pet-clinics/pet-clinics.module').then( m => m.PetClinicsPageModule)
+  },
+  {
     path: 'vet',
     loadChildren: () => import('./views/vet/vet.module').then( m => m.VetPageModule)
   },

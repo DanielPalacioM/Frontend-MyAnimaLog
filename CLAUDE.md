@@ -53,6 +53,7 @@ Copia la estructura de `views/maps/`:
 | `ProfileService` | `/user/profile/{id}` | Ver un perfil ajeno da 403 (pasa en `loadCaregivers` del Home) |
 | `NotificationService` | `/notifications` | |
 | `MapsService/maps.ts` | Google Places (New) y Routes | Veterinarias cercanas, autocompletado, detalle y ruta |
+| `VeterinaryService/veterinary.ts` | `/veterinary/links*`, `/veterinary/me/*` | Fase 4A del dueño: vista previa por código, vincularse (idempotente), mis clínicas, desvincularme, compartir y revocar mascotas, clínicas por mascota. Errores como `VetError` con `code`. |
 | `TutorialService` | localStorage | Textos en `tutorial-content.ts` |
 
 ### Convenciones del código
@@ -80,6 +81,8 @@ Copia la estructura de `views/maps/`:
 Lo que ya existe:
 - **`/maps`:** busca veterinarias cercanas. Desde ahí se puede agendar una cita (`/calendar/add-event?type=VET_APPOINTMENT&title=&location=`), ver la ruta, llamar y abrir el sitio web.
 - **`/vet` (`views/vet/`, 9 oct):** la ruta quedó unificada. La abren "Asociar veterinaria" y el acceso rápido "Vet" del Home, y la pestaña "Vet" del tab bar (`key: 'veterinary'`, `route: '/vet'`). Por ahora muestra el estado vacío de Figma ("VetAsosiation - empty", `858:83`), y "Empieza" lleva a `/maps`. La ilustración está en `assets/images/Vet/`.
+- **Vincular y compartir (17 nov, Fase 4A, `views/vet/` + `views/pet-clinics/`):** `/vet` (vacío o Mis veterinarias), `/vet/link` (código, QR con jsQR y vista previa; acepta `?code=VET-XXXXXXXX`), `/vet/share/:vetId`, `/vet/detail/:vetId` (interruptor por mascota y desvincular) y `/pet-clinics/:id` (Clínicas con acceso, desde el menú del perfil de la mascota; solo el dueño). Rutas reales en `docs/coleccion de postman` (carpeta 11 de la colección más nueva; la de `Descargas` del 17 nov es más reciente que la del repo). **Sin probar contra el gateway:** devuelve 401 a cualquier ruta, así que falta un token para confirmar que está desplegado. No hay citas, directorio ni reclamos todavía; "Próxima cita", "Pedir cita" y "Última visita" del Figma quedan fuera.
+- **Pruebas:** `ng test` completo no compila por specs de plantilla viejos; usa `npx ng test --watch=false --browsers=ChromeHeadless --ts-config=tsconfig.spec.vet.json --include=<spec>` (con `CHROME_BIN`).
 - **Datos:** hoy la veterinaria es solo texto libre (`veterinarian` en vacunas y visitas, `vetName` en Pet). No hay modelo `Vet` ni servicio.
 
 ### Plan Vet (fuente de verdad: [docs/MYANIMALOG_VET_MAESTRO.md](docs/MYANIMALOG_VET_MAESTRO.md))

@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.spec.json",
+  "include": [
+    "src/**/vet.util.spec.ts",
+    "src/**/veterinary.spec.ts",
+    "src/**/vet-pages.spec.ts",
+    "src/**/vet-link.guard.spec.ts",
+    "src/**/*.d.ts"
+  ]
+}

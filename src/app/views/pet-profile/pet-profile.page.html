@@ -37,6 +37,10 @@
         <img src="assets/images/PetProfileSidebar/PersonasAccesoCompartidoIcon.png" alt="" />
         <span>Ver personas con acceso compartido</span>
       </div>
+      <div class="sidebar-item" *ngIf="isOwner" (click)="onClinicasAcceso()">
+        <img src="assets/images/Home_icons/VetIcon.png" alt="" />
+        <span>Clínicas con acceso</span>
+      </div>
       <div class="sidebar-item" *ngIf="canEdit" (click)="onAgendarCita()">
         <img src="assets/images/PetProfileSidebar/AgendarCitaIcon.png" alt="" />
         <span>Agendar cita rápida</span>

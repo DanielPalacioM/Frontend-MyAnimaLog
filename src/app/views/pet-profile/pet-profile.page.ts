@@ -403,6 +403,12 @@ private toLocalTimeString(d: Date): string {
     this.router.navigate(['/shared-profiles'], { queryParams: { petId: this.pet.id } });
   }
 
+  onClinicasAcceso(): void {
+    this.closeSidebar();
+    if (!this.pet) return;
+    this.router.navigate(['/pet-clinics', this.pet.id]);
+  }
+
   onAgendarCita(): void {
     this.closeSidebar();
     if (!this.pet) return;

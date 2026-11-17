@@ -1,0 +1,65 @@
+<ion-content [fullscreen]="true" class="vet-light">
+  <div class="page-wrap">
+
+    <div class="page-head">
+      <button class="back-arrow" (click)="goBack()" aria-label="Volver"><ion-icon name="arrow-back-outline"></ion-icon></button>
+      <h1>{{ pet?.name || 'Mascota' }}</h1>
+    </div>
+
+    <div class="pet-card" *ngIf="pet">
+      <span class="pet-avatar">{{ initial }}</span>
+      <div>
+        <p class="pc-name">{{ pet.name }}</p>
+        <p class="pc-sub">{{ subtitle }}</p>
+      </div>
+    </div>
+
+    <div class="title-row">
+      <h2 class="section-title">Clínicas con acceso</h2>
+      <button class="share-link" (click)="goVet()">Compartir ›</button>
+    </div>
+
+    <p class="state-msg" *ngIf="loading">Cargando...</p>
+
+    <div class="alert alert-error" *ngIf="loadError" role="alert">
+      <strong>{{ loadError.title }}</strong>{{ loadError.detail }}
+    </div>
+
+    <ng-container *ngIf="!loading && !loadError">
+      <p class="lead" *ngIf="clinics.length">Estas clínicas pueden ver la historia de {{ pet?.name }} y registrar lo que hagan en cada consulta.</p>
+
+      <div class="empty" *ngIf="!clinics.length">
+        <p>{{ pet?.name }} no está compartida con ninguna clínica.</p>
+        <button class="btn btn-outline" (click)="goVet()">Ir a Mis veterinarias</button>
+      </div>
+
+      <div class="card clinic" *ngFor="let c of clinics">
+        <div class="clinic-top">
+          <app-vet-avatar [name]="c.name" [logoUrl]="c.logoUrl" [size]="48"></app-vet-avatar>
+          <div>
+            <p class="cl-name">{{ c.name }}</p>
+            <p class="cl-sub">
+              <ng-container *ngIf="since(c)">Desde el {{ since(c) }} · </ng-container>la compartiste tú
+            </p>
+          </div>
+        </div>
+        <button class="btn btn-danger-outline small" (click)="askRevoke(c)">Quitar acceso</button>
+      </div>
+
+      <div class="alert alert-error" *ngIf="error" role="alert"><strong>{{ error.title }}</strong>{{ error.detail }}</div>
+
+      <p class="foot-note">La historia es tuya: viaja con {{ pet?.name }} entre clínicas. Quitar el acceso no borra lo que la clínica ya registró.</p>
+    </ng-container>
+
+  </div>
+
+  <app-bottom-sheet [isOpen]="!!revoking" [title]="'¿Quitarle a ' + (revoking?.name || 'la clínica') + ' el acceso a ' + (pet?.name || 'tu mascota') + '?'" (closed)="closeRevoke()">
+    <p class="sheet-text">Dejará de ver su historia, vacunas y documentos en menos de un minuto. Sigues vinculado a la clínica y puedes volver a compartirla cuando quieras.</p>
+    <div class="sheet-actions">
+      <button class="btn btn-danger" [disabled]="revokeBusy" (click)="confirmRevoke()">{{ revokeBusy ? 'Quitando...' : 'Quitar acceso' }}</button>
+      <button class="btn btn-outline" [disabled]="revokeBusy" (click)="closeRevoke()">Cancelar</button>
+    </div>
+  </app-bottom-sheet>
+
+  <app-tab-bar activeTab="pet-profile"></app-tab-bar>
+</ion-content>

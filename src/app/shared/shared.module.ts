@@ -27,6 +27,9 @@ import { VisitPickerFieldComponent } from './components/visit-picker-field/visit
 import { TutorialOverlayComponent } from './components/tutorial-overlay/tutorial-overlay.component';
 import { TutorialGalleryComponent } from './components/tutorial-gallery/tutorial-gallery.component';
 
+import { VetAvatarComponent } from './components/vet-avatar/vet-avatar.component';
+import { QrScannerComponent } from './components/qr-scanner/qr-scanner.component';
+
 import { ImgFallbackDirective } from './directives/img-fallback.directive';
 
 @NgModule({
@@ -52,7 +55,9 @@ import { ImgFallbackDirective } from './directives/img-fallback.directive';
     DocumentsSectionComponent,
     VaccineTimelineCardComponent,
     TutorialOverlayComponent,
-    TutorialGalleryComponent
+    TutorialGalleryComponent,
+    VetAvatarComponent,
+    QrScannerComponent
   ],
   imports: [
     CommonModule,
@@ -83,7 +88,9 @@ import { ImgFallbackDirective } from './directives/img-fallback.directive';
     DocumentsSectionComponent,
     VaccineTimelineCardComponent,
     TutorialOverlayComponent,
-    TutorialGalleryComponent
+    TutorialGalleryComponent,
+    VetAvatarComponent,
+    QrScannerComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

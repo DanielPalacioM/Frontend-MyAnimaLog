@@ -1,0 +1,60 @@
+// Estilos comunes de las pantallas de la parte Vet del dueño (Figma 2031:*, 2032:*).
+$purple: #4037BE;
+$text: #1a1a2e;
+$muted: #6b6b80;
+$soft: #F1F0FB;
+$softer: #F7F6FF;
+$line: #E4E2F4;
+$danger: #B3261E;
+
+.vet-light { --background: #ffffff; font-family: 'Actor', sans-serif; }
+
+.page-wrap { max-width: 480px; margin: 0 auto; padding: 44px 20px 140px; color: $text; }
+
+.page-head {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+  h1 { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 26px; line-height: 1.1; margin: 0; flex: 1; }
+}
+.back-arrow {
+  width: 36px; height: 36px; border: none; background: transparent; color: $text; font-size: 28px;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; margin-left: -6px;
+}
+.plus-btn {
+  width: 44px; height: 44px; border: none; border-radius: 50%; background: $purple; color: #fff; font-size: 26px;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+
+.lead { color: $muted; font-size: 14px; line-height: 1.35; margin: 0 0 16px; }
+
+.btn {
+  display: flex; align-items: center; justify-content: center; width: 100%; height: 54px; border-radius: 16px;
+  font-family: 'Jua', sans-serif; font-size: 20px; cursor: pointer; border: 2px solid $purple;
+  &:disabled { opacity: .45; cursor: default; }
+  &:active:not(:disabled) { transform: scale(.98); }
+}
+.btn-primary { background: $purple; color: #fff; }
+.btn-outline { background: #fff; color: $purple; }
+.btn-danger { background: $danger; border-color: $danger; color: #fff; }
+.btn-danger-outline { background: #fff; border-color: $danger; color: $danger; }
+.btn-text { background: transparent; border: none; color: $purple; font-family: 'Jua', sans-serif; font-size: 17px; padding: 14px; cursor: pointer; width: 100%; }
+
+.alert { border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 1.35; margin: 12px 0;
+  strong { display: block; font-size: 15px; margin-bottom: 2px; } }
+.alert-error { background: #FFF1EF; color: $danger; }
+.alert-ok { background: #E6F7EE; color: #1E6B3E; }
+.alert-info { background: #E0FBF4; color: #0A6B57; }
+
+.state-msg { text-align: center; color: $muted; padding: 48px 12px; }
+
+.card { border: 1.5px solid $line; border-radius: 18px; padding: 16px; background: #fff; }
+
+.pet-dot {
+  width: 46px; height: 46px; border-radius: 50%; background: #FFF1DA; color: #B26A00; display: flex; align-items: center;
+  justify-content: center; font-family: 'Jua', sans-serif; font-size: 18px; flex-shrink: 0;
+}
+
+.section-title { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 19px; margin: 22px 0 10px; }
+
+.sheet-text { color: $muted; font-size: 15px; line-height: 1.4; margin: 0 0 14px; }
+.sheet-note { background: $softer; border-radius: 10px; padding: 10px 12px; font-size: 14px; margin: 0 0 16px; }
+.sheet-actions { display: grid; gap: 10px; }

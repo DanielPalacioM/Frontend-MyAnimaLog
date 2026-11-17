@@ -1,0 +1,12 @@
+<div class="qr-backdrop" *ngIf="_open">
+  <div class="qr-box">
+    <p class="qr-title">Escanear código QR</p>
+    <div class="qr-frame">
+      <video #video playsinline muted></video>
+      <span class="qr-corner tl"></span><span class="qr-corner tr"></span>
+      <span class="qr-corner bl"></span><span class="qr-corner br"></span>
+    </div>
+    <p class="qr-hint" [class.err]="error">{{ error || 'Apunta la cámara al QR de la recepción.' }}</p>
+    <button type="button" class="qr-close" (click)="close()">Escribir el código</button>
+  </div>
+</div>

@@ -1,0 +1,50 @@
+<ion-content [fullscreen]="true" class="vet-light">
+  <div class="page-wrap">
+
+    <div class="page-head">
+      <button class="back-arrow" (click)="goBack()" aria-label="Volver"><ion-icon name="arrow-back-outline"></ion-icon></button>
+      <h1>Compartir mascotas</h1>
+    </div>
+
+    <p class="state-msg" *ngIf="loading">Cargando...</p>
+
+    <div class="state-msg" *ngIf="!loading && loadError">
+      <p>No pudimos cargar esta clínica. Puede que ya no estés vinculado.</p>
+      <button class="btn btn-primary" (click)="goBack()">Volver a Mis veterinarias</button>
+    </div>
+
+    <ng-container *ngIf="!loading && !loadError && vet">
+      <div class="alert alert-ok" *ngIf="welcome">✓ Te vinculaste a {{ vet.name }}</div>
+
+      <p class="lead">¿Qué mascotas quieres que vea {{ vet.name }}? Podrá leer su historia, vacunas y documentos, y registrar lo que haga en cada consulta.</p>
+
+      <h2 class="section-title">Tus mascotas</h2>
+      <p class="lead" *ngIf="!own.length">Todavía no tienes mascotas propias para compartir.</p>
+
+      <button type="button" class="pet-row" *ngFor="let p of own" [class.on]="p.selected" [class.done]="p.alreadyShared"
+              [disabled]="p.alreadyShared" (click)="toggle(p)" [attr.aria-pressed]="p.selected">
+        <span class="pet-dot">{{ initial(p.name) }}</span>
+        <span class="pet-info"><strong>{{ p.name }}</strong><small>{{ p.alreadyShared ? 'Ya compartida con esta clínica' : p.subtitle }}</small></span>
+        <span class="check" [class.checked]="p.selected || p.alreadyShared"><ion-icon *ngIf="p.selected || p.alreadyShared" name="checkmark-outline"></ion-icon></span>
+      </button>
+
+      <ng-container *ngIf="care.length">
+        <h2 class="section-title">A tu cuidado</h2>
+        <div class="pet-row locked" *ngFor="let p of care">
+          <span class="pet-dot plain">{{ initial(p.name) }}</span>
+          <span class="pet-info"><strong>{{ p.name }}</strong>
+            <small>Es de {{ p.ownerName }} (eres {{ p.role }}). Solo su dueño puede compartirla con una clínica.</small></span>
+        </div>
+      </ng-container>
+
+      <div class="alert alert-error" *ngIf="error" role="alert"><strong>{{ error.title }}</strong>{{ error.detail }}</div>
+
+      <div class="bottom">
+        <button class="btn btn-primary" [disabled]="selectedCount === 0 || busy" (click)="onShare()">{{ busy ? 'Compartiendo...' : shareLabel }}</button>
+        <button class="btn-text" (click)="goDetail()">Ahora no</button>
+      </div>
+    </ng-container>
+
+  </div>
+  <app-tab-bar activeTab="veterinary"></app-tab-bar>
+</ion-content>

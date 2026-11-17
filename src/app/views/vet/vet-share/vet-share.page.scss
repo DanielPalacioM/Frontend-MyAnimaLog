@@ -1,0 +1,18 @@
+@use '../vet-common';
+
+.pet-row {
+  display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; padding: 14px; margin-bottom: 12px;
+  border: 1.5px solid #E4E2F4; border-radius: 18px; background: #fff; color: #1a1a2e; cursor: pointer;
+  &.on { border-color: #4037BE; border-width: 2px; }
+  &.done { background: #F7F6FF; cursor: default; }
+  &.locked { background: #F4F4F6; border-color: transparent; cursor: default; color: #8a8a99; }
+}
+.pet-info { flex: 1; min-width: 0; display: flex; flex-direction: column;
+  strong { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 19px; }
+  small { color: #6b6b80; font-size: 13px; line-height: 1.3; } }
+.pet-dot.plain { background: #fff; color: #8a8a99; }
+.check {
+  width: 26px; height: 26px; border-radius: 7px; border: 2px solid #C9C7D8; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; flex-shrink: 0;
+  &.checked { background: #4037BE; border-color: #4037BE; }
+}
+.bottom { margin-top: 24px; }

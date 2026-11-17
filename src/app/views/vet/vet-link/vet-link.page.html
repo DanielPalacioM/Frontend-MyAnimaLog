@@ -1,0 +1,65 @@
+<ion-content [fullscreen]="true" class="vet-light">
+  <div class="page-wrap">
+
+    <div class="page-head">
+      <button class="back-arrow" (click)="goBack()" aria-label="Volver"><ion-icon name="arrow-back-outline"></ion-icon></button>
+      <h1>Vincular clínica</h1>
+    </div>
+
+    <!-- Paso 1: código o QR (Figma 2031:259 / 2031:295) -->
+    <ng-container *ngIf="step === 'code'">
+      <p class="lead">Escribe el código que te dio tu veterinaria. También está en el QR de recepción.</p>
+
+      <label class="field-label" for="vet-code">Código de la clínica</label>
+      <input id="vet-code" class="code-input" [class.err]="error" type="text" inputmode="text"
+             autocapitalize="characters" autocomplete="off" spellcheck="false" maxlength="12"
+             placeholder="VET-XXXXXXXX" [ngModel]="code" (ngModelChange)="onCodeInput($event)"
+             (keyup.enter)="onContinue()" />
+
+      <div class="alert alert-error" *ngIf="error" role="alert">
+        <strong>{{ error.title }}</strong>{{ error.detail }}
+      </div>
+
+      <button type="button" class="qr-row" (click)="openScanner()">
+        <span class="qr-ico"><ion-icon name="qr-code-outline"></ion-icon></span>
+        <span class="qr-txt"><strong>Escanear código QR</strong><small>Abre la cámara y apunta al QR</small></span>
+      </button>
+
+      <div class="bottom">
+        <button class="btn btn-primary" [disabled]="!canContinue" (click)="onContinue()">
+          {{ busy ? 'Buscando...' : 'Continuar' }}
+        </button>
+        <p class="foot">Solo te vinculas con la clínica. Tú decides después qué mascotas compartir.</p>
+      </div>
+    </ng-container>
+
+    <!-- Paso 2: vista previa (Figma 2031:338) -->
+    <ng-container *ngIf="step === 'preview' && preview">
+      <div class="hero">
+        <app-vet-avatar [name]="preview.name" [logoUrl]="preview.logoUrl" [size]="82" [inverse]="true"></app-vet-avatar>
+        <h2>{{ preview.name }}</h2>
+        <span class="verified">✓ Clínica verificada</span>
+        <p class="hero-addr" *ngIf="preview.address || preview.city">
+          {{ preview.address }}<ng-container *ngIf="preview.address && preview.city"> · </ng-container>{{ preview.city }}
+        </p>
+      </div>
+
+      <div class="alert alert-info">
+        Al vincularte, la clínica te ve como cliente y recibe tu nombre, correo y teléfono. Tus mascotas solo las ve si tú las compartes, y puedes quitarle el acceso cuando quieras.
+      </div>
+
+      <div class="alert alert-error" *ngIf="error" role="alert">
+        <strong>{{ error.title }}</strong>{{ error.detail }}
+      </div>
+
+      <button class="btn btn-primary" [disabled]="busy" (click)="onLink()">
+        {{ busy ? 'Vinculando...' : (preview.alreadyLinked ? 'Ya estás vinculado: ver clínica' : 'Vincularme') }}
+      </button>
+      <button class="btn-text" (click)="onCancelPreview()">Cancelar</button>
+    </ng-container>
+
+  </div>
+
+  <app-qr-scanner [open]="scanning" (scanned)="onScanned($event)" (closed)="scanning = false"></app-qr-scanner>
+  <app-tab-bar activeTab="veterinary"></app-tab-bar>
+</ion-content>

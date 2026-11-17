@@ -7,6 +7,9 @@ import { IonicModule } from '@ionic/angular';
 import { VetPageRoutingModule } from './vet-routing.module';
 
 import { VetPage } from './vet.page';
+import { VetLinkPage } from './vet-link/vet-link.page';
+import { VetSharePage } from './vet-share/vet-share.page';
+import { VetDetailPage } from './vet-detail/vet-detail.page';
 import { SharedModule } from 'src/app/shared/shared.module';
 
 @NgModule({
@@ -17,6 +20,6 @@ import { SharedModule } from 'src/app/shared/shared.module';
     VetPageRoutingModule,
     SharedModule
   ],
-  declarations: [VetPage]
+  declarations: [VetPage, VetLinkPage, VetSharePage, VetDetailPage]
 })
 export class VetPageModule {}

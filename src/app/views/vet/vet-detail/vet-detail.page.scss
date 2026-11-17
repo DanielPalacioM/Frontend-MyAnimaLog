@@ -1,0 +1,24 @@
+@use '../vet-common';
+
+.vet-info { display: flex; gap: 14px; align-items: center; background: #F1F0FB; border-radius: 18px; padding: 16px; margin-bottom: 14px; }
+.vi-main { font-size: 16px; margin: 0; }
+.vi-sub { color: #6b6b80; font-size: 14px; margin: 2px 0 0; }
+.vi-small { color: #8a8a99; font-size: 12px; margin: 4px 0 0; }
+
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn.small { height: 46px; font-size: 17px; }
+
+.sw-row { display: flex; align-items: center; gap: 14px; padding: 8px 0; }
+.sw-info { flex: 1; min-width: 0; display: flex; flex-direction: column;
+  strong { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 18px; }
+  small { color: #6b6b80; font-size: 13px; } }
+
+.switch {
+  position: relative; width: 52px; height: 30px; border-radius: 999px; border: none; background: #D5D3E3; padding: 0; cursor: pointer; flex-shrink: 0; transition: background .15s;
+  &.on { background: #4037BE; }
+  &:disabled { opacity: .55; }
+  .knob { position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .15s; }
+  &.on .knob { transform: translateX(22px); }
+}
+.note { color: #6b6b80; font-size: 13px; line-height: 1.35; margin: 12px 0 0; padding-top: 10px; border-top: 1px solid #E4E2F4; }
+.unlink { margin-top: 24px; }

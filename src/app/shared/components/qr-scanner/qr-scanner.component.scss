@@ -1,0 +1,18 @@
+.qr-backdrop {
+  position: fixed; inset: 0; z-index: 10000; background: rgba(26, 26, 46, 0.92);
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.qr-box { width: 100%; max-width: 360px; text-align: center; color: #fff; font-family: 'Actor', sans-serif; }
+.qr-title { font-family: 'Jua', sans-serif; font-size: 22px; margin: 0 0 16px; }
+.qr-frame { position: relative; width: 100%; aspect-ratio: 1; border-radius: 20px; overflow: hidden; background: #000; }
+video { width: 100%; height: 100%; object-fit: cover; }
+.qr-corner { position: absolute; width: 36px; height: 36px; border: 4px solid #f5a623; }
+.tl { top: 14px; left: 14px; border-right: 0; border-bottom: 0; border-radius: 10px 0 0 0; }
+.tr { top: 14px; right: 14px; border-left: 0; border-bottom: 0; border-radius: 0 10px 0 0; }
+.bl { bottom: 14px; left: 14px; border-right: 0; border-top: 0; border-radius: 0 0 0 10px; }
+.br { bottom: 14px; right: 14px; border-left: 0; border-top: 0; border-radius: 0 0 10px 0; }
+.qr-hint { font-size: 14px; margin: 16px 0 20px; opacity: .9; &.err { color: #ffb4a9; opacity: 1; } }
+.qr-close {
+  width: 100%; height: 52px; border-radius: 16px; border: 2px solid #fff; background: transparent;
+  color: #fff; font-family: 'Jua', sans-serif; font-size: 18px; cursor: pointer;
+}

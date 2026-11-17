@@ -1,0 +1,65 @@
+<ion-content [fullscreen]="true" class="vet-light">
+  <div class="page-wrap">
+
+    <div class="page-head">
+      <button class="back-arrow" (click)="goBack()" aria-label="Volver"><ion-icon name="arrow-back-outline"></ion-icon></button>
+      <h1>{{ vet?.name || 'Clínica' }}</h1>
+    </div>
+
+    <p class="state-msg" *ngIf="loading">Cargando...</p>
+
+    <div class="state-msg" *ngIf="!loading && loadError">
+      <p>No encontramos esta clínica entre tus veterinarias.</p>
+      <button class="btn btn-primary" (click)="goBack()">Volver a Mis veterinarias</button>
+    </div>
+
+    <ng-container *ngIf="!loading && !loadError && vet">
+
+      <div class="vet-info">
+        <app-vet-avatar [name]="vet.name" [logoUrl]="vet.logoUrl" [size]="60"></app-vet-avatar>
+        <div>
+          <p class="vi-main" *ngIf="vet.city">{{ vet.city }}</p>
+          <p class="vi-sub" *ngIf="vet.phone">{{ vet.phone }}</p>
+          <p class="vi-small" *ngIf="linkedSince">Vinculado desde el {{ linkedSince }}</p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-outline small" [disabled]="!vet.phone" (click)="call()">Llamar</button>
+        <button class="btn btn-outline small" (click)="directions()">Cómo llegar</button>
+      </div>
+
+      <h2 class="section-title">Mascotas que ve</h2>
+      <div class="card">
+        <p class="lead" *ngIf="!pets.length">Todavía no tienes mascotas propias para compartir.</p>
+        <div class="sw-row" *ngFor="let p of pets">
+          <span class="pet-dot">{{ initial(p.name) }}</span>
+          <span class="sw-info"><strong>{{ p.name }}</strong><small>{{ subtitle(p) }}</small></span>
+          <button type="button" role="switch" class="switch" [class.on]="p.shared" [disabled]="p.busy"
+                  [attr.aria-checked]="p.shared" [attr.aria-label]="(p.shared ? 'Dejar de compartir a ' : 'Compartir a ') + p.name"
+                  (click)="togglePet(p)"><span class="knob"></span></button>
+        </div>
+        <p class="note">Al apagar una mascota, la clínica deja de ver su historia en menos de un minuto. Lo que ya registró sigue en tu historia.</p>
+      </div>
+
+      <div class="alert alert-error" *ngIf="error" role="alert"><strong>{{ error.title }}</strong>{{ error.detail }}</div>
+
+      <button class="btn btn-danger-outline unlink" (click)="openUnlink()">Desvincularme</button>
+    </ng-container>
+
+  </div>
+
+  <app-bottom-sheet [isOpen]="unlinkOpen" [title]="'¿Desvincularte de ' + (vet?.name || 'esta clínica') + '?'" (closed)="closeUnlink()">
+    <p class="sheet-text">
+      La clínica dejará de ver a todas tus mascotas compartidas<ng-container *ngIf="sharedNames"> ({{ sharedNames }})</ng-container>.
+      También se borran tu correo y teléfono de su lista de clientes; solo conserva tu nombre.
+    </p>
+    <p class="sheet-note">Lo que la clínica ya registró se queda en la historia de tus mascotas.</p>
+    <div class="sheet-actions">
+      <button class="btn btn-danger" [disabled]="unlinking" (click)="confirmUnlink()">{{ unlinking ? 'Desvinculando...' : 'Sí, desvincularme' }}</button>
+      <button class="btn btn-outline" [disabled]="unlinking" (click)="closeUnlink()">Cancelar</button>
+    </div>
+  </app-bottom-sheet>
+
+  <app-tab-bar activeTab="veterinary"></app-tab-bar>
+</ion-content>

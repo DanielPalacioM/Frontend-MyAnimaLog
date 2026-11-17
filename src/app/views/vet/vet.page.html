@@ -1,20 +1,66 @@
-<ion-content [fullscreen]="true" class="vet-content">
+<ion-content [fullscreen]="true" class="vet-content" [class.vet-light]="state === 'list' || state === 'error'">
 
-  <div class="vet-wrap">
-
+  <!-- Estado vacío (Figma 2031:225) y mientras carga -->
+  <div class="vet-wrap" *ngIf="state === 'empty' || state === 'loading'">
     <button class="back-btn" (click)="goBack()" aria-label="Volver">
       <ion-icon name="arrow-back-outline"></ion-icon>
     </button>
 
     <img src="assets/images/Home_icons/MyAnimaLogVetLogo.png" alt="MyAnimaLogVet" class="vet-logo" />
-
     <img src="assets/images/Vet/vet-empty-illustration.png" alt="" class="vet-illustration" />
 
-    <h1 class="vet-title">¿No estás asociado a una veterinaria aún?</h1>
-    <p class="vet-text">Encuentra y conecta con veterinarias locales que ya usan MyAnimaLog</p>
+    <ng-container *ngIf="state === 'empty'">
+      <h1 class="vet-title">¿No estás asociado a una veterinaria aún?</h1>
+      <p class="vet-text">Encuentra y conecta con veterinarias locales que ya usan MyAnimaLog</p>
 
-    <button class="start-btn" (click)="onStart()">Empieza</button>
+      <button class="white-btn" (click)="onHaveCode()">Tengo un código</button>
+      <button class="ghost-btn" (click)="onSearch()">Buscar clínicas</button>
+      <p class="vet-foot">Tu veterinaria te da el código o el QR en recepción</p>
+    </ng-container>
 
+    <p class="vet-text" *ngIf="state === 'loading'">Cargando...</p>
+  </div>
+
+  <!-- Mis veterinarias (Figma 2032:227) -->
+  <div class="page-wrap" *ngIf="state === 'list'">
+    <div class="page-head">
+      <button class="back-arrow" (click)="goBack()" aria-label="Volver"><ion-icon name="arrow-back-outline"></ion-icon></button>
+      <h1>Mis veterinarias</h1>
+      <button class="plus-btn" (click)="onHaveCode()" aria-label="Vincular otra clínica"><ion-icon name="add-outline"></ion-icon></button>
+    </div>
+
+    <div class="card vet-card" *ngFor="let v of vets" (click)="openVet(v)">
+      <div class="vet-card-top">
+        <app-vet-avatar [name]="v.name" [logoUrl]="v.logoUrl" [size]="56"></app-vet-avatar>
+        <div class="vet-card-info">
+          <p class="vet-card-name">{{ v.name }}</p>
+          <p class="vet-card-sub" *ngIf="v.city">{{ v.city }}</p>
+          <span class="chip-ok" *ngIf="v.status === 'ACTIVE'">✓ Verificada</span>
+        </div>
+      </div>
+      <div class="vet-card-row">
+        <span class="link-text">{{ seesLabel(v) }}</span>
+        <span class="link-text">Ver ›</span>
+      </div>
+    </div>
+
+    <div class="tip">
+      <p class="tip-title">¿Vas a otra veterinaria?</p>
+      <p class="tip-text">Pídele su código o busca clínicas cerca. Puedes estar vinculado a varias a la vez.</p>
+    </div>
+    <button class="btn btn-outline" (click)="onSearch()">Buscar clínicas</button>
+  </div>
+
+  <!-- Error de carga -->
+  <div class="page-wrap" *ngIf="state === 'error'">
+    <div class="page-head">
+      <button class="back-arrow" (click)="goBack()" aria-label="Volver"><ion-icon name="arrow-back-outline"></ion-icon></button>
+      <h1>Mis veterinarias</h1>
+    </div>
+    <div class="state-msg">
+      <p>No pudimos conectar. Revisa tu conexión e intenta de nuevo.</p>
+      <button class="btn btn-primary" (click)="load()">Reintentar</button>
+    </div>
   </div>
 
   <app-tab-bar activeTab="veterinary"></app-tab-bar>

@@ -1,5 +1,6 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { afterLoginUrl } from '../../guards/vet-link.guard';
 import { AuthService } from 'src/app/services/authServices/auth';
 
 declare global {
@@ -151,7 +152,7 @@ export class LoginPage implements AfterViewInit {
     }).subscribe({
       next: () => {
         console.log('✅ Login exitoso');
-        this.router.navigate(['/home']);
+        this.router.navigateByUrl(afterLoginUrl(this.router));
       },
       error: (err: any) => {
         console.error(err);
@@ -235,7 +236,7 @@ export class LoginPage implements AfterViewInit {
       next: (res: any) => {
         this.googleSubmitting = false;
         console.log('✅ Login con Google exitoso', res);
-        this.router.navigate(['/home']);
+        this.router.navigateByUrl(afterLoginUrl(this.router));
       },
       error: (err) => {
         this.googleSubmitting = false;
