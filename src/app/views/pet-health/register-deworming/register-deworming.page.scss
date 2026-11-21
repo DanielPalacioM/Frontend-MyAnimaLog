@@ -1,0 +1,6 @@
+@use '../health-common';
+
+.form-wrap { padding-bottom: calc(32px + env(safe-area-inset-bottom)); }
+.two { display: grid; grid-template-columns: 1.3fr 1fr; gap: 10px; }
+.field-hint.tight { margin-top: -6px; }
+.link-btn.left { align-self: flex-start; }

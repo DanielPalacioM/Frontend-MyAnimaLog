@@ -54,6 +54,8 @@ Copia la estructura de `views/maps/`:
 | `NotificationService` | `/notifications` | |
 | `MapsService/maps.ts` | Google Places (New) y Routes | Veterinarias cercanas, autocompletado, detalle y ruta |
 | `VeterinaryService/veterinary.ts` | `/veterinary/links*`, `/veterinary/me/*` | Fase 4A del dueño: vista previa por código, vincularse (idempotente), mis clínicas, desvincularme, compartir y revocar mascotas, clínicas por mascota. Errores como `VetError` con `code`. |
+| `AiChatService/ai-chat.ts` | `POST /ai/chat` (multipart), `/ai/actions/{id}/confirm` y `/reject` | IA-service. El historial lo guarda el servidor (`conversationId`); las acciones (crear mascota, agendar cita, registrar vacuna) piden confirmación. Errores como `AiError` con `code`. **El gateway ya enruta `/api/ai/*` pero el servicio responde 503 (sin desplegar).** Contrato en `docs/IA_CHAT_CONTRATO.md` y Postman `MyAnimaLog-IA-service`. También guarda los chats por usuario en localStorage. |
+| `AiConversationService` | — | Estado de la conversación compartido por el chat completo y el mini chat (enviar, reintentar, confirmar acciones, historial). |
 | `TutorialService` | localStorage | Textos en `tutorial-content.ts` |
 
 ### Convenciones del código
@@ -85,6 +87,29 @@ Lo que ya existe:
 - **Pruebas:** `ng test` completo no compila por specs de plantilla viejos; usa `npx ng test --watch=false --browsers=ChromeHeadless --ts-config=tsconfig.spec.vet.json --include=<spec>` (con `CHROME_BIN`).
 - **Datos:** hoy la veterinaria es solo texto libre (`veterinarian` en vacunas y visitas, `vetName` en Pet). No hay modelo `Vet` ni servicio.
 
+### Chat de IA (18 nov, `views/ai-chat/`, ruta `/ia`) y botón de IA
+Sin diseño de Figma; criterios del equipo.
+- **Chat completo:** estilo ChatGPT/Claude, fondo **naranja** con la parte de abajo (caja de escribir) en **blanco**, logo + "MyAnimaLog IA" + saludo al centro, tamaños compactos. La primera vez se presenta en varios mensajes; después solo da la bienvenida. Se escribe y se adjuntan PDF o imágenes (máx. 5 de 10 MB). Sin `app-tab-bar`. Barra lateral (☰) con el historial: abrir, buscar y borrar chats (localStorage por usuario, máx. 40).
+- **Botón de IA, dos modos** (`AiAccessService`):
+  - **Seguimiento** (`shared/components/ai-fab`, en `app.component.html`): flota en **todas** las pantallas menos login/registro y el chat. **Toque** = mini chat; **mantener presionado** = chat completo (con animación de círculo desde el botón); **arrastrar** = moverlo (se pega al borde) y, si se suelta sobre "Ocultar", pasa a modo anclado. La primera vez en el Home cada sesión saluda con un mensajito.
+  - **Anclado** (`shared/components/ai-dock`, en el header del Home): queda junto al menú ☰. **Toque** = chat completo; **mantener presionado** (o clic derecho) = "Volver al modo seguimiento".
+- **Mini chat** (`shared/components/ai-mini-chat`): panel lateral derecho sobre cualquier pantalla. Manda `context` (pantalla y `petId`) para que la IA sepa dónde está el usuario. Es la misma conversación del chat completo (`AiConversationService`). Sin adjuntos (para eso, el chat completo).
+- **Acciones:** cuando la IA propone crear una mascota, agendar una cita o registrar una vacuna, se muestra una tarjeta (`ai-action-card`) con Confirmar/Cancelar; nada se escribe sin confirmar.
+- **Plan:** `AiAccessService.canUseAi()` hoy deja pasar a todos (`environment.ai.requiresPlan = false`). Para probar contra el servicio directo, `environment.ai.baseUrl`.
+- **Home:** los íconos del header (notificaciones, quitar anuncios, tutorial) están en un menú de tres líneas (`data-tour="home-menu"`).
+- **Tipografía:** estas pantallas y las de vinculación Vet usan **Actor** (negrita en títulos), como Perfiles compartidos; no usar Jua en pantallas nuevas.
+- Al probar en el navegador usa `localhost:8100` (con `127.0.0.1` el gateway bloquea por CORS).
+
+### Salud de la mascota: desparasitación, alergias y esterilización (20 nov, `views/pet-health/`)
+Sin diseño de Figma; criterios del equipo (cabecera naranja + tarjeta blanca como la línea de vida de vacunas, **Actor**).
+- **Decisión de diseño:** la desparasitación es **una sección propia, junto a Vacunas** (no dentro): tiene datos distintos (interna/externa, producto, dosis, peso). Usa el mismo lenguaje de estados (Al día, Por vencer, Vencida, Sin registro; el color nunca va solo, cada chip lleva ícono).
+- **Rutas** (módulo `PetHealthModule`, montado en `pet-health/:petId`): `/pet-health/:petId` (esterilización y alergias), `/deworming` (estado por tipo + historial) y `/deworming/new?kind=` (registrar). Perfil de la mascota: tarjetas `app-prevention-card` y `app-health-card`, aviso rojo con alergia grave vigente y dos entradas en el menú lateral.
+- **Servicio:** `PetHealthService` (`/allergies`, `/dewormings`, `/pets/{id}/clinical-profile` y `/clinical-summary`); errores como `HealthError` con `code`. Lógica pura en `shared/utils/pet-health.util.ts` (normaliza las respuestas, estado del ciclo, próxima dosis sugerida por edad). El usuario sale del token, no del body.
+- **Reglas:** el dueño declara una alergia (`SUSPECTED`); solo un veterinario la confirma. Nada se borra: se resuelve o se anula con `/corrections` y motivo. "No sé" ≠ "no tiene" (`UNKNOWN` ≠ `NONE_KNOWN`). `OWNER` y `EDITOR` registran, `VIEWER` solo lee. La próxima dosis sugerida por edad es una referencia general **que debe validar un veterinario**.
+- **Corrections:** el backend ya no acepta `PUT` en visitas, tratamientos, cirugías ni vacunas (405 `USE_CORRECTION_ENDPOINT`): `update*` de `MedicalHistoryService` y `VaccineService` ahora hacen `POST /corrections` con `reason`.
+- **Pendiente del backend:** el gateway **aún no enruta** `/api/allergies`, `/api/dewormings` ni `/api/pets/{id}/clinical-*` (404 "No static resource"; verificado el 20 nov). Mientras tanto las pantallas dicen "todavía no disponible". Las formas de respuesta salen de la colección Postman; `normalize*` es tolerante a variantes. Falta probar de punta a punta cuando se publiquen.
+- **Pendiente en la app:** esterilización y alergias en el registro de mascota (`add-pet`), recordatorios de desparasitación en calendario y notificaciones.
+
 ### Plan Vet (fuente de verdad: [docs/MYANIMALOG_VET_MAESTRO.md](docs/MYANIMALOG_VET_MAESTRO.md))
 Ese documento define el plan de todo el ecosistema. Lee la sección que toque antes de trabajar en la parte Vet; no inventes contratos que no estén ahí. Lo que afecta a esta app:
 - **Alcance:** el panel de la clínica (MyAnimaLogVet, B2B) es una web aparte. Esta app solo hace la parte del dueño: el directorio, asociarse a una clínica, compartir o revocar mascotas, reclamar mascotas registradas por una clínica, pedir citas y ver qué clínicas tienen acceso.
@@ -103,4 +128,4 @@ Ese documento define el plan de todo el ecosistema. Lee la sección que toque an
 - Agregar `.firebase/` al `.gitignore`.
 - Poner las imágenes del tutorial en `src/assets/images/Tutorial/` (`01-home.png` … `09-maps.png`).
 - **Info de la vacuna:** "Eliminar" no borra nada (no hay endpoint), el toggle del recordatorio y el documento adjunto no se guardan, y "Editar" no carga la vacuna en `register-vaccine`.
-- Los botones de IA y de quitar anuncios del header del Home no hacen nada todavía.
+- "Quitar anuncios" (menú del Home) solo muestra un aviso: falta la función.

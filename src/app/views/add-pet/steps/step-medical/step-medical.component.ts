@@ -15,6 +15,8 @@ export const VACCINE_TYPES = [
 })
 export class StepMedicalComponent implements OnInit {
   @Input() data!: PetForm;
+  /** En edición no se pregunta esterilización ni alergias: se cambian desde "Salud y alertas" del perfil. */
+  @Input() editMode = false;
   @Output() dataChange = new EventEmitter<Partial<PetForm>>();
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
 
@@ -28,12 +30,29 @@ export class StepMedicalComponent implements OnInit {
   vetName = '';
   showOptionalNote = true;
 
+  // Salud (esterilización y alergias)
+  readonly today = new Date().toISOString().slice(0, 10);
+  readonly yesNo: { value: 'YES' | 'NO' | 'UNKNOWN'; label: string }[] = [
+    { value: 'YES', label: 'Sí' }, { value: 'NO', label: 'No' }, { value: 'UNKNOWN', label: 'No sé' },
+  ];
+  readonly severities: { value: 'MILD' | 'MODERATE' | 'SEVERE'; label: string }[] = [
+    { value: 'MILD', label: 'Leve' }, { value: 'MODERATE', label: 'Moderada' }, { value: 'SEVERE', label: 'Grave' },
+  ];
+  neuteredStatus: 'YES' | 'NO' | 'UNKNOWN' = 'UNKNOWN';
+  neuteredAt = '';
+  allergyAnswer: 'YES' | 'NO' | 'UNKNOWN' = 'UNKNOWN';
+  allergies: { allergen: string; severity: 'MILD' | 'MODERATE' | 'SEVERE' }[] = [];
+
   constructor(private router: Router) {}
 
   ngOnInit() {
     this.selectedVaccineType = this.data.vaccine?.type || '';
     this.vaccineDate         = this.data.vaccine?.date || '';
     this.vetName             = this.data.vetName       || '';
+    this.neuteredStatus      = this.data.neuteredStatus || 'UNKNOWN';
+    this.neuteredAt          = this.data.neuteredAt     || '';
+    this.allergyAnswer       = this.data.allergyAnswer  || 'UNKNOWN';
+    this.allergies           = this.data.allergies?.length ? this.data.allergies.map(a => ({ ...a })) : [];
     if (this.vaccineDate) this.calcNextVaccine();
   }
 
@@ -93,8 +112,34 @@ export class StepMedicalComponent implements OnInit {
     this.router.navigate(['/veterinarias']);
   }
 
+  pickNeutered(v: 'YES' | 'NO' | 'UNKNOWN') {
+    this.neuteredStatus = v;
+    if (v !== 'YES') this.neuteredAt = '';
+    this.emit();
+  }
+
+  pickAllergy(v: 'YES' | 'NO' | 'UNKNOWN') {
+    this.allergyAnswer = v;
+    if (v === 'YES' && !this.allergies.length) this.addAllergyRow();
+    this.emit();
+  }
+
+  addAllergyRow() {
+    this.allergies = [...this.allergies, { allergen: '', severity: 'MILD' }];
+    this.emit();
+  }
+
+  removeAllergyRow(i: number) {
+    this.allergies = this.allergies.filter((_, idx) => idx !== i);
+    this.emit();
+  }
+
   emit() {
     this.dataChange.emit({
+      neuteredStatus: this.neuteredStatus,
+      neuteredAt: this.neuteredStatus === 'YES' ? this.neuteredAt : '',
+      allergyAnswer: this.allergyAnswer,
+      allergies: this.allergyAnswer === 'YES' ? this.allergies : [],
       vaccine: this.selectedVaccineType
         ? { type: this.selectedVaccineType, date: this.vaccineDate }
         : null,

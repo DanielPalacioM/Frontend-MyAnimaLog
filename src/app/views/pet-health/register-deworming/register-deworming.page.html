@@ -1,0 +1,81 @@
+<ion-content [fullscreen]="true" class="health-content">
+  <div class="health-wrap form-wrap">
+
+    <div class="health-header">
+      <button class="back-btn" (click)="goBack()" aria-label="Volver"><ion-icon name="arrow-back-outline"></ion-icon></button>
+      <h1 class="health-title">Registrar desparasitación</h1>
+    </div>
+
+    <div class="health-card-wrap">
+
+      <p class="state-msg" *ngIf="loading">Cargando...</p>
+      <div class="state-msg" *ngIf="!loading && loadError">
+        <p>No se pudo cargar la información de esta mascota.</p>
+        <button class="btn btn-outline small" (click)="goBack()">Volver</button>
+      </div>
+
+      <div class="state-msg" *ngIf="!loading && !loadError && !canEdit">
+        <p>Con tu rol solo puedes ver la desparasitación de {{ pet?.name }}.</p>
+        <button class="btn btn-outline small" (click)="goBack()">Volver</button>
+      </div>
+
+      <ng-container *ngIf="!loading && !loadError && pet && canEdit">
+
+        <div class="pet-line">
+          <img *ngIf="pet.imageUrl" class="avatar" [src]="pet.imageUrl" alt="" />
+          <span *ngIf="!pet.imageUrl" class="avatar-fallback">{{ pet.name.charAt(0) }}</span>
+          <span>{{ pet.name }}<small>{{ pet.species }}</small></span>
+        </div>
+
+        <div class="field">
+          <span class="field-label">Tipo</span>
+          <div class="seg" role="radiogroup" aria-label="Tipo de desparasitación">
+            <button type="button" role="radio" class="seg-opt" *ngFor="let k of kinds" [class.on]="kind === k" [attr.aria-checked]="kind === k" (click)="pickKind(k)">
+              {{ kindLabel(k) }}<small>{{ kindHint(k) }}</small>
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="dw-product">Producto</label>
+          <input id="dw-product" class="field-input" [class.invalid]="productInvalid" type="text" placeholder="Nombre comercial" maxlength="80" [(ngModel)]="product" autocomplete="off" />
+          <p class="field-error" *ngIf="productInvalid">Escribe el nombre del producto.</p>
+        </div>
+
+        <div class="two">
+          <div class="field">
+            <label class="field-label" for="dw-dose">Dosis <small>(opcional)</small></label>
+            <input id="dw-dose" class="field-input" type="text" placeholder="1 tableta, 2,5 ml" maxlength="40" [(ngModel)]="dose" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label class="field-label" for="dw-weight">Peso hoy <small>(kg)</small></label>
+            <input id="dw-weight" class="field-input" type="text" inputmode="decimal" placeholder="Ej. 4,2" maxlength="6" [(ngModel)]="weight" autocomplete="off" />
+          </div>
+        </div>
+        <p class="field-hint tight">La dosis depende del peso: anotarlo evita dar de menos o de más.</p>
+
+        <div class="field">
+          <span class="field-label">Fecha de aplicación</span>
+          <app-date-picker-field placeholder="Fecha aplicada" [value]="appliedDate" [max]="today" (valueChange)="onDateChange($event)"></app-date-picker-field>
+        </div>
+
+        <div class="field">
+          <span class="field-label">Próxima dosis <small *ngIf="!nextEdited && nextDose">(sugerida)</small></span>
+          <app-date-picker-field placeholder="Sin próxima dosis" [value]="nextDose" [min]="appliedDate" (valueChange)="onNextChange($event)"></app-date-picker-field>
+          <button type="button" class="link-btn left" *ngIf="nextDose" (click)="clearNext()">Quitar la próxima dosis</button>
+          <p class="field-hint">{{ scheduleNote }}</p>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="dw-notes">Notas <small>(opcional)</small></label>
+          <textarea id="dw-notes" class="field-textarea field-input" rows="2" maxlength="200" placeholder="Observaciones" [(ngModel)]="notes"></textarea>
+        </div>
+
+        <p class="error-box" *ngIf="error" role="alert">{{ error }}</p>
+
+        <button class="btn btn-primary" [disabled]="saving" (click)="save()">{{ saving ? 'Guardando...' : 'Guardar desparasitación' }}</button>
+        <button class="btn btn-outline" (click)="cancel()">Cancelar</button>
+      </ng-container>
+    </div>
+  </div>
+</ion-content>

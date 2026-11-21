@@ -9,6 +9,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { BypassTunnelInterceptor } from './interceptors/bypass-tunnel.interceptor';
 import { AuthInterceptor } from './interceptors/auth.interceptors';
+import { SharedModule } from './shared/shared.module';
 
 @NgModule({
   declarations: [AppComponent, ],
@@ -16,6 +17,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptors';
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
+    SharedModule, // trae el botón flotante de la IA (<app-ai-fab>)
     HttpClientModule // 👈 AQUÍ
   ],
   providers: [

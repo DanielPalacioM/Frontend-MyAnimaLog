@@ -36,6 +36,9 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   upcomingEvents: CalendarEvent[] = [];
   unreadNotificationsCount: number = 0;
 
+  // Menú de tres líneas del header
+  menuOpen = false;
+
   // --- Swipe / carrusel state ---
   @ViewChild('swipeContainer') swipeContainerRef!: ElementRef<HTMLDivElement>;
 
@@ -58,6 +61,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     private toastCtrl: ToastController
   ) {}
 
+
   ngOnInit() {
     this.loadUserData();
     this.loadPets();
@@ -73,6 +77,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   }
 
    ionViewWillEnter() {
+    this.menuOpen = false;
     this.loadUserData();
     this.loadPets();
     this.notificationService.refreshUnreadCount();
@@ -389,6 +394,13 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   navigate(route: string) { this.router.navigate([route]); }
+
+  // ---- Menú del header ----
+  toggleMenu() { this.menuOpen = !this.menuOpen; }
+  closeMenu() { this.menuOpen = false; }
+  menuGo(route: string) { this.menuOpen = false; this.navigate(route); }
+  menuTutorial() { this.menuOpen = false; this.openTutorialMenu(); }
+  onAdsTap() { this.menuOpen = false; this.showToast('Quitar anuncios estará disponible pronto.'); }
   onAsociationVet() { this.router.navigate(['/vet']); }
   onFindVet() { this.router.navigate(['/maps']); }
   goToProfile() { this.router.navigate(['/profile']); }

@@ -33,6 +33,14 @@
         <img src="assets/images/PetProfileSidebar/FiltrarVacunasIcon.png" alt="" />
         <span>Filtrar vacunas</span>
       </div>
+      <div class="sidebar-item" (click)="goToHealth()">
+        <ion-icon name="warning-outline"></ion-icon>
+        <span>Salud y alergias</span>
+      </div>
+      <div class="sidebar-item" (click)="goToDeworming()">
+        <ion-icon name="bug-outline"></ion-icon>
+        <span>Desparasitación</span>
+      </div>
       <div class="sidebar-item" *ngIf="isOwner" (click)="onPersonasAcceso()">
         <img src="assets/images/PetProfileSidebar/PersonasAccesoCompartidoIcon.png" alt="" />
         <span>Ver personas con acceso compartido</span>
@@ -112,6 +120,13 @@
     <!-- ZONA NARANJA -->
     <div class="orange-zone">
 
+      <!-- Alergia grave vigente: aviso rojo y visible arriba -->
+      <button type="button" class="allergy-banner" *ngIf="severeAllergy as a" (click)="goToHealth()">
+        <ion-icon name="alert-circle"></ion-icon>
+        <span><strong>Alergia grave: {{ a.allergen }}</strong><small>Avisa a la clínica antes de cualquier medicamento</small></span>
+        <ion-icon name="chevron-forward-outline" class="chev"></ion-icon>
+      </button>
+
       <app-pet-stats-card data-tour="pp-stats" [stats]="petStats"></app-pet-stats-card>
 
       <app-medical-history-card data-tour="pp-medical"
@@ -133,6 +148,23 @@
   <p>No hay vacunas registradas.</p>
   <button *ngIf="canEdit" (click)="goToRegisterVaccine()">Registrar vacuna</button>
 </div>
+
+      <!-- DESPARASITACIÓN: su propia sección, junto a las vacunas -->
+      <app-prevention-card data-tour="pp-deworming"
+        [prevention]="health?.prevention || null"
+        [unavailable]="healthUnavailable"
+        [canEdit]="canEdit"
+        (add)="goToRegisterDeworming()"
+        (open)="goToDeworming()">
+      </app-prevention-card>
+
+      <!-- SALUD Y ALERTAS: esterilización y alergias -->
+      <app-health-card data-tour="pp-health"
+        [summary]="health"
+        [unavailable]="healthUnavailable"
+        [canEdit]="canEdit"
+        (open)="goToHealth()">
+      </app-health-card>
 
       <!-- ANUNCIOS -->
       <div class="ads-section">

@@ -1,0 +1,117 @@
+// Estilos comunes de las pantallas de salud de la mascota (desparasitación, alergias y esterilización).
+// Misma estructura que la línea de vida de vacunas: cabecera naranja y tarjeta blanca; tipografía Actor.
+$purple: #4037BE;
+$orange: #FFB84F;
+$text: #1a1a2e;
+$muted: #6b6b80;
+$soft: #F1F0FB;
+$softer: #F7F6FF;
+$line: #E4E2F4;
+$danger: #B42318;
+
+.health-content { --background: #{$orange}; font-family: 'Actor', sans-serif; }
+
+.health-wrap {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: calc(110px + env(safe-area-inset-bottom)); // espacio para la tab bar
+}
+
+.health-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: max(52px, calc(env(safe-area-inset-top) + 16px)) 16px 16px;
+  background: $orange;
+}
+
+.back-btn {
+  background: transparent; border: none; cursor: pointer; padding: 0; flex-shrink: 0;
+  ion-icon { font-size: 24px; color: $text; }
+}
+
+.health-title { font-size: 22px; font-weight: 700; color: $text; margin: 0; line-height: 1.2; }
+
+.health-card-wrap {
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  padding: 20px 16px 32px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: $text;
+}
+
+.pet-line {
+  display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700;
+  .avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; background: $soft; }
+  .avatar-fallback { width: 34px; height: 34px; border-radius: 50%; background: #FFF1DA; color: #B26A00; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+  small { font-weight: 400; color: $muted; font-size: 12px; margin-left: 4px; }
+}
+
+.state-msg { text-align: center; color: $muted; font-size: 14px; padding: 28px 12px; margin: 0; }
+
+.notice { margin: 0; padding: 10px 12px; border-radius: 12px; font-size: 13px; line-height: 1.35; background: #E6F7EE; color: #1E6B3E; }
+.error-box {
+  margin: 0; padding: 10px 12px; border-radius: 12px; font-size: 13px; line-height: 1.35; background: #FFF1EF; color: $danger;
+  button { border: none; background: none; color: $purple; font-weight: 700; font-family: 'Actor', sans-serif; padding: 0 0 0 6px; cursor: pointer; }
+}
+
+// Tarjeta de una sección
+.block { border: 1.5px solid $line; border-radius: 18px; padding: 14px; background: #fff; display: flex; flex-direction: column; gap: 10px; }
+.block-head { display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  h2 { margin: 0; font-size: 16px; font-weight: 700; } }
+.block-note { margin: 0; font-size: 12.5px; color: $muted; line-height: 1.4; }
+.link-btn { border: none; background: none; color: $purple; font-family: 'Actor', sans-serif; font-weight: 700; font-size: 13px; padding: 4px 0; cursor: pointer; }
+
+// Estados (el color nunca va solo: cada chip lleva su ícono)
+.chip {
+  display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 10px; font-size: 11.5px; font-weight: 700; white-space: nowrap; flex-shrink: 0;
+  ion-icon { font-size: 13px; }
+  &.tone-ok { background: #E8F5E9; color: #2E7D32; }
+  &.tone-warn { background: #FFF4E0; color: #B26A00; }
+  &.tone-bad { background: #FEF3F2; color: $danger; }
+  &.tone-mute { background: #F0F0F3; color: $muted; }
+  &.tone-info { background: $soft; color: $purple; }
+}
+
+// Botones
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; height: 48px; border-radius: 14px; border: 2px solid $purple;
+  font-family: 'Actor', sans-serif; font-weight: 700; font-size: 16px; cursor: pointer;
+  &:disabled { opacity: .5; cursor: default; }
+  &:active:not(:disabled) { transform: scale(.98); }
+}
+.btn-primary { background: $purple; color: #fff; }
+.btn-outline { background: #fff; color: $purple; }
+.btn-danger { background: $danger; border-color: $danger; color: #fff; }
+.btn.small { height: 40px; font-size: 14px; border-radius: 12px; }
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+// Formularios
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field-label { font-size: 13px; font-weight: 700; display: flex; align-items: baseline; gap: 6px; small { font-weight: 400; color: $muted; font-size: 12px; } }
+.field-input, .field-textarea {
+  width: 100%; box-sizing: border-box; padding: 12px; background: #fff; border: 1px solid #E0E0E0; border-radius: 12px;
+  font-family: 'Actor', sans-serif; font-size: 14px; color: $text; outline: none;
+  &:focus { border-color: $purple; }
+  &.invalid { border-color: $danger; }
+}
+.field-textarea { resize: none; }
+.field-hint { margin: 0; font-size: 12px; color: $muted; line-height: 1.35; }
+.field-error { margin: 0; font-size: 12px; color: $danger; }
+
+.seg { display: flex; flex-wrap: wrap; gap: 8px; }
+.seg-opt {
+  flex: 1; min-width: 0; padding: 10px 8px; border: 1.5px solid $line; border-radius: 12px; background: #fff; color: $text; text-align: center;
+  font-family: 'Actor', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer;
+  small { display: block; font-weight: 400; color: $muted; font-size: 11px; margin-top: 2px; }
+  &.on { border-color: $purple; background: $soft; color: $purple; small { color: $purple; } }
+  &.sev-moderate.on { border-color: #B26A00; background: #FFF4E0; color: #B26A00; }
+  &.sev-severe.on { border-color: $danger; background: #FEF3F2; color: $danger; }
+}
+
+.sheet-scroll { max-height: 64vh; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 4px; }
+.sheet-actions { display: grid; gap: 8px; margin-top: 6px; }

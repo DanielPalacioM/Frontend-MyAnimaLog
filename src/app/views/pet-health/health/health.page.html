@@ -1,0 +1,170 @@
+<ion-content [fullscreen]="true" class="health-content">
+  <div class="health-wrap">
+
+    <div class="health-header">
+      <button class="back-btn" (click)="goBack()" aria-label="Volver"><ion-icon name="arrow-back-outline"></ion-icon></button>
+      <h1 class="health-title">Salud y alertas</h1>
+    </div>
+
+    <div class="health-card-wrap">
+
+      <p class="state-msg" *ngIf="loading">Cargando...</p>
+
+      <div class="state-msg" *ngIf="!loading && loadError">
+        <p>No se pudo cargar la información de esta mascota.</p>
+        <button class="btn btn-outline small" (click)="load()">Reintentar</button>
+      </div>
+
+      <ng-container *ngIf="!loading && !loadError && pet">
+
+        <div class="pet-line">
+          <img *ngIf="pet.imageUrl" class="avatar" [src]="pet.imageUrl" alt="" />
+          <span *ngIf="!pet.imageUrl" class="avatar-fallback">{{ pet.name.charAt(0) }}</span>
+          <span>{{ pet.name }}<small>{{ pet.species }}</small></span>
+        </div>
+
+        <p class="notice" *ngIf="notice" role="status">{{ notice }}</p>
+
+        <!-- Esterilización -->
+        <section class="block" data-section="neutered">
+          <div class="block-head">
+            <h2>Esterilización</h2>
+            <button class="link-btn" *ngIf="canEdit && neutered" (click)="openNeutered()">Editar</button>
+          </div>
+          <p class="error-box" *ngIf="neuteredFailed">{{ neuteredFailed.code === 'NOT_AVAILABLE' ? 'Todavía no está disponible.' : 'No pudimos cargarla.' }}</p>
+          <button class="btn btn-outline small" *ngIf="canEdit && !neutered && neuteredFailed" (click)="openNeutered()">Indicar si está esterilizada</button>
+          <ng-container *ngIf="neutered">
+            <p class="big-value">{{ neuteredText }}</p>
+            <p class="block-note" *ngIf="neuteredWho">
+              <ion-icon [name]="neutered.confirmed ? 'shield-checkmark' : 'person-outline'"></ion-icon> {{ neuteredWho }}
+            </p>
+            <p class="block-note" *ngIf="neutered.status === 'UNKNOWN'">
+              Ayuda a la clínica a cuidarla mejor en una cirugía o un tratamiento.
+            </p>
+            <button class="btn btn-outline small" *ngIf="canEdit && neutered.status === 'UNKNOWN'" (click)="openNeutered()">Indicar si está esterilizada</button>
+          </ng-container>
+        </section>
+
+        <!-- Alergias -->
+        <section class="block" data-section="allergies">
+          <div class="block-head">
+            <h2>Alergias</h2>
+            <span class="chip tone-bad" *ngIf="hasSevere"><ion-icon name="alert-circle"></ion-icon>Alergia grave</span>
+          </div>
+
+          <p class="error-box" *ngIf="allergiesFailed" role="alert">{{ failedText }}<button (click)="loadHealth()">Reintentar</button></p>
+
+          <div class="btn-row" *ngIf="!allergies && allergiesFailed && canEdit">
+            <button class="btn btn-primary small" (click)="openAdd()"><ion-icon name="add"></ion-icon>Agregar alergia</button>
+          </div>
+
+          <ng-container *ngIf="allergies">
+            <p class="block-note" *ngIf="!active.length">{{ statusText }}.
+              <ng-container *ngIf="allergies.allergyStatus === 'UNKNOWN'">Cuéntanos si tiene alguna alergia conocida: es el dato que más ayuda a evitar un medicamento peligroso.</ng-container>
+            </p>
+            <p class="error-box" *ngIf="statusError" role="alert">{{ statusError }}</p>
+
+            <div class="allergy" *ngFor="let a of active" [ngClass]="'sev-' + a.severity.toLowerCase()">
+              <div class="allergy-top">
+                <strong>{{ a.allergen }}</strong>
+                <span class="chip" [ngClass]="'tone-' + sevTone(a.severity)">{{ sevLabel(a.severity) }}</span>
+              </div>
+              <p class="allergy-meta">{{ catLabel(a.category) }}<span *ngIf="a.reaction"> · {{ a.reaction }}</span></p>
+              <p class="allergy-origin"><ion-icon [name]="a.state === 'CONFIRMED' ? 'shield-checkmark' : 'person-outline'"></ion-icon>{{ origin(a) }}</p>
+              <div class="allergy-actions" *ngIf="canChange(a)">
+                <button class="link-btn" (click)="askChange(a, 'RESOLVED')">Ya no la tiene</button>
+                <button class="link-btn muted" (click)="askChange(a, 'ENTERED_IN_ERROR')">Fue un error</button>
+              </div>
+              <p class="allergy-meta" *ngIf="!canChange(a) && a.source === 'CLINIC'">La cambia la clínica que la registró.</p>
+            </div>
+
+            <div class="btn-row" *ngIf="canEdit">
+              <button class="btn btn-primary small" (click)="openAdd()"><ion-icon name="add"></ion-icon>Agregar alergia</button>
+              <button class="btn btn-outline small" *ngIf="allergies.allergyStatus === 'UNKNOWN' && !active.length" [disabled]="statusBusy" (click)="markNoneKnown()">No tiene alergias conocidas</button>
+              <button class="btn btn-outline small" *ngIf="allergies.allergyStatus === 'NONE_KNOWN'" [disabled]="statusBusy" (click)="markUnknown()">Ya no estoy seguro</button>
+            </div>
+
+            <div class="past" *ngIf="past.length">
+              <p class="past-title">Anteriores</p>
+              <div class="past-row" *ngFor="let a of past">
+                <span><strong>{{ a.allergen }}</strong> · {{ catLabel(a.category) }}</span>
+                <span class="chip tone-mute">Resuelta</span>
+              </div>
+            </div>
+
+            <p class="block-note">Una alergia que declaras aquí la ven las clínicas con las que compartes a {{ pet.name }}. Un veterinario puede confirmarla.</p>
+          </ng-container>
+        </section>
+
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- Hoja: esterilización -->
+  <app-bottom-sheet [isOpen]="neuteredOpen" title="¿Está esterilizada?" (closed)="closeNeutered()">
+    <div class="sheet-scroll">
+      <div class="seg" role="radiogroup" aria-label="Esterilización">
+        <button type="button" role="radio" class="seg-opt" *ngFor="let o of neuteredOptions" [class.on]="nStatus === o.value" [attr.aria-checked]="nStatus === o.value" (click)="pickNeutered(o.value)">{{ o.label }}</button>
+      </div>
+      <div class="field" *ngIf="nStatus === 'YES'">
+        <span class="field-label">¿Cuándo? <small>(opcional, puede ser aproximado)</small></span>
+        <app-date-picker-field placeholder="Fecha de la cirugía" [value]="nDate" [max]="today" (valueChange)="nDate = $event"></app-date-picker-field>
+      </div>
+      <p class="field-hint">"No sé" es una respuesta válida: no afirmamos que lo esté ni que no.</p>
+      <p class="field-error" *ngIf="nError" role="alert">{{ nError }}</p>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn btn-primary" [disabled]="nSaving" (click)="saveNeutered()">{{ nSaving ? 'Guardando...' : 'Guardar' }}</button>
+      <button class="btn btn-outline" (click)="closeNeutered()">Cancelar</button>
+    </div>
+  </app-bottom-sheet>
+
+  <!-- Hoja: agregar alergia -->
+  <app-bottom-sheet [isOpen]="addOpen" title="Agregar alergia" (closed)="closeAdd()">
+    <div class="sheet-scroll">
+      <div class="field">
+        <label class="field-label" for="al-name">¿A qué es alérgica?</label>
+        <input id="al-name" class="field-input" [class.invalid]="!!formError && !form.allergen.trim()" type="text" placeholder="Ej. Penicilina, pollo, picadura de pulga" maxlength="80" [(ngModel)]="form.allergen" autocomplete="off" />
+      </div>
+      <div class="field">
+        <span class="field-label">Tipo</span>
+        <div class="seg">
+          <button type="button" class="seg-opt" *ngFor="let c of categories" [class.on]="form.category === c" (click)="form.category = c">{{ catLabel(c) }}</button>
+        </div>
+      </div>
+      <div class="field">
+        <span class="field-label">Gravedad</span>
+        <div class="seg">
+          <button type="button" class="seg-opt" *ngFor="let s of severities" [ngClass]="'sev-' + s.toLowerCase()" [class.on]="form.severity === s" (click)="form.severity = s">{{ sevLabel(s) }}</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label" for="al-reaction">Reacción <small>(opcional)</small></label>
+        <input id="al-reaction" class="field-input" type="text" placeholder="Ej. Urticaria, vómito" maxlength="120" [(ngModel)]="form.reaction" autocomplete="off" />
+      </div>
+      <p class="field-error" *ngIf="formError" role="alert">{{ formError }}</p>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn btn-primary" [disabled]="saving" (click)="saveAllergy()">{{ saving ? 'Guardando...' : 'Guardar alergia' }}</button>
+      <button class="btn btn-outline" (click)="closeAdd()">Cancelar</button>
+    </div>
+  </app-bottom-sheet>
+
+  <!-- Hoja: cambiar el estado de una alergia -->
+  <app-bottom-sheet [isOpen]="!!changing" [title]="changeTitle" (closed)="closeChange()">
+    <div class="sheet-scroll">
+      <p class="field-hint">No se borra: queda en el historial de {{ pet?.name || 'tu mascota' }} con el motivo.</p>
+      <div class="field">
+        <label class="field-label" for="al-reason">Motivo</label>
+        <textarea id="al-reason" class="field-textarea field-input" rows="2" maxlength="200" placeholder="Ej. El veterinario la descartó con una prueba" [(ngModel)]="reason"></textarea>
+      </div>
+      <p class="field-error" *ngIf="changeError" role="alert">{{ changeError }}</p>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn btn-primary" [disabled]="changeBusy" (click)="confirmChange()">{{ changeBusy ? 'Guardando...' : 'Confirmar' }}</button>
+      <button class="btn btn-outline" (click)="closeChange()">Cancelar</button>
+    </div>
+  </app-bottom-sheet>
+
+  <app-tab-bar activeTab="pet-profile"></app-tab-bar>
+</ion-content>

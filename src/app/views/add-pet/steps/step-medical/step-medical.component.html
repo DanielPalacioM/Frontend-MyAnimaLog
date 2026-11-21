@@ -9,6 +9,32 @@
     </button>
   </div>
 
+  <!-- SALUD: esterilización y alergias -->
+  <div class="health-block" *ngIf="!editMode">
+    <p class="health-title">Salud</p>
+
+    <p class="health-q">¿Está esterilizada?</p>
+    <div class="health-seg" role="radiogroup" aria-label="Esterilización">
+      <button type="button" role="radio" *ngFor="let o of yesNo" [class.on]="neuteredStatus === o.value" [attr.aria-checked]="neuteredStatus === o.value" (click)="pickNeutered(o.value)">{{ o.label }}</button>
+    </div>
+    <app-date-picker-field *ngIf="neuteredStatus === 'YES'" placeholder="¿Cuándo? (opcional)" [value]="neuteredAt" [max]="today" (valueChange)="neuteredAt = $event; emit()"></app-date-picker-field>
+    <p class="health-hint">Ayuda a la clínica a cuidarla mejor en una cirugía o un tratamiento.</p>
+
+    <p class="health-q">¿Tiene alergias conocidas?</p>
+    <div class="health-seg" role="radiogroup" aria-label="Alergias">
+      <button type="button" role="radio" *ngFor="let o of yesNo" [class.on]="allergyAnswer === o.value" [attr.aria-checked]="allergyAnswer === o.value" (click)="pickAllergy(o.value)">{{ o.label }}</button>
+    </div>
+    <div class="allergy-row" *ngFor="let a of allergies; let i = index">
+      <input type="text" class="allergy-input" placeholder="¿A qué? Ej. Penicilina, pollo" maxlength="80" [(ngModel)]="a.allergen" (ngModelChange)="emit()" [attr.aria-label]="'Alergia ' + (i + 1)" />
+      <select class="allergy-sev" [(ngModel)]="a.severity" (ngModelChange)="emit()" aria-label="Gravedad">
+        <option *ngFor="let s of severities" [value]="s.value">{{ s.label }}</option>
+      </select>
+      <button type="button" class="allergy-x" (click)="removeAllergyRow(i)" aria-label="Quitar alergia"><ion-icon name="close-outline"></ion-icon></button>
+    </div>
+    <button type="button" class="health-add" *ngIf="allergyAnswer === 'YES'" (click)="addAllergyRow()">+ Agregar otra alergia</button>
+    <p class="health-hint">"No sé" no significa que no tenga: la clínica te lo volverá a preguntar. Un veterinario puede confirmarlas después.</p>
+  </div>
+
   <!-- VACUNA -->
 <div class="medical-card" (click)="goToRegisterVaccine()">
   <div class="medical-card-header">

@@ -44,8 +44,9 @@ export class MedicalHistoryService {
     return this.http.patch<Visit>(`${this.baseUrl}/visits/${visitId}/treatment`, data);
   }
 
-  updateVisit(id: string, data: Partial<Visit>): Observable<Visit> {
-  return this.http.put<Visit>(`${this.baseUrl}/visits/${id}`, data);
+  /** Corrige una visita. El PUT antiguo ya no existe (405 USE_CORRECTION_ENDPOINT): se usa /corrections con un motivo obligatorio. */
+  updateVisit(id: string, data: Partial<Visit>, reason: string): Observable<Visit> {
+  return this.http.post<Visit>(`${this.baseUrl}/visits/${id}/corrections`, { ...data, reason });
 }
 
   // ============ TRATAMIENTOS (treatments) ============
@@ -80,8 +81,9 @@ getTreatmentForVisit(visitId: string): Observable<Treatment[]> {
   );
 }
 
-updateTreatment(id: string, treatment: Partial<Treatment>): Observable<Treatment> {
-  return this.http.put<{ success: boolean; data: Treatment }>(`${this.baseUrl}/treatments/${id}`, treatment).pipe(
+/** Corrige un tratamiento (/corrections, con motivo obligatorio). */
+updateTreatment(id: string, treatment: Partial<Treatment>, reason: string): Observable<Treatment> {
+  return this.http.post<{ success: boolean; data: Treatment }>(`${this.baseUrl}/treatments/${id}/corrections`, { ...treatment, reason }).pipe(
     map(response => response.data)
   );
 }
@@ -140,8 +142,9 @@ updateTreatment(id: string, treatment: Partial<Treatment>): Observable<Treatment
   );
 }
 
- updateSurgery(id: string, data: Partial<Surgery>): Observable<Surgery> {
-  return this.http.put<{ success: boolean; data: Surgery }>(`${this.baseUrl}/surgery/${id}`, data).pipe(
+ /** Corrige una cirugía (/corrections, con motivo obligatorio). */
+ updateSurgery(id: string, data: Partial<Surgery>, reason: string): Observable<Surgery> {
+  return this.http.post<{ success: boolean; data: Surgery }>(`${this.baseUrl}/surgery/${id}/corrections`, { ...data, reason }).pipe(
     map(response => response.data)
   );
 }

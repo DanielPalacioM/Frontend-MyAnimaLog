@@ -29,6 +29,12 @@ import { TutorialGalleryComponent } from './components/tutorial-gallery/tutorial
 
 import { VetAvatarComponent } from './components/vet-avatar/vet-avatar.component';
 import { QrScannerComponent } from './components/qr-scanner/qr-scanner.component';
+import { AiFabComponent } from './components/ai-fab/ai-fab.component';
+import { AiActionCardComponent } from './components/ai-action-card/ai-action-card.component';
+import { AiMiniChatComponent } from './components/ai-mini-chat/ai-mini-chat.component';
+import { AiDockComponent } from './components/ai-dock/ai-dock.component';
+import { PreventionCardComponent } from './components/prevention-card/prevention-card.component';
+import { HealthCardComponent } from './components/health-card/health-card.component';
 
 import { ImgFallbackDirective } from './directives/img-fallback.directive';
 
@@ -57,7 +63,13 @@ import { ImgFallbackDirective } from './directives/img-fallback.directive';
     TutorialOverlayComponent,
     TutorialGalleryComponent,
     VetAvatarComponent,
-    QrScannerComponent
+    QrScannerComponent,
+    AiFabComponent,
+    AiActionCardComponent,
+    AiMiniChatComponent,
+    AiDockComponent,
+    PreventionCardComponent,
+    HealthCardComponent
   ],
   imports: [
     CommonModule,
@@ -90,7 +102,13 @@ import { ImgFallbackDirective } from './directives/img-fallback.directive';
     TutorialOverlayComponent,
     TutorialGalleryComponent,
     VetAvatarComponent,
-    QrScannerComponent
+    QrScannerComponent,
+    AiFabComponent,
+    AiActionCardComponent,
+    AiMiniChatComponent,
+    AiDockComponent,
+    PreventionCardComponent,
+    HealthCardComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

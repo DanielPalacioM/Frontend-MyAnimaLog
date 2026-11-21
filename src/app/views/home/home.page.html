@@ -23,20 +23,34 @@
            alt="User">
         <span class="username">{{ username }}</span>
       </div>
-      <div class="header-icons">
-        <div class="icon-card" data-tour="home-notifications" (click)="navigate('/notifications')">
-          <img src="assets/images/Home_icons/NotificationIcon.png" alt="notifications" />
-          <span class="notif-badge" *ngIf="unreadNotificationsCount > 0">{{ unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount }}</span>
+      <div class="header-actions">
+      <!-- Botón de la IA anclado (solo si se sacó del modo seguimiento) -->
+      <app-ai-dock></app-ai-dock>
+
+      <!-- Menú de tres líneas: notificaciones, quitar anuncios y tutorial -->
+      <div class="header-menu">
+        <button type="button" class="menu-btn" data-tour="home-menu" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen" aria-label="Menú">
+          <ion-icon name="menu-outline"></ion-icon>
+          <span class="menu-dot" *ngIf="unreadNotificationsCount > 0 && !menuOpen"></span>
+        </button>
+
+        <div class="menu-backdrop" *ngIf="menuOpen" (click)="closeMenu()"></div>
+        <div class="menu-panel" *ngIf="menuOpen" role="menu">
+          <button type="button" class="menu-item" role="menuitem" (click)="menuGo('/notifications')">
+            <img src="assets/images/Home_icons/NotificationIcon.png" alt="" />
+            <span>Notificaciones</span>
+            <span class="notif-badge" *ngIf="unreadNotificationsCount > 0">{{ unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount }}</span>
+          </button>
+          <button type="button" class="menu-item" role="menuitem" (click)="onAdsTap()">
+            <img src="assets/images/Home_icons/AD blocker icon.png" alt="" />
+            <span>Quitar anuncios</span>
+          </button>
+          <button type="button" class="menu-item" role="menuitem" (click)="menuTutorial()">
+            <ion-icon name="videocam-outline" class="menu-ico"></ion-icon>
+            <span>Tutorial</span>
+          </button>
         </div>
-        <div class="icon-card" data-tour="home-ia">
-          <img src="assets/images/Home_icons/IA icon.png" alt="IA" />
-        </div>
-        <div class="icon-card" data-tour="home-ads">
-          <img src="assets/images/Home_icons/AD blocker icon.png" alt="ad blocker" />
-        </div>
-        <div class="icon-card" data-tour="home-tutorial" (click)="openTutorialMenu()">
-          <ion-icon name="videocam-outline" class="tutorial-icon"></ion-icon>
-        </div>
+      </div>
       </div>
     </div>
 

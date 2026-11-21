@@ -5,6 +5,8 @@
     "src/**/veterinary.spec.ts",
     "src/**/vet-pages.spec.ts",
     "src/**/vet-link.guard.spec.ts",
+    "src/**/ai-*.spec.ts",
+    "src/**/pet-health*.spec.ts",
     "src/**/*.d.ts"
   ]
 }

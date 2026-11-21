@@ -31,8 +31,8 @@ export class VaccineService {
     return this.http.get<{ isDue: boolean }>(`${this.baseUrl}/${id}/due`);
   }
 
-  updateVaccine(id: string, data: Partial<Vaccine>): Observable<Vaccine> {
-    const userId = this.getUserId();
-    return this.http.put<Vaccine>(`${this.baseUrl}/${id}`, { ...data, userId });
+  /** Corrige una vacuna. El PUT antiguo ya no existe: se usa /corrections con un motivo obligatorio. */
+  updateVaccine(id: string, data: Partial<Vaccine>, reason: string): Observable<Vaccine> {
+    return this.http.post<Vaccine>(`${this.baseUrl}/${id}/corrections`, { ...data, reason });
   }
 }

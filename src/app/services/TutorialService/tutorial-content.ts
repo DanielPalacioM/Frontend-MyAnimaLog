@@ -17,24 +17,13 @@ export const TUTORIAL_STEPS: Record<TutorialKey, TutorialStep[]> = {
       text: 'Toca tu foto o tu nombre para editar tus datos, cambiar el idioma o cerrar sesión.',
     },
     {
-      target: 'home-notifications',
-      title: 'Notificaciones',
-      text: 'Aquí llegan los recordatorios de citas y vacunas y las invitaciones para cuidar mascotas de otras personas. El número rojo indica cuántas no has leído.',
+      target: 'home-menu',
+      title: 'Menú',
+      text: 'Toca las tres líneas para abrir el menú: ahí están las notificaciones (un punto rojo avisa que tienes nuevas), quitar anuncios y volver a ver este tutorial.',
     },
     {
-      target: 'home-ia',
       title: 'Asistente con IA',
-      text: 'Resuelve dudas sobre el cuidado, la alimentación o la salud de tu mascota.',
-    },
-    {
-      target: 'home-ads',
-      title: 'Sin anuncios',
-      text: 'Desde aquí puedes quitar la publicidad de la app.',
-    },
-    {
-      target: 'home-tutorial',
-      title: 'Ver el tutorial otra vez',
-      text: 'Cuando quieras repasar, toca este botón: puedes verlo de forma interactiva, como ahora, o con imágenes.',
+      text: 'El botón naranja con el perrito te acompaña en todas las pantallas. Tócalo para abrir un mini chat y pedirle cosas ahí mismo; mantenlo presionado para abrir el chat completo. Puedes moverlo: si lo arrastras a "Ocultar", se queda junto al menú (≡) del Inicio.',
     },
     {
       target: 'home-quick-vet',

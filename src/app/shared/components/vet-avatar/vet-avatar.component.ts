@@ -13,7 +13,7 @@ import { vetInitials } from '../../utils/vet.util';
   `,
   styles: [`
     .vet-avatar { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
-      border-radius: 50%; background: #4037BE; color: #fff; font-family: 'Jua', sans-serif; overflow: hidden; }
+      border-radius: 50%; background: #4037BE; color: #fff; font-family: 'Actor', sans-serif; font-weight: 700; overflow: hidden; }
     .vet-avatar.inverse { background: #fff; color: #4037BE; }
     img { width: 100%; height: 100%; object-fit: cover; }
   `],

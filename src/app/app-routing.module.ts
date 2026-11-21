@@ -138,8 +138,17 @@ const routes: Routes = [
     loadChildren: () => import('./views/maps/maps.module').then( m => m.MapsPageModule)
   },
   {
+    path: 'ia',
+    loadChildren: () => import('./views/ai-chat/ai-chat.module').then( m => m.AiChatPageModule)
+  },
+  {
     path: 'pet-clinics/:id',
     loadChildren: () => import('./views/pet-clinics/pet-clinics.module').then( m => m.PetClinicsPageModule)
+  },
+  {
+    // Salud de la mascota (esterilización y alergias), `deworming` y `deworming/new`.
+    path: 'pet-health/:petId',
+    loadChildren: () => import('./views/pet-health/pet-health.module').then( m => m.PetHealthModule)
   },
   {
     path: 'vet',

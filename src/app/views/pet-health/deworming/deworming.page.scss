@@ -1,0 +1,25 @@
+@use '../health-common';
+
+.kind {
+  border: 1.5px solid #E4E2F4; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 8px; background: #fff;
+  &.state-overdue { border-color: #F2B8B5; background: #FFFAF9; }
+  &.state-due_soon { border-color: #F5D9A6; background: #FFFCF5; }
+}
+.kind-top { display: flex; align-items: center; gap: 10px; }
+.kind-ico {
+  width: 40px; height: 40px; border-radius: 50%; background: #F1F0FB; color: #4037BE; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+  &.ext { background: #FFF1DA; color: #B26A00; }
+}
+.kind-title { flex: 1; min-width: 0; display: flex; flex-direction: column; strong { font-size: 17px; } small { color: #6b6b80; font-size: 12px; line-height: 1.25; } }
+.kind-line {
+  display: flex; justify-content: space-between; gap: 12px; margin: 0; font-size: 13.5px; color: #4a4860;
+  b { color: #1a1a2e; text-align: right; font-weight: 700; em { font-style: normal; font-weight: 400; color: #6b6b80; } }
+  &.next b { color: #4037BE; }
+}
+.kind-hint { margin: 0; font-size: 12.5px; color: #6b6b80; line-height: 1.35; }
+
+.entry { border-top: 1px solid #E4E2F4; padding: 10px 0 2px; display: flex; flex-direction: column; gap: 3px; &:first-of-type { border-top: none; padding-top: 0; } }
+.entry-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; strong { font-size: 15px; } }
+.entry-line { margin: 0; font-size: 13px; color: #4a4860; display: flex; align-items: center; gap: 6px; ion-icon { font-size: 15px; color: #FBA523; flex-shrink: 0; } &.who { color: #6b6b80; font-size: 12px; ion-icon { color: #4037BE; } } }
+
+.empty { background: #F7F6FF; border-radius: 16px; padding: 18px 14px; text-align: center; p { margin: 0; font-size: 13.5px; color: #4a4860; line-height: 1.4; } p + p { margin-top: 4px; } }

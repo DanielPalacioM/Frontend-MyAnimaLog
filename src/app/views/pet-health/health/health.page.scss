@@ -1,0 +1,19 @@
+@use '../health-common';
+
+.big-value { margin: 0; font-size: 20px; font-weight: 700; }
+.block-note ion-icon { vertical-align: -2px; color: #4037BE; }
+
+.allergy {
+  border-radius: 14px; padding: 12px; background: #F7F6FF; display: flex; flex-direction: column; gap: 4px; border-left: 5px solid #B0AEC9;
+  &.sev-severe { background: #FEF3F2; border-left-color: #B42318; }
+  &.sev-moderate { background: #FFF4E0; border-left-color: #F5A623; }
+  p { margin: 0; }
+}
+.allergy-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; strong { font-size: 16px; } }
+.allergy-meta { font-size: 13px; color: #4a4860; }
+.allergy-origin { font-size: 12px; color: #6b6b80; display: flex; align-items: center; gap: 4px; ion-icon { font-size: 14px; color: #4037BE; } }
+.allergy-actions { display: flex; gap: 16px; margin-top: 2px; .muted { color: #6b6b80; } }
+
+.past { border-top: 1px solid #E4E2F4; padding-top: 10px; }
+.past-title { margin: 0 0 6px; font-size: 13px; font-weight: 700; color: #6b6b80; }
+.past-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; padding: 4px 0; }

@@ -1,0 +1,131 @@
+<!-- Barra lateral con el historial de chats -->
+<div class="sb-backdrop" *ngIf="sidebarOpen" (click)="closeSidebar()"></div>
+<aside class="sidebar" [class.open]="sidebarOpen" aria-label="Historial de chats" [attr.aria-hidden]="!sidebarOpen">
+  <div class="sb-head">
+    <img src="assets/images/logo app.png" alt="" />
+    <span>Tus chats</span>
+    <button class="sb-close" (click)="closeSidebar()" aria-label="Cerrar historial"><ion-icon name="close"></ion-icon></button>
+  </div>
+
+  <button class="sb-new" (click)="newChat()"><ion-icon name="add"></ion-icon> Nuevo chat</button>
+
+  <label class="sb-search">
+    <ion-icon name="search-outline"></ion-icon>
+    <input type="search" [(ngModel)]="search" placeholder="Buscar en tus chats" aria-label="Buscar en tus chats" />
+    <button type="button" *ngIf="search" (click)="search = ''" aria-label="Borrar búsqueda"><ion-icon name="close-circle"></ion-icon></button>
+  </label>
+
+  <div class="sb-list">
+    <ng-container *ngFor="let g of groups">
+      <p class="sb-group">{{ g.label }}</p>
+      <div class="sb-item" *ngFor="let c of g.chats" [class.active]="c.id === chat?.id" (click)="openChat(c)" tabindex="0" (keydown.enter)="openChat(c)">
+        <div class="sb-info">
+          <strong>{{ c.title }}</strong>
+          <small>{{ when(c) }} · {{ count(c) }} {{ count(c) === 1 ? 'mensaje' : 'mensajes' }}</small>
+        </div>
+        <button class="sb-del" (click)="askDelete(c, $event)" [attr.aria-label]="'Borrar el chat ' + c.title"><ion-icon name="trash-outline"></ion-icon></button>
+      </div>
+    </ng-container>
+    <p class="sb-empty" *ngIf="!groups.length">{{ search ? 'No encontré chats con eso.' : 'Aquí aparecerán tus conversaciones.' }}</p>
+  </div>
+
+  <button class="sb-clear" *ngIf="chats.length" (click)="askDeleteAll()"><ion-icon name="trash-outline"></ion-icon> Borrar todos los chats</button>
+</aside>
+
+<ion-header class="ion-no-border">
+  <ion-toolbar class="ai-toolbar">
+    <button slot="start" class="icon-btn" (click)="goBack()" aria-label="Volver"><ion-icon name="arrow-back-outline"></ion-icon></button>
+    <button slot="start" class="icon-btn" (click)="openSidebar()" aria-label="Ver tus chats anteriores"><ion-icon name="menu-outline"></ion-icon></button>
+    <button slot="end" class="icon-btn" (click)="newChat()" [disabled]="!messages.length" aria-label="Chat nuevo"><ion-icon name="create-outline"></ion-icon></button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ai-content">
+  <div class="thread">
+
+    <!-- Nombre de la IA y saludo, al centro -->
+    <div class="welcome">
+      <img src="assets/images/logo app.png" alt="MyAnimaLog" class="welcome-logo" />
+      <span class="welcome-name">{{ aiName }}</span>
+      <h1>{{ greeting }}</h1>
+      <p class="welcome-sub" *ngIf="!firstTime">¿En qué te puedo ayudar hoy?</p>
+    </div>
+
+    <!-- Mensajes -->
+    <ng-container *ngFor="let m of shown; trackBy: trackById">
+
+      <div class="row user" *ngIf="m.role === 'user'">
+        <div class="bubble">
+          <div class="files" *ngIf="m.attachments?.length">
+            <ng-container *ngFor="let a of m.attachments">
+              <img *ngIf="a.previewUrl && isImage(a)" [src]="a.previewUrl" [alt]="a.name" class="file-thumb" />
+              <div class="file-chip" *ngIf="!(a.previewUrl && isImage(a))">
+                <ion-icon [name]="isImage(a) ? 'image-outline' : 'document-text-outline'"></ion-icon>
+                <span class="file-name">{{ a.name }}</span>
+                <small>{{ size(a.size) }}</small>
+              </div>
+            </ng-container>
+          </div>
+          <p *ngIf="m.text" class="user-text">{{ m.text }}</p>
+        </div>
+      </div>
+
+      <div class="row assistant" *ngIf="m.role === 'assistant'">
+        <img src="assets/images/logo app.png" alt="" class="avatar" />
+        <div class="answer" [class.error]="m.error">
+          <div class="rich" [innerHTML]="html(m.text)"></div>
+          <app-ai-action-card *ngIf="m.pendingAction" [action]="m.pendingAction" [busy]="actionBusyId === m.pendingAction.id"
+                              (confirmed)="confirmAction(m)" (rejected)="rejectAction(m)"></app-ai-action-card>
+          <button *ngIf="m.error" class="retry" (click)="retry()" [disabled]="sending">
+            <ion-icon name="refresh-outline"></ion-icon> Reintentar
+          </button>
+        </div>
+      </div>
+
+    </ng-container>
+
+    <!-- "Escribiendo..." -->
+    <div class="row assistant" *ngIf="typing" aria-live="polite">
+      <img src="assets/images/logo app.png" alt="" class="avatar" />
+      <div class="answer"><span class="dots" aria-label="Escribiendo"><i></i><i></i><i></i></span></div>
+    </div>
+
+    <!-- Sugerencias para empezar -->
+    <div class="suggestions" *ngIf="showSuggestions">
+      <button class="suggestion" *ngFor="let s of suggestions" (click)="useSuggestion(s)">
+        <ion-icon [name]="s.icon"></ion-icon>{{ s.label }}
+      </button>
+    </div>
+
+  </div>
+</ion-content>
+
+<!-- Parte de abajo en blanco, como una barra inferior -->
+<ion-footer class="ai-footer ion-no-border">
+  <div class="composer-wrap">
+    <div class="composer" [class.has-text]="canSend">
+
+      <div class="pending" *ngIf="pending.length">
+        <div class="pending-item" *ngFor="let p of pending; let i = index">
+          <img *ngIf="p.previewUrl" [src]="p.previewUrl" alt="" class="pending-thumb" />
+          <ion-icon *ngIf="!p.previewUrl" name="document-text-outline" class="pending-ico"></ion-icon>
+          <span class="pending-info"><strong>{{ p.file.name }}</strong><small>{{ size(p.file.size) }}</small></span>
+          <button (click)="removePending(i)" [attr.aria-label]="'Quitar ' + p.file.name"><ion-icon name="close"></ion-icon></button>
+        </div>
+      </div>
+
+      <div class="input-row">
+        <button class="attach" (click)="openPicker()" [disabled]="sending" aria-label="Adjuntar documento">
+          <ion-icon name="attach-outline"></ion-icon>
+        </button>
+        <textarea #textarea rows="1" [(ngModel)]="draft" (input)="autoSize()" (keydown.enter)="onEnter($event)"
+                  placeholder="Escribe tu mensaje..." aria-label="Mensaje"></textarea>
+        <button class="send" (click)="send()" [disabled]="!canSend" aria-label="Enviar">
+          <ion-icon name="arrow-up"></ion-icon>
+        </button>
+      </div>
+      <input #fileInput type="file" class="hidden-input" multiple [accept]="accept" (change)="onFilesSelected($event)" />
+    </div>
+    <p class="disclaimer">La IA puede equivocarse y no reemplaza a tu veterinario.</p>
+  </div>
+</ion-footer>

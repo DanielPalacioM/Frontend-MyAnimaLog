@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
+import { forkJoin, Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { PetService } from 'src/app/services/PetService/pet';
+import { PetHealthService } from 'src/app/services/PetHealthService/pet-health';
+import { AllergySeverity } from 'src/app/models/pet-health.model';
 
 export interface PetForm {
   photo: string | null;
@@ -16,6 +20,11 @@ export interface PetForm {
   vaccine: { type: string; date: string } | null;
   document: File | null;
   vetName: string;
+  // Salud: se guarda en Medical justo después de crear la mascota. "No sé" no es "no": UNKNOWN es el valor por defecto.
+  neuteredStatus: 'YES' | 'NO' | 'UNKNOWN';
+  neuteredAt: string;
+  allergyAnswer: 'YES' | 'NO' | 'UNKNOWN';
+  allergies: { allergen: string; severity: AllergySeverity }[];
 }
 
 @Component({
@@ -47,6 +56,10 @@ export class AddPetComponent implements OnInit {
     vaccine: null,
     document: null,
     vetName: '',
+    neuteredStatus: 'UNKNOWN',
+    neuteredAt: '',
+    allergyAnswer: 'UNKNOWN',
+    allergies: [],
   };
 
   constructor(
@@ -54,6 +67,7 @@ export class AddPetComponent implements OnInit {
     private route: ActivatedRoute,
     private petService: PetService,
     private location: Location,
+    private petHealth: PetHealthService,
   ) {}
 
   ngOnInit() {
@@ -85,6 +99,10 @@ export class AddPetComponent implements OnInit {
           vaccine: pet.vaccine ? { type: pet.vaccine.type, date: pet.vaccine.date } : null,
           document: null,
           vetName: pet.vetName,
+          neuteredStatus: 'UNKNOWN',
+          neuteredAt: '',
+          allergyAnswer: 'UNKNOWN',
+          allergies: [],
         };
       },
       error: (err) => {
@@ -159,8 +177,11 @@ export class AddPetComponent implements OnInit {
     this.petService.addPet(this.petForm).subscribe({
       next: (pet) => {
         console.log('✅ Mascota creada exitosamente:', pet);
-        this.isSaving = false;
-        this.router.navigate(['/home'], { replaceUrl: true });
+        // La mascota ya existe: si algo de salud falla no se pierde, se puede completar después desde su perfil.
+        this.saveHealth(pet.id).subscribe(() => {
+          this.isSaving = false;
+          this.router.navigate(['/home'], { replaceUrl: true });
+        });
       },
       error: (err) => {
         this.isSaving = false;
@@ -170,6 +191,24 @@ export class AddPetComponent implements OnInit {
     });
   }
 }
+
+  /** Esterilización y alergias que el dueño contestó en el registro (solo lo que contestó; "No sé" no se manda). */
+  saveHealth(petId: string): Observable<unknown> {
+    const f = this.petForm;
+    const calls: Observable<unknown>[] = [];
+    if (f.neuteredStatus !== 'UNKNOWN') {
+      calls.push(this.petHealth.setNeutered(petId, f.neuteredStatus, f.neuteredAt || undefined));
+    }
+    if (f.allergyAnswer === 'NO') {
+      calls.push(this.petHealth.setAllergyStatus(petId, 'NONE_KNOWN'));
+    } else if (f.allergyAnswer === 'YES') {
+      f.allergies
+        .filter(a => a.allergen.trim())
+        .forEach(a => calls.push(this.petHealth.addAllergy({ petId, allergen: a.allergen.trim(), category: 'OTHER', severity: a.severity })));
+    }
+    if (!calls.length) return of(null);
+    return forkJoin(calls.map(c => c.pipe(catchError(err => { console.error('❌ No se pudo guardar un dato de salud:', err); return of(null); }))));
+  }
 
   cancel() {
   this.location.back();

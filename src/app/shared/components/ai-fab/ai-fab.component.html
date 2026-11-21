@@ -1,0 +1,28 @@
+<ng-container *ngIf="visible">
+
+  <!-- Zona "Ocultar": aparece mientras se arrastra el botón -->
+  <div class="drop-zone" *ngIf="dragging" [class.over]="overZone"
+       [style.left.px]="zone.x - zone.r" [style.top.px]="zone.y - zone.r" [style.width.px]="zone.r * 2" [style.height.px]="zone.r * 2"
+       aria-hidden="true">
+    <ion-icon name="close"></ion-icon>
+    <span>Ocultar</span>
+  </div>
+
+  <div class="fab-wrap" [class.dragging]="dragging" [class.pressing]="pressing || dragging" [class.snapping]="snapping"
+       [class.left]="side === 'left'"
+       [style.transform]="'translate3d(' + pos.x + 'px,' + pos.y + 'px,0)'">
+
+    <div class="bubble" *ngIf="bubbleOpen && !dragging" role="status" (click)="openMini()">
+      <span>¡Soy la IA de MyAnimaLog! ¿En qué te puedo ayudar?</span>
+      <button type="button" class="bubble-x" (click)="closeBubble($event)" aria-label="Cerrar mensaje">×</button>
+    </div>
+
+    <button type="button" class="fab" data-tour="ai-fab" aria-label="Abrir el asistente de IA"
+            (pointerdown)="onPointerDown($event)" (pointermove)="onPointerMove($event)"
+            (pointerup)="onPointerUp($event)" (pointercancel)="onPointerCancel()" (keydown)="onKeydown($event)"
+            (contextmenu)="$event.preventDefault()">
+      <img src="assets/images/logo app.png" alt="" draggable="false" />
+    </button>
+  </div>
+
+</ng-container>

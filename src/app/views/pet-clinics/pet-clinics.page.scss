@@ -1,8 +1,8 @@
 @use '../vet/vet-common';
 
 .pet-card { display: flex; align-items: center; gap: 14px; background: #FFF4E0; border: 2px solid #f5a623; border-radius: 18px; padding: 16px; }
-.pet-avatar { width: 56px; height: 56px; border-radius: 50%; background: #fff; color: #B26A00; display: flex; align-items: center; justify-content: center; font-family: 'Jua', sans-serif; font-size: 24px; }
-.pc-name { font-family: 'Jua', sans-serif; font-size: 24px; margin: 0; }
+.pet-avatar { width: 56px; height: 56px; border-radius: 50%; background: #fff; color: #B26A00; display: flex; align-items: center; justify-content: center; font-family: 'Actor', sans-serif; font-weight: 700; font-size: 24px; }
+.pc-name { font-family: 'Actor', sans-serif; font-weight: 700; font-size: 24px; margin: 0; }
 .pc-sub { color: #6b6b80; font-size: 14px; margin: 2px 0 0; }
 
 .title-row { display: flex; align-items: baseline; justify-content: space-between; .section-title { margin: 22px 0 10px; } }
@@ -10,7 +10,7 @@
 
 .clinic { margin-bottom: 14px; }
 .clinic-top { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
-.cl-name { font-family: 'Jua', sans-serif; font-size: 19px; margin: 0; }
+.cl-name { font-family: 'Actor', sans-serif; font-weight: 700; font-size: 19px; margin: 0; }
 .cl-sub { color: #6b6b80; font-size: 13px; margin: 2px 0 0; }
 .btn.small { height: 46px; font-size: 17px; }
 

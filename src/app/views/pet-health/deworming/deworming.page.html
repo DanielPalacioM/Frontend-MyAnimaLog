@@ -1,0 +1,105 @@
+<ion-content [fullscreen]="true" class="health-content">
+  <div class="health-wrap">
+
+    <div class="health-header">
+      <button class="back-btn" (click)="goBack()" aria-label="Volver"><ion-icon name="arrow-back-outline"></ion-icon></button>
+      <h1 class="health-title">Desparasitación</h1>
+    </div>
+
+    <div class="health-card-wrap">
+
+      <p class="state-msg" *ngIf="loading">Cargando...</p>
+
+      <div class="state-msg" *ngIf="!loading && loadError">
+        <p>No se pudo cargar la información de esta mascota.</p>
+        <button class="btn btn-outline small" (click)="load()">Reintentar</button>
+      </div>
+
+      <ng-container *ngIf="!loading && !loadError && pet">
+
+        <div class="pet-line">
+          <img *ngIf="pet.imageUrl" class="avatar" [src]="pet.imageUrl" alt="" />
+          <span *ngIf="!pet.imageUrl" class="avatar-fallback">{{ pet.name.charAt(0) }}</span>
+          <span>{{ pet.name }}<small>{{ pet.species }}</small></span>
+        </div>
+
+        <p class="notice" *ngIf="notice" role="status">{{ notice }}</p>
+        <p class="error-box" *ngIf="failed" role="alert">{{ failedText }}<button (click)="loadOverview()">Reintentar</button></p>
+
+        <ng-container *ngIf="overview">
+
+          <!-- Estado por tipo -->
+          <section class="kind" *ngFor="let k of kinds" [attr.data-kind]="k" [ngClass]="'state-' + status(k)!.state.toLowerCase()">
+            <div class="kind-top">
+              <span class="kind-ico" [class.ext]="k === 'EXTERNAL'"><ion-icon [name]="k === 'INTERNAL' ? 'medical-outline' : 'bug-outline'"></ion-icon></span>
+              <div class="kind-title">
+                <strong>{{ kindLabel(k) }}</strong>
+                <small>{{ kindHint(k) }}</small>
+              </div>
+              <span class="chip" [ngClass]="'tone-' + tone(status(k)!.state)"><ion-icon [name]="icon(status(k)!.state)"></ion-icon>{{ stateLabel(status(k)!.state) }}</span>
+            </div>
+
+            <ng-container *ngIf="status(k)!.registered; else noDose">
+              <p class="kind-line"><span>Última dosis</span><b>{{ date(status(k)!.lastApplicationDate) }}</b></p>
+              <p class="kind-line" *ngIf="detail(status(k)!.last)"><span>Producto</span><b>{{ detail(status(k)!.last) }}</b></p>
+              <p class="kind-line next" *ngIf="status(k)!.nextDoseDate">
+                <span>Próxima dosis</span>
+                <b>{{ date(status(k)!.nextDoseDate) }} <em>({{ due(status(k)!.nextDoseDate) }})</em></b>
+              </p>
+              <p class="kind-hint" *ngIf="status(k)!.nextSuggested">Fecha sugerida según la edad de {{ pet.name }}.</p>
+            </ng-container>
+            <ng-template #noDose><p class="kind-hint">Todavía no hay una dosis registrada.</p></ng-template>
+
+            <button class="btn btn-outline small" *ngIf="canEdit" (click)="register(k)">Registrar dosis {{ kindLabel(k).toLowerCase() }}</button>
+          </section>
+
+          <p class="block-note" *ngIf="anyRegistered">{{ scheduleNote }}</p>
+
+          <!-- Historial -->
+          <section class="block" *ngIf="entries.length">
+            <div class="block-head"><h2>Historial</h2></div>
+            <div class="entry" *ngFor="let e of entries">
+              <div class="entry-top">
+                <strong>{{ e.product || 'Sin producto' }}</strong>
+                <span class="chip tone-info">{{ kindLabel(e.kind) }}</span>
+              </div>
+              <p class="entry-line"><ion-icon name="calendar-outline"></ion-icon>{{ date(e.applicationDate) }}<span *ngIf="detail(e) && e.product"> · {{ e.dose }}<span *ngIf="e.weightKg != null"> · {{ e.weightKg }} kg</span></span></p>
+              <p class="entry-line who"><ion-icon [name]="e.administeredBy === 'CLINIC' ? 'shield-checkmark' : 'person-outline'"></ion-icon>{{ who(e) }}</p>
+              <p class="entry-line" *ngIf="e.notes"><ion-icon name="document-text-outline"></ion-icon>{{ e.notes }}</p>
+              <button class="link-btn" *ngIf="canVoid(e)" (click)="askVoid(e)">Anular (la registré por error)</button>
+            </div>
+          </section>
+
+          <div class="empty" *ngIf="!anyRegistered && !failed">
+            <p><strong>Aún no hay desparasitaciones registradas</strong></p>
+            <p>Anota la última dosis y te avisamos cuando toque la siguiente.</p>
+          </div>
+
+          <button class="btn btn-primary" *ngIf="canEdit" (click)="register()"><ion-icon name="add"></ion-icon>Registrar desparasitación</button>
+        </ng-container>
+
+        <!-- Si todavía no se pudo leer, igual se puede registrar -->
+        <button class="btn btn-primary" *ngIf="!overview && canEdit" (click)="register()"><ion-icon name="add"></ion-icon>Registrar desparasitación</button>
+
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- Hoja: anular una dosis -->
+  <app-bottom-sheet [isOpen]="!!voiding" title="¿Anular esta dosis?" (closed)="closeVoid()">
+    <div class="sheet-scroll">
+      <p class="field-hint">No se borra: queda en el historial de {{ pet?.name || 'tu mascota' }} como ingresada por error, con el motivo.</p>
+      <div class="field">
+        <label class="field-label" for="dw-reason">Motivo</label>
+        <textarea id="dw-reason" class="field-textarea field-input" rows="2" maxlength="200" placeholder="Ej. Me equivoqué de fecha" [(ngModel)]="reason"></textarea>
+      </div>
+      <p class="field-error" *ngIf="voidError" role="alert">{{ voidError }}</p>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn btn-danger" [disabled]="voidBusy" (click)="confirmVoid()">{{ voidBusy ? 'Guardando...' : 'Anular dosis' }}</button>
+      <button class="btn btn-outline" (click)="closeVoid()">Cancelar</button>
+    </div>
+  </app-bottom-sheet>
+
+  <app-tab-bar activeTab="pet-profile"></app-tab-bar>
+</ion-content>

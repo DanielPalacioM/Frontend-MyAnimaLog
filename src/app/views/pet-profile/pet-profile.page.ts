@@ -16,6 +16,9 @@ import { CalendarService } from 'src/app/services/CalendarService/calendar';
 import { SharedProfileService } from 'src/app/services/SharedProfileService/shared-profile';
 import { PetRole } from 'src/app/models/shared-profile.model';
 import { TutorialService, TutorialStep } from 'src/app/services/TutorialService/tutorial';
+import { PetHealthService } from 'src/app/services/PetHealthService/pet-health';
+import { Allergy, HealthSummary } from 'src/app/models/pet-health.model';
+import { isActiveAllergy } from 'src/app/shared/utils/pet-health.util';
 
 interface PetStats {
   age: string;
@@ -73,6 +76,11 @@ export class PetProfilePage implements OnInit {
 
   vaccineSummary: VaccineSummary | null = null;
 
+  // Salud de la mascota (servicio Medical): esterilización, alergias y desparasitación.
+  // Si el backend todavía no responde, las tarjetas lo dicen en vez de quedar vacías.
+  health: HealthSummary | null = null;
+  healthUnavailable = false;
+
   calendarEvents: PetCalendarEvent[] = [];
 
   documents: PetDocument[] = [];
@@ -87,7 +95,8 @@ export class PetProfilePage implements OnInit {
     private documentService: DocumentService,
     private calendarService: CalendarService,
     private sharedProfileService: SharedProfileService,
-    private tutorialService: TutorialService
+    private tutorialService: TutorialService,
+    private petHealth: PetHealthService
   ) {}
 
   ngOnInit(): void {
@@ -145,6 +154,7 @@ closePhotoViewer(): void {
         this.loading = false;
         this.loadMedicalHistoryCounts(id);
         this.loadVaccineSummary(id);
+        this.loadHealthSummary(id);
         this.loadDocuments(id);
         this.loadCalendarEvents(id);
         this.maybeStartTutorial();
@@ -273,6 +283,42 @@ private toLocalTimeString(d: Date): string {
         this.vaccineSummary = null;
       }
     });
+  }
+
+  private loadHealthSummary(petId: string): void {
+    this.petHealth.getSummary(petId).subscribe({
+      next: (summary) => {
+        this.health = summary;
+        this.healthUnavailable = false;
+      },
+      error: (err) => {
+        console.error('❌ Error cargando la salud de la mascota:', err);
+        this.health = null;
+        this.healthUnavailable = true;
+      }
+    });
+  }
+
+  /** Alergia grave vigente: el aviso rojo de arriba del perfil. */
+  get severeAllergy(): Allergy | null {
+    return this.health?.allergies.find(a => isActiveAllergy(a) && a.severity === 'SEVERE') ?? null;
+  }
+
+  goToHealth(): void {
+    this.closeSidebar();
+    if (!this.pet) return;
+    this.router.navigate(['/pet-health', this.pet.id]);
+  }
+
+  goToDeworming(): void {
+    this.closeSidebar();
+    if (!this.pet) return;
+    this.router.navigate(['/pet-health', this.pet.id, 'deworming']);
+  }
+
+  goToRegisterDeworming(): void {
+    if (!this.pet) return;
+    this.router.navigate(['/pet-health', this.pet.id, 'deworming', 'new']);
   }
 
   private loadMedicalHistoryCounts(petId: string): void {

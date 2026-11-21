@@ -1,0 +1,55 @@
+<div class="mini-backdrop" *ngIf="open" (click)="close()"></div>
+
+<aside class="mini" [class.open]="open" role="dialog" aria-label="Mini chat con la IA" [attr.aria-hidden]="!open">
+
+  <header class="mini-head">
+    <img src="assets/images/logo app.png" alt="" class="mini-logo" />
+    <div class="mini-titles">
+      <strong>{{ aiName }}</strong>
+      <small>Estás en: {{ screen.label }}</small>
+    </div>
+    <button type="button" class="mini-btn" (click)="expand()" aria-label="Abrir el chat completo"><ion-icon name="expand-outline"></ion-icon></button>
+    <button type="button" class="mini-btn" (click)="close()" aria-label="Cerrar"><ion-icon name="close"></ion-icon></button>
+  </header>
+
+  <div class="mini-body" #body>
+
+    <!-- Sin conversación todavía: saludo según la pantalla y sugerencias -->
+    <div class="mini-empty" *ngIf="!conv.messages.length && !conv.typing">
+      <p>¿Qué necesitas en <strong>{{ screen.label }}</strong>?</p>
+      <button type="button" class="mini-chip" *ngFor="let s of suggestions" (click)="useSuggestion(s)" [disabled]="conv.sending">{{ s }}</button>
+    </div>
+
+    <ng-container *ngFor="let m of conv.messages; trackBy: trackById">
+      <div class="m-row user" *ngIf="m.role === 'user'">
+        <div class="m-bubble">
+          <span class="m-files" *ngIf="m.attachments?.length">📎 {{ m.attachments!.length }} {{ m.attachments!.length === 1 ? 'archivo' : 'archivos' }}</span>
+          {{ m.text }}
+        </div>
+      </div>
+
+      <div class="m-row assistant" *ngIf="m.role === 'assistant'">
+        <img src="assets/images/logo app.png" alt="" class="m-avatar" />
+        <div class="m-answer" [class.error]="m.error">
+          <div class="rich" [innerHTML]="html(m.text)"></div>
+          <app-ai-action-card *ngIf="m.pendingAction" [action]="m.pendingAction" [busy]="conv.actionBusyId === m.pendingAction.id"
+                              (confirmed)="confirmAction(m)" (rejected)="rejectAction(m)"></app-ai-action-card>
+          <button *ngIf="m.error" type="button" class="m-retry" (click)="retry()" [disabled]="conv.sending">Reintentar</button>
+        </div>
+      </div>
+    </ng-container>
+
+    <div class="m-row assistant" *ngIf="conv.typing" aria-live="polite">
+      <img src="assets/images/logo app.png" alt="" class="m-avatar" />
+      <div class="m-answer"><span class="dots" aria-label="Escribiendo"><i></i><i></i><i></i></span></div>
+    </div>
+  </div>
+
+  <footer class="mini-foot">
+    <div class="mini-composer">
+      <textarea rows="1" [(ngModel)]="draft" (keydown.enter)="onEnter($event)" placeholder="Pídele algo a la IA..." aria-label="Mensaje para la IA"></textarea>
+      <button type="button" class="mini-send" (click)="send()" [disabled]="!canSend" aria-label="Enviar"><ion-icon name="arrow-up"></ion-icon></button>
+    </div>
+    <p class="mini-hint">Para adjuntar documentos, abre el chat completo.</p>
+  </footer>
+</aside>
