@@ -1,0 +1,137 @@
+<ion-content [fullscreen]="true" class="vet-light">
+  <div class="page-wrap">
+
+    <div class="page-head">
+      <button class="back-arrow" (click)="result ? goVet() : back()" aria-label="Volver"><ion-icon name="arrow-back-outline"></ion-icon></button>
+      <h1>{{ rescheduling ? 'Reprogramar cita' : 'Pedir cita' }}</h1>
+    </div>
+
+    <p class="state-msg" *ngIf="loading">Cargando...</p>
+
+    <div class="state-msg" *ngIf="!loading && loadError">
+      <strong>{{ loadError.title }}</strong>
+      <p>{{ loadError.detail }}</p>
+      <button class="btn btn-primary" (click)="goBackHome()">Volver a Mis veterinarias</button>
+    </div>
+
+    <ng-container *ngIf="!loading && !loadError && vet && !result">
+
+      <p class="clinic-line">
+        <app-vet-avatar [name]="vet.name" [logoUrl]="vet.logoUrl" [size]="32"></app-vet-avatar>
+        <span>{{ vet.name }}<small *ngIf="vet.city"> · {{ vet.city }}</small></span>
+      </p>
+
+      <!-- Reprogramar: recuerda qué cita se mueve -->
+      <div class="moving" *ngIf="moving">
+        <strong>{{ moving.serviceName }} · {{ moving.petName }}</strong>
+        <small>Hoy la tienes el {{ dayLabel(moving.startsAt) }} a las {{ timeLabel(moving.startsAt) }}</small>
+      </div>
+
+      <div class="progress" *ngIf="!rescheduling" aria-label="Progreso">
+        <span class="step-label">PASO {{ step }} DE 3</span>
+        <span class="bar"><i [style.width.%]="step * 33.4"></i></span>
+      </div>
+
+      <!-- Paso 1: servicio (Figma 2034:225) -->
+      <ng-container *ngIf="step === 1 && !rescheduling">
+        <h2 class="section-title">¿Qué necesita tu mascota?</h2>
+        <div class="alert alert-info" *ngIf="!services.length">
+          <strong>Esta clínica no tiene servicios para pedir desde la app</strong>
+          Llámala para agendar.
+        </div>
+        <button type="button" class="svc" *ngFor="let s of services" (click)="pickService(s)">
+          <span class="svc-main"><strong>{{ s.name }}</strong><small>{{ duration(s.durationMinutes) }}</small></span>
+          <span class="svc-price" *ngIf="s.price !== null">{{ money(s.price) }}</span>
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </button>
+      </ng-container>
+
+      <!-- Paso 2: fecha y hora (Figma 2034:282) -->
+      <ng-container *ngIf="step === 2 && service">
+        <h2 class="section-title">¿Cuándo?</h2>
+        <p class="svc-chip"><strong>{{ service.name }}</strong> · {{ duration(service.durationMinutes) }}</p>
+
+        <div class="strip" role="group" aria-label="Días">
+          <button type="button" class="strip-nav" [disabled]="!canGoBack || loadingSlots" (click)="shift(-1)" aria-label="Días anteriores"><ion-icon name="chevron-back-outline"></ion-icon></button>
+          <button type="button" class="day" *ngFor="let d of strip" [class.on]="d.key === dayKey" [class.off]="!d.hasSlots"
+                  [disabled]="loadingSlots" [attr.aria-pressed]="d.key === dayKey" (click)="pickDay(d.key)">
+            <small>{{ d.name }}</small><strong>{{ d.num }}</strong>
+          </button>
+          <button type="button" class="strip-nav" [disabled]="loadingSlots" (click)="shift(1)" aria-label="Días siguientes"><ion-icon name="chevron-forward-outline"></ion-icon></button>
+        </div>
+
+        <p class="state-msg small" *ngIf="loadingSlots">Buscando horas libres...</p>
+        <div class="alert alert-error" *ngIf="slotsError" role="alert">
+          <strong>{{ slotsError.title }}</strong>{{ slotsError.detail }}
+          <button type="button" class="retry" (click)="loadSlots(stripStart)">Reintentar</button>
+        </div>
+
+        <ng-container *ngIf="!loadingSlots && !slotsError && availability">
+          <h3 class="sub-title">{{ freeHoursTitle }}</h3>
+          <p class="closed" *ngIf="day?.closed">La clínica no atiende este día. Prueba con otro.</p>
+          <p class="closed" *ngIf="day && !day.closed && !daySlots.length">No quedan horas libres este día.</p>
+          <div class="slots">
+            <button type="button" class="slot" *ngFor="let s of daySlots" [class.on]="isPicked(s.slot)" [disabled]="!s.ok"
+                    [attr.aria-pressed]="isPicked(s.slot)" (click)="pickSlot(s.slot)">{{ timeLabel(s.slot.startsAt) }}</button>
+          </div>
+          <p class="note">No mostramos horas con menos de 1 hora de anticipación.</p>
+          <p class="note" *ngIf="gridNote">Estas horas son una guía: la clínica confirma tu cita.</p>
+        </ng-container>
+
+        <div class="alert alert-error" *ngIf="error" role="alert"><strong>{{ error.title }}</strong>{{ error.detail }}</div>
+
+        <button class="btn btn-primary cta" [disabled]="!slot || submitting" (click)="continueFromSlots()">
+          {{ rescheduling ? (submitting ? 'Reprogramando...' : 'Reprogramar cita') : 'Continuar' }}
+        </button>
+      </ng-container>
+
+      <!-- Paso 3: mascota y confirmar (Figma 2034:361) -->
+      <ng-container *ngIf="step === 3 && service && slot">
+        <h2 class="section-title">¿Para quién es?</h2>
+        <div class="alert alert-info" *ngIf="!pets.length">
+          <strong>Aún no tienes mascotas propias</strong>
+          Solo el dueño de una mascota puede pedir cita para ella.
+        </div>
+        <div class="card pets" *ngIf="pets.length">
+          <button type="button" class="pet-row" *ngFor="let p of pets" [class.on]="p.id === petId" [attr.aria-pressed]="p.id === petId" (click)="pickPet(p)">
+            <span class="pet-dot">{{ p.name[0] | uppercase }}</span>
+            <span class="pet-info"><strong>{{ p.name }}</strong><small>{{ p.shared ? 'La clínica ya ve su historia' : 'La clínica aún no ve su historia' }}</small></span>
+            <span class="radio" [class.on]="p.id === petId"></span>
+          </button>
+        </div>
+        <p class="note" *ngIf="pet && !pet.shared">Para atenderla, {{ vet.name }} necesita ver la historia de {{ pet.name }}. Podrás quitarle el acceso cuando quieras.</p>
+
+        <label class="field-label" for="notes">Nota para la clínica (opcional)</label>
+        <textarea id="notes" class="notes" rows="3" maxlength="300" [(ngModel)]="notes" placeholder="Ej. Está un poco decaído desde ayer"></textarea>
+
+        <div class="card summary">
+          <p><span>Servicio</span><strong>{{ service.name }}</strong></p>
+          <p><span>Cuándo</span><strong>{{ dayLabel(slot.startsAt) }} · {{ timeLabel(slot.startsAt) }}</strong></p>
+          <p *ngIf="service.price !== null"><span>Precio</span><strong>{{ money(service.price) }}</strong></p>
+        </div>
+        <p class="note" *ngIf="service.price !== null">El precio queda fijo en tu cita aunque la clínica lo cambie después.</p>
+
+        <div class="alert alert-error" *ngIf="error" role="alert"><strong>{{ error.title }}</strong>{{ error.detail }}</div>
+
+        <button class="btn btn-primary cta" [disabled]="!canConfirm" (click)="confirm()">{{ confirmLabel }}</button>
+      </ng-container>
+    </ng-container>
+
+    <!-- Resultado -->
+    <div class="done" *ngIf="result" role="status">
+      <span class="done-ic" [class.pending]="result.status === 'REQUESTED'"><ion-icon [name]="status[result.status].icon"></ion-icon></span>
+      <h2>{{ resultTitle }}</h2>
+      <p>{{ resultText }}</p>
+      <div class="card summary">
+        <p><span>Servicio</span><strong>{{ result.serviceName || service?.name }}</strong></p>
+        <p><span>Cuándo</span><strong>{{ dayLabel(result.startsAt) }} · {{ timeLabel(result.startsAt) }}</strong></p>
+        <p *ngIf="result.petName || pet"><span>Mascota</span><strong>{{ result.petName || pet?.name }}</strong></p>
+      </div>
+      <button class="btn btn-primary" (click)="goAppointments()">Ver mis citas</button>
+      <button class="btn-text" (click)="goVet()">Listo</button>
+    </div>
+
+  </div>
+
+  <app-tab-bar activeTab="veterinary"></app-tab-bar>
+</ion-content>

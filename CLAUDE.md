@@ -54,6 +54,7 @@ Copia la estructura de `views/maps/`:
 | `NotificationService` | `/notifications` | |
 | `MapsService/maps.ts` | Google Places (New) y Routes | Veterinarias cercanas, autocompletado, detalle y ruta |
 | `VeterinaryService/veterinary.ts` | `/veterinary/links*`, `/veterinary/me/*` | Fase 4A del dueño: vista previa por código, vincularse (idempotente), mis clínicas, desvincularme, compartir y revocar mascotas, clínicas por mascota. Errores como `VetError` con `code`. |
+| `AppointmentService/appointment.ts` | `environment.calendarUrl` (o `apiUrl`): `/veterinaries/{id}/services`, `/availability`, `/appointment-requests`, `/me/appointments`, `PATCH …/cancel` y `…/reschedule` | Citas con una clínica (calendar-service, servicio aparte del gateway). Errores como `AppointmentError` con `code`. Contrato en Postman "Calendar Microservice" y `docs/MYANIMALOG_VET_BACKEND_CONTRATO.md` §G–H. |
 | `AiChatService/ai-chat.ts` | `POST /ai/chat` (multipart), `/ai/actions/{id}/confirm` y `/reject` | IA-service. El historial lo guarda el servidor (`conversationId`); las acciones (crear mascota, agendar cita, registrar vacuna) piden confirmación. Errores como `AiError` con `code`. **El gateway ya enruta `/api/ai/*` pero el servicio responde 503 (sin desplegar).** Contrato en `docs/IA_CHAT_CONTRATO.md` y Postman `MyAnimaLog-IA-service`. También guarda los chats por usuario en localStorage. |
 | `AiConversationService` | — | Estado de la conversación compartido por el chat completo y el mini chat (enviar, reintentar, confirmar acciones, historial). |
 | `TutorialService` | localStorage | Textos en `tutorial-content.ts` |
@@ -86,6 +87,16 @@ Lo que ya existe:
 - **Vincular y compartir (17 nov, Fase 4A, `views/vet/` + `views/pet-clinics/`):** `/vet` (vacío o Mis veterinarias), `/vet/link` (código, QR con jsQR y vista previa; acepta `?code=VET-XXXXXXXX`), `/vet/share/:vetId`, `/vet/detail/:vetId` (interruptor por mascota y desvincular) y `/pet-clinics/:id` (Clínicas con acceso, desde el menú del perfil de la mascota; solo el dueño). Rutas reales en `docs/coleccion de postman` (carpeta 11 de la colección más nueva; la de `Descargas` del 17 nov es más reciente que la del repo). **Sin probar contra el gateway:** devuelve 401 a cualquier ruta, así que falta un token para confirmar que está desplegado. No hay citas, directorio ni reclamos todavía; "Próxima cita", "Pedir cita" y "Última visita" del Figma quedan fuera.
 - **Pruebas:** `ng test` completo no compila por specs de plantilla viejos; usa `npx ng test --watch=false --browsers=ChromeHeadless --ts-config=tsconfig.spec.vet.json --include=<spec>` (con `CHROME_BIN`).
 - **Datos:** hoy la veterinaria es solo texto libre (`veterinarian` en vacunas y visitas, `vetName` en Pet). No hay modelo `Vet` ni servicio.
+
+### Pedir cita y Mis citas (23 nov, `views/vet/vet-book/` y `views/vet/vet-appointments/`)
+Hechas con la lógica completa y **sin conectar todavía**: solo falta llenar `environment.calendarUrl` con la URL de Calendar (`https://calendar-microservice-20369076707.us-central1.run.app/api`) y que Calendar permita CORS desde `localhost:8100` (en móvil nativo no hace falta). Probado solo con pruebas unitarias (`vet-appointments.spec.ts`); contra el backend real no.
+- **`/vet/book/:vetId`** (Figma 2034:225/282/361): servicio → fecha y hora (tira de 5 días) → mascota y confirmar. Con `?appointmentId=` reprograma esa cita. Solo mascotas propias; si la elegida no está compartida se comparte y se sigue ("Compartir a X y pedir cita"); sin horas con menos de 1 h de anticipación; el precio queda fijo en la cita.
+- **`/vet/appointments`** (`?veterinaryId=` filtra): próximas y anteriores con el estado en texto e ícono (`STATUS_VIEW`). Cancelar y reprogramar se bloquean fuera de plazo (24 h, o `cancellableUntil` si el backend lo manda) y explican por qué.
+- **Entradas:** botón "Pedir cita" y "Ver mis citas con esta clínica" en `/vet/detail/:vetId`, y "Mis citas" en `/vet`. Las notificaciones `APPOINTMENT_*` abren Mis citas.
+- **Horas libres:** `GET …/availability` no existe todavía; si responde 404 la app usa una cuadrícula local (L–V 8–12 y 14–18, sábado 8–12, cada 30 min) y avisa "la clínica confirma tu cita". Cuando el endpoint exista no hay que tocar nada.
+- **Lógica pura** (fechas en hora de Bogotá, franjas, plazos, errores) en `shared/utils/appointment.util.ts`.
+- **Pruebas:** `npx ng test --watch=false --browsers=ChromeHeadless --ts-config=tsconfig.spec.vet.json --include='src/**/vet-appointments.spec.ts'`.
+- **Falta:** mostrar las citas en el calendario (separadas de los eventos manuales) y los avisos `APPOINTMENT_*` en el enum del backend.
 
 ### Chat de IA (18 nov, `views/ai-chat/`, ruta `/ia`) y botón de IA
 Sin diseño de Figma; criterios del equipo.

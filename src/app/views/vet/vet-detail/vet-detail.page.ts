@@ -139,6 +139,10 @@ export class VetDetailPage {
     window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, '_blank');
   }
 
+  bookAppointment(): void { this.router.navigate(['/vet/book', this.vetId]); }
+
+  myAppointments(): void { this.router.navigate(['/vet/appointments'], { queryParams: { veterinaryId: this.vetId } }); }
+
   goBack(): void { this.router.navigate(['/vet']); }
 
   private async showToast(message: string): Promise<void> {

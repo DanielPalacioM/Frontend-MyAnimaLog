@@ -75,4 +75,6 @@ export class VetPage {
   onHaveCode(): void { this.router.navigate(['/vet/link']); }
   onSearch(): void { this.router.navigate(['/maps']); }
   openVet(v: LinkedVet): void { this.router.navigate(['/vet/detail', v.veterinaryId]); }
+
+  openAppointments(): void { this.router.navigate(['/vet/appointments']); }
 }

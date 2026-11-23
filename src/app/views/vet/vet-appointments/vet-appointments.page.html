@@ -1,0 +1,81 @@
+<ion-content [fullscreen]="true" class="vet-light">
+  <div class="page-wrap">
+
+    <div class="page-head">
+      <button class="back-arrow" (click)="goBack()" aria-label="Volver"><ion-icon name="arrow-back-outline"></ion-icon></button>
+      <h1>Mis citas</h1>
+    </div>
+
+    <p class="state-msg" *ngIf="state === 'loading'">Cargando...</p>
+
+    <div class="state-msg" *ngIf="state === 'error' && error">
+      <strong>{{ error.title }}</strong>
+      <p>{{ error.detail }}</p>
+      <button class="btn btn-primary" (click)="load()">Reintentar</button>
+    </div>
+
+    <ng-container *ngIf="state === 'ready'">
+
+      <div class="state-msg" *ngIf="empty">
+        <strong>Todavía no tienes citas</strong>
+        <p>Pide una desde la página de tu veterinaria.</p>
+        <button class="btn btn-primary" (click)="book()">Ir a Mis veterinarias</button>
+      </div>
+
+      <ng-container *ngIf="upcoming.length">
+        <h2 class="section-title">Próximas</h2>
+        <article class="card appt" *ngFor="let a of upcoming">
+          <header>
+            <span class="when">{{ when(a) }}</span>
+            <span class="chip" [ngClass]="'tone-' + status[a.status].tone"><ion-icon [name]="status[a.status].icon"></ion-icon>{{ status[a.status].label }}</span>
+          </header>
+          <p class="what"><strong>{{ a.serviceName }}</strong> · {{ a.petName }}</p>
+          <p class="where">{{ a.clinicName }}<ng-container *ngIf="a.employeeName"> · {{ a.employeeName }}</ng-container></p>
+          <p class="where" *ngIf="a.address">{{ a.address }}</p>
+          <p class="meta">{{ duration(a.durationMinutes) }}<ng-container *ngIf="a.price !== null"> · {{ money(a.price) }}</ng-container></p>
+          <p class="hint" *ngIf="detail(a)">{{ detail(a) }}</p>
+
+          <div class="acts" *ngIf="canAct(a)">
+            <button type="button" class="btn btn-outline small" (click)="reschedule(a)">Reprogramar</button>
+            <button type="button" class="btn btn-danger-outline small" (click)="openCancel(a)">Cancelar</button>
+          </div>
+          <p class="locked" *ngIf="!canAct(a) && whyNot(a)"><ion-icon name="lock-closed-outline"></ion-icon>{{ whyNot(a) }}</p>
+        </article>
+      </ng-container>
+
+      <ng-container *ngIf="past.length">
+        <h2 class="section-title">Anteriores</h2>
+        <article class="card appt past" *ngFor="let a of past">
+          <header>
+            <span class="when">{{ dayLabel(a.startsAt) }} · {{ timeLabel(a.startsAt) }}</span>
+            <span class="chip" [ngClass]="'tone-' + status[a.status].tone"><ion-icon [name]="status[a.status].icon"></ion-icon>{{ status[a.status].label }}</span>
+          </header>
+          <p class="what"><strong>{{ a.serviceName }}</strong> · {{ a.petName }}</p>
+          <p class="where">{{ a.clinicName }}</p>
+          <p class="hint" *ngIf="detail(a)">{{ detail(a) }}</p>
+        </article>
+      </ng-container>
+
+      <p class="note-foot" *ngIf="!empty">Solo puedes cancelar o mover una cita hasta 24 horas antes. Después, comunícate con la clínica.</p>
+    </ng-container>
+
+  </div>
+
+  <app-bottom-sheet [isOpen]="!!cancelling" title="¿Cancelar esta cita?" (closed)="closeCancel()">
+    <ng-container *ngIf="cancelling">
+      <p class="sheet-text">
+        {{ cancelling.serviceName }} de {{ cancelling.petName }} · {{ dayLabel(cancelling.startsAt) }} a las {{ timeLabel(cancelling.startsAt) }}
+        en {{ cancelling.clinicName }}.
+      </p>
+      <label class="field-label" for="reason">Motivo (opcional)</label>
+      <textarea id="reason" class="notes" rows="2" maxlength="300" [(ngModel)]="reason" placeholder="Ej. Ya no puedo llevarlo"></textarea>
+      <div class="alert alert-error" *ngIf="actionError" role="alert"><strong>{{ actionError.title }}</strong>{{ actionError.detail }}</div>
+      <div class="sheet-actions">
+        <button class="btn btn-danger" [disabled]="busy" (click)="confirmCancel()">{{ busy ? 'Cancelando...' : 'Sí, cancelar cita' }}</button>
+        <button class="btn btn-outline" [disabled]="busy" (click)="closeCancel()">Mantener cita</button>
+      </div>
+    </ng-container>
+  </app-bottom-sheet>
+
+  <app-tab-bar activeTab="veterinary"></app-tab-bar>
+</ion-content>

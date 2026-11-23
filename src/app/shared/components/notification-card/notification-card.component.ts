@@ -1,4 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Router } from '@angular/router';
+import { isAppointmentNotification } from 'src/app/shared/utils/appointment.util';
 
 export interface AppNotification {
   id: string;
@@ -37,7 +39,14 @@ export class NotificationCardComponent {
   toggleMenu() { this.menuOpen = !this.menuOpen; }
   onAccept()   { this.accepted.emit(this.notification.id); }
   onReject()   { this.rejected.emit(this.notification.id); }
-  onMarkRead() { this.markRead.emit(this.notification.id); this.menuOpen = false; }
+  constructor(private router: Router) {}
+
+  /** Tocar una notificación la marca leída; si es de una cita, además abre Mis citas. */
+  onMarkRead() {
+    this.markRead.emit(this.notification.id);
+    this.menuOpen = false;
+    if (isAppointmentNotification(this.notification.type)) this.router.navigate(['/vet/appointments']);
+  }
   onHide()     { this.hidden.emit(this.notification.id);   this.menuOpen = false; }
   onDelete()   { this.deleted.emit(this.notification.id);  this.menuOpen = false; }
   onComplete() { this.completed.emit(this.notification.id); this.menuOpen = false; }

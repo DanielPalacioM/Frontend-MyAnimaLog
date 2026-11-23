@@ -29,6 +29,9 @@
         <button class="btn btn-outline small" (click)="directions()">Cómo llegar</button>
       </div>
 
+      <button class="btn btn-primary book" (click)="bookAppointment()">Pedir cita</button>
+      <button class="btn-text" (click)="myAppointments()">Ver mis citas con esta clínica</button>
+
       <h2 class="section-title">Mascotas que ve</h2>
       <div class="card">
         <p class="lead" *ngIf="!pets.length">Todavía no tienes mascotas propias para compartir.</p>

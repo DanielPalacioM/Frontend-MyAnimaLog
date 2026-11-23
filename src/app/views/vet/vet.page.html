@@ -29,6 +29,8 @@
       <button class="plus-btn" (click)="onHaveCode()" aria-label="Vincular otra clínica"><ion-icon name="add-outline"></ion-icon></button>
     </div>
 
+    <button class="btn btn-outline appts-link" (click)="openAppointments()">Mis citas</button>
+
     <div class="card vet-card" *ngFor="let v of vets" (click)="openVet(v)">
       <div class="vet-card-top">
         <app-vet-avatar [name]="v.name" [logoUrl]="v.logoUrl" [size]="56"></app-vet-avatar>

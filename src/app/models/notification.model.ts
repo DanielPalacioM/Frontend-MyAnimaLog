@@ -4,7 +4,17 @@ export type NotificationType =
   | 'SHARED_ACCESS'
   | 'MEDICAL'
   | 'VACCINE_DUE'
-  | 'VETERINARY_ALERT';
+  | 'VETERINARY_ALERT'
+  // Vet (contrato §6): citas y vínculo con la clínica. Aún no están en el enum del backend; se aceptan como texto.
+  | 'APPOINTMENT_REQUESTED'
+  | 'APPOINTMENT_CONFIRMED'
+  | 'APPOINTMENT_REJECTED'
+  | 'APPOINTMENT_RESCHEDULED'
+  | 'APPOINTMENT_CANCELLED'
+  | 'APPOINTMENT_REMINDER'
+  | 'APPOINTMENT_COMPLETED'
+  | 'USER_LINKED'
+  | 'PET_CLAIMED';
 
 // Forma real de una notificación tal como la devuelve el NotificationMicroservice.
 export interface AppNotificationDto {
