@@ -45,9 +45,18 @@ describe('VeterinaryService', () => {
   it('un 404 LINK_CODE_NOT_FOUND llega como VetError con su código', () => {
     let err: VetError | undefined;
     service.link('VET-AAAAAAAA').subscribe({ error: e => (err = e) });
-    http.expectOne(`${base}/links`).flush({ code: 'LINK_CODE_NOT_FOUND' }, { status: 404, statusText: 'Not Found' });
+    http.expectOne(r => r.url === `${base}/links` && r.body.code === 'VET-AAAAAAAA').flush({ code: 'LINK_CODE_NOT_FOUND' }, { status: 404, statusText: 'Not Found' });
+    http.expectOne(r => r.url === `${base}/links` && r.body.code === 'AAAAAAAA').flush({ code: 'LINK_CODE_NOT_FOUND' }, { status: 404, statusText: 'Not Found' });
     expect(err?.code).toBe('LINK_CODE_NOT_FOUND');
     expect(err?.status).toBe(404);
+  });
+
+  it('un código sin VET- (como lo muestra el panel) se manda con prefijo y, si no existe, también sin él', () => {
+    let out: any;
+    service.previewByCode('kkkkd9ud').subscribe(r => (out = r));
+    http.expectOne(r => r.body.code === 'VET-KKKKD9UD').flush({ code: 'LINK_CODE_NOT_FOUND' }, { status: 404, statusText: 'Not Found' });
+    http.expectOne(r => r.body.code === 'KKKKD9UD').flush({ veterinaryId: VET, name: 'El Bosque', alreadyLinked: false });
+    expect(out.name).toBe('El Bosque');
   });
 
   it('getLinked desempaqueta { veterinaries } y acepta snake_case', () => {

@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import {
-  extractVetCode, isValidVetCode, normalizeVetCode, parseVetError, petSubtitle, vetErrorText, vetInitials,
+  extractVetCode, isValidVetCode, normalizeVetCode, parseVetError, petSubtitle, vetCodeForms, vetErrorText, vetInitials, withVetPrefix,
 } from './vet.util';
 
 describe('vet.util', () => {
@@ -20,6 +20,13 @@ describe('vet.util', () => {
       expect(isValidVetCode('VET-7K2M9QX')).toBeFalse();
       expect(isValidVetCode('VET-7K2M9QXAB')).toBeFalse();
       expect(isValidVetCode('')).toBeFalse();
+    });
+
+    it('acepta también los 8 caracteres sin VET- (así los muestra el panel) y los lleva al formato con prefijo', () => {
+      expect(isValidVetCode('kkkkd9ud')).toBeTrue();
+      expect(withVetPrefix(' kkkkd9ud ')).toBe('VET-KKKKD9UD');
+      expect(vetCodeForms('KKKKD9UD')).toEqual(['VET-KKKKD9UD', 'KKKKD9UD']);
+      expect(extractVetCode('KKKKD9UD')).toBe('VET-KKKKD9UD');
     });
 
     it('extrae el código de un enlace de invitación o de un QR con solo el código', () => {

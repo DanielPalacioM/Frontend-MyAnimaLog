@@ -8,17 +8,35 @@ export function normalizeVetCode(raw: string): string {
   return (raw ?? '').trim().toUpperCase().replace(/\s+/g, '');
 }
 
+/** Los 8 caracteres sin el prefijo: el panel de la clínica puede mostrar el código así (`KKKKD9UD`). */
+const BARE_CODE_RE = /^[A-Z0-9]{8}$/;
+
 export function isValidVetCode(raw: string): boolean {
-  return VET_CODE_RE.test(normalizeVetCode(raw));
+  const code = normalizeVetCode(raw);
+  return VET_CODE_RE.test(code) || BARE_CODE_RE.test(code);
+}
+
+/** El código con `VET-` delante (formato documentado), aunque lo hayan escrito sin él. */
+export function withVetPrefix(raw: string): string {
+  const code = normalizeVetCode(raw);
+  return BARE_CODE_RE.test(code) ? `VET-${code}` : code;
+}
+
+/** Las formas en que se prueba un código ante el servidor: la documentada primero y, si tiene prefijo, también sin él. */
+export function vetCodeForms(raw: string): string[] {
+  const full = withVetPrefix(raw);
+  return VET_CODE_RE.test(full) ? [full, full.slice(4)] : [full];
 }
 
 /**
  * Saca el código de un texto cualquiera: el QR de recepción puede traer solo el código
- * o un enlace de invitación que lo lleva dentro.
+ * (con o sin `VET-`) o un enlace de invitación que lo lleva dentro. Devuelve siempre `VET-XXXXXXXX`.
  */
 export function extractVetCode(text: string): string | null {
-  const m = (text ?? '').match(VET_CODE_IN_TEXT_RE);
-  return m ? m[0].toUpperCase() : null;
+  const raw = (text ?? '').trim();
+  const m = raw.match(VET_CODE_IN_TEXT_RE);
+  if (m) return m[0].toUpperCase();
+  return BARE_CODE_RE.test(raw.toUpperCase()) ? `VET-${raw.toUpperCase()}` : null;
 }
 
 /** "Clínica Patitas" → "CP". Para el avatar cuando la clínica no tiene logo. */

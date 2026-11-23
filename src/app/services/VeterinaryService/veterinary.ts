@@ -12,7 +12,7 @@ import {
   VetLinkResult,
   VetPreview,
 } from 'src/app/models/veterinary.model';
-import { normalizeVetCode, parseVetError } from 'src/app/shared/utils/vet.util';
+import { parseVetError, vetCodeForms } from 'src/app/shared/utils/vet.util';
 
 /** Mascota mínima que necesita el cruce "qué clínica ve a quién". */
 export interface PetRef { id: string; name: string; /** Desde cuándo la ve la clínica (solo en el mapa de `loadSharing`). */ grantedAt?: string; }
@@ -29,16 +29,29 @@ export class VeterinaryService {
 
   /** Vista previa por código (el código va en el body, nunca en la URL). */
   previewByCode(code: string): Observable<VetPreview> {
-    return this.http
-      .post<any>(`${this.baseUrl}/links/preview`, { code: normalizeVetCode(code) })
+    return this.postCode<any>(`${this.baseUrl}/links/preview`, code)
       .pipe(map(r => this.toPreview(r)), this.mapError());
   }
 
   /** Vincularme. Idempotente: si ya estaba vinculado responde 200 con `alreadyLinked`. */
   link(code: string): Observable<VetLinkResult> {
-    return this.http
-      .post<any>(`${this.baseUrl}/links`, { code: normalizeVetCode(code) })
+    return this.postCode<any>(`${this.baseUrl}/links`, code)
       .pipe(map(r => this.toLinkResult(r)), this.mapError());
+  }
+
+  /**
+   * Envía el código en el body. Si el servidor dice `LINK_CODE_NOT_FOUND` con `VET-XXXXXXXX`, prueba una vez sin el
+   * prefijo: el panel de la clínica hoy muestra el código sin él, y el servidor no dice cuál de las dos formas guarda.
+   */
+  private postCode<T>(url: string, code: string): Observable<T> {
+    const [first, second] = vetCodeForms(code);
+    const send = (c: string) => this.http.post<T>(url, { code: c });
+    if (!second) return send(first);
+    return send(first).pipe(
+      catchError(err =>
+        err?.status === 404 && (err?.error?.code ?? '') === 'LINK_CODE_NOT_FOUND' ? send(second) : throwError(() => err)
+      )
+    );
   }
 
   getLinked(): Observable<LinkedVet[]> {
