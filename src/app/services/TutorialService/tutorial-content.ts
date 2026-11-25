@@ -28,7 +28,7 @@ export const TUTORIAL_STEPS: Record<TutorialKey, TutorialStep[]> = {
     {
       target: 'home-greeting',
       title: 'Tu saludo del día',
-      text: 'Cambia con la hora y con lo que pasa con tus mascotas: te dice lo más importante de hoy. Toca al perrito para hablar con el asistente.',
+      text: 'Cambia con la hora y con lo que pasa con tus mascotas: te dice lo más importante de hoy (una cita, una vacuna por vencer, un cumpleaños). Toca al perrito: es el mismo asistente de IA.',
     },
     {
       target: 'home-quick-shared',
@@ -58,7 +58,7 @@ export const TUTORIAL_STEPS: Record<TutorialKey, TutorialStep[]> = {
     {
       target: 'home-vet-card',
       title: 'MyAnimaLogVet',
-      text: '"Asociar veterinaria" conecta tu veterinaria para que pueda consultar y actualizar el historial de tu mascota. "Buscar veterinaria" abre el mapa con las más cercanas.',
+      text: '"Asociar veterinaria" conecta tu veterinaria para que pueda consultar y actualizar el historial de tu mascota. "Buscar veterinaria" abre el mapa con las más cercanas. Cuando ya tienes una, aparece justo debajo para pedir cita o llamarla.',
     },
   ],
 
@@ -71,17 +71,22 @@ export const TUTORIAL_STEPS: Record<TutorialKey, TutorialStep[]> = {
     },
   ],
 
-  // Home con al menos una mascota: la tarjeta del carrusel.
+  // Home con al menos una mascota: "Para hoy" y las tarjetas de "Tus mascotas".
   'home-pets': [
     {
-      target: 'home-pet-card',
-      title: 'La tarjeta de tu mascota',
-      text: 'Muestra su nombre, raza, fecha de nacimiento y sexo. Tócala para abrir su perfil completo.',
+      target: 'home-today',
+      title: 'Para hoy',
+      text: 'Lo más urgente primero: vacunas o desparasitaciones vencidas o por vencer y tus citas de hoy y mañana. Cada una trae su botón para resolverla. Si no hay nada, te lo decimos.',
     },
     {
       target: 'home-pet-card',
-      title: 'Cambia entre mascotas',
-      text: 'Si tienes varias, desliza la tarjeta hacia los lados o toca la flecha. Las que te compartieron aparecen con la etiqueta "A mi cuidado" y abajo ves quién más cuida a las tuyas.',
+      title: 'Tus mascotas',
+      text: 'Cada tarjeta muestra su foto, raza, edad y un aviso de salud (por ejemplo "Vacunas al día" o "Alergia grave"). Tócala para abrir su perfil completo.',
+    },
+    {
+      target: 'home-pet-card',
+      title: 'Atajos de cada mascota',
+      text: 'Los tres botones de abajo abren sus vacunas, su salud y alergias, y agendar algo para ella. Si tienes varias, desliza hacia los lados; las que te compartieron dicen "A mi cuidado".',
     },
   ],
 
@@ -226,7 +231,7 @@ export const TUTORIAL_GALLERY: TutorialSlide[] = [
   {
     image: 'assets/images/Tutorial/01-home.png',
     title: 'Inicio',
-    text: 'Tu perfil, notificaciones, accesos rápidos y las tarjetas de tus mascotas.',
+    text: 'Tu saludo del día, lo que hay para hoy, accesos rápidos, tus mascotas, la semana y tu veterinaria.',
   },
   {
     image: 'assets/images/Tutorial/02-add-pet.png',

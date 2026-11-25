@@ -61,7 +61,7 @@
     </app-home-greeting>
 
     <!-- PARA HOY: lo más urgente primero (máx. 3) -->
-    <div class="today-card" id="para-hoy" *ngIf="hasPets">
+    <div class="today-card" id="para-hoy" data-tour="home-today" *ngIf="hasPets">
       <div class="today-head">
         <p class="today-title">Para hoy</p>
         <span class="today-count" *ngIf="todayItems.length">{{ todayItems.length }} {{ todayItems.length === 1 ? 'pendiente' : 'pendientes' }}</span>
