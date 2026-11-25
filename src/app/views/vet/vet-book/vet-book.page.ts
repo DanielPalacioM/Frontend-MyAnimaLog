@@ -199,9 +199,17 @@ export class VetBookPage {
     });
   }
 
+  /**
+   * Horas que el servidor rechazó (409 SLOT_UNAVAILABLE). Mientras Calendar no publique `availability`, las franjas son una
+   * cuadrícula local: la que la clínica no atiende se marca como no disponible y no se vuelve a ofrecer en esta pantalla.
+   */
+  private rejected = new Set<string>();
+
+  private isFree(s: TimeSlot): boolean { return slotBookable(s) && !this.rejected.has(s.startsAt); }
+
   get strip(): StripDay[] {
     return (this.availability?.days ?? []).map(d => ({
-      key: d.date, ...stripDay(d.date), hasSlots: d.slots.some(s => slotBookable(s)),
+      key: d.date, ...stripDay(d.date), hasSlots: d.slots.some(s => this.isFree(s)),
     }));
   }
 
@@ -218,7 +226,7 @@ export class VetBookPage {
   }
 
   get daySlots(): { slot: TimeSlot; ok: boolean }[] {
-    return (this.day?.slots ?? []).map(s => ({ slot: s, ok: slotBookable(s) }));
+    return (this.day?.slots ?? []).map(s => ({ slot: s, ok: this.isFree(s) }));
   }
 
   get freeHoursTitle(): string {
@@ -319,6 +327,10 @@ export class VetBookPage {
     this.error = isVetError(e) ? vetErrorText(e) : appointmentErrorText(e);
     // La hora se ocupó o quedó muy cerca: se vuelve a elegir hora con las franjas al día.
     if (code === 'SLOT_UNAVAILABLE' || code === 'SLOT_TAKEN' || code === 'SLOT_TOO_SOON') {
+      if (this.slot) this.rejected.add(this.slot.startsAt);
+      if (this.gridNote && code === 'SLOT_UNAVAILABLE') {
+        this.error = { title: 'La clínica no atiende a esa hora', detail: 'O ya está ocupada. La quitamos de la lista: elige otra hora.' };
+      }
       this.step = 2;
       this.loadSlots(this.stripStart || this.today);
     }

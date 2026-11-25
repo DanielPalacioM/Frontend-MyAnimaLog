@@ -289,9 +289,16 @@ describe('VetBookPage', () => {
     page.step = 3;
     page.confirm();
     expect(page.step as number).toBe(2);
-    expect(page.error?.title).toContain('ya no está libre');
+    // Con la cuadrícula local (Calendar aún sin availability) lo más probable es que la clínica no atienda a esa hora
+    expect(page.error?.title).toBe('La clínica no atiende a esa hora');
     expect(page.slot).toBeNull();
     expect(page.submitting).toBeFalse();
+    // La hora rechazada queda deshabilitada y no se vuelve a ofrecer
+    page.availability = { days: [fallbackDay('2026-12-07', 30)], source: 'grid' };
+    page.pickDay('2026-12-07');
+    const nine = page.daySlots.find(s => s.slot.startsAt === slotIso('2026-12-07', '09:00'));
+    expect(nine?.ok).toBeFalse();
+    expect(page.daySlots.some(s => s.ok)).toBeTrue();
   });
 
   it('PET_NOT_SHARED con la mascota marcada como compartida: comparte y reintenta una vez', () => {
