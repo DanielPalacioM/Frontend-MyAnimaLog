@@ -7,9 +7,9 @@ export const environment = {
   // El servicio tiene que permitir CORS desde http://localhost:8100.
   medicalUrl: '',
   // Calendar (citas: pedir, mis citas, cancelar, reprogramar) es un servicio aparte del gateway. Con /api y sin barra final.
-  // Ej. 'https://calendar-microservice-20369076707.us-central1.run.app/api'. Vacío = gateway (hoy no publica esas rutas).
-  // En el navegador necesita CORS desde http://localhost:8100; en móvil nativo no.
-  calendarUrl: '',
+  // En el celular (Capacitor) funciona directo. En la web desplegada el navegador lo bloquea hasta que Calendar permita CORS
+  // desde el dominio de Firebase Hosting (hoy no manda cabeceras CORS).
+  calendarUrl: 'https://calendar-microservice-20369076707.us-central1.run.app/api',
   apiUrl: 'https://pets-api-gateway-20369076707.us-central1.run.app/api', // cámbialo cuando tengan dominio real
   // Key de navegador restringida por dominio a Maps JavaScript API y Places API (New).
   // mapId: Map ID "MyAnimaLog Web" con el estilo de la app (se edita en Google Cloud, sin redesplegar).

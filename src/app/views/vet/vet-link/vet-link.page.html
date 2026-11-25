@@ -55,6 +55,10 @@
       <button class="btn btn-primary" [disabled]="busy" (click)="onLink()">
         {{ busy ? 'Vinculando...' : (preview.alreadyLinked ? 'Ya estás vinculado: ver clínica' : 'Vincularme') }}
       </button>
+      <button class="btn btn-outline book-btn" [disabled]="busy" (click)="onLinkAndBook()">
+        {{ preview.alreadyLinked ? 'Pedir cita' : 'Vincularme y pedir cita' }}
+      </button>
+      <p class="book-note" *ngIf="!preview.alreadyLinked">Para pedir una cita primero te vinculas. Tu cita queda pendiente hasta que la clínica la confirme; entonces aparece en el calendario de tu mascota.</p>
       <button class="btn-text" (click)="onCancelPreview()">Cancelar</button>
     </ng-container>
 

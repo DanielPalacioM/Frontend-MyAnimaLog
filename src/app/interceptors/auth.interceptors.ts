@@ -39,7 +39,10 @@ export class AuthInterceptor implements HttpInterceptor {
 
     // Logout lleva el token, pero un 401 ahí no debe intentar renovar la sesión.
     // Lo mismo para URLs que no son del gateway: se manda el token como antes, sin refresh.
-    if (req.url.includes('/auth/logout') || !req.url.startsWith(environment.apiUrl)) {
+    // Calendar (citas) es otro servicio con el mismo token: también se renueva la sesión si da 401.
+    const calendarUrl = (environment as { calendarUrl?: string }).calendarUrl;
+    const ownApi = req.url.startsWith(environment.apiUrl) || (!!calendarUrl && req.url.startsWith(calendarUrl));
+    if (req.url.includes('/auth/logout') || !ownApi) {
       return next.handle(this.withToken(req, this.auth.getToken()));
     }
 

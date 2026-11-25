@@ -35,6 +35,7 @@ import { AiMiniChatComponent } from './components/ai-mini-chat/ai-mini-chat.comp
 import { AiDockComponent } from './components/ai-dock/ai-dock.component';
 import { PreventionCardComponent } from './components/prevention-card/prevention-card.component';
 import { HealthCardComponent } from './components/health-card/health-card.component';
+import { HomeGreetingComponent } from './components/home-greeting/home-greeting.component';
 
 import { ImgFallbackDirective } from './directives/img-fallback.directive';
 
@@ -69,7 +70,8 @@ import { ImgFallbackDirective } from './directives/img-fallback.directive';
     AiMiniChatComponent,
     AiDockComponent,
     PreventionCardComponent,
-    HealthCardComponent
+    HealthCardComponent,
+    HomeGreetingComponent
   ],
   imports: [
     CommonModule,
@@ -108,7 +110,8 @@ import { ImgFallbackDirective } from './directives/img-fallback.directive';
     AiMiniChatComponent,
     AiDockComponent,
     PreventionCardComponent,
-    HealthCardComponent
+    HealthCardComponent,
+    HomeGreetingComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

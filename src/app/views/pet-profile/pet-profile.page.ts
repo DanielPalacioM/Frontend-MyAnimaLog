@@ -19,6 +19,10 @@ import { TutorialService, TutorialStep } from 'src/app/services/TutorialService/
 import { PetHealthService } from 'src/app/services/PetHealthService/pet-health';
 import { Allergy, HealthSummary } from 'src/app/models/pet-health.model';
 import { isActiveAllergy } from 'src/app/shared/utils/pet-health.util';
+import { AppointmentService } from 'src/app/services/AppointmentService/appointment';
+import { Appointment } from 'src/app/models/appointment.model';
+import { confirmedForPet, dateKey } from 'src/app/shared/utils/appointment.util';
+import { catchError, forkJoin, of } from 'rxjs';
 
 interface PetStats {
   age: string;
@@ -96,7 +100,8 @@ export class PetProfilePage implements OnInit {
     private calendarService: CalendarService,
     private sharedProfileService: SharedProfileService,
     private tutorialService: TutorialService,
-    private petHealth: PetHealthService
+    private petHealth: PetHealthService,
+    private appointmentService: AppointmentService
   ) {}
 
   ngOnInit(): void {
@@ -195,14 +200,38 @@ closePhotoViewer(): void {
   }
 
   private loadCalendarEvents(petId: string): void {
-    this.calendarService.getAllUserEvents().subscribe({
-      next: (events) => {
-        this.calendarEvents = events
-          .filter(e => e.pet_id === petId)
-          .map(e => this.mapToPetCalendarEvent(e));
+    // Eventos manuales + citas con clínicas que la clínica ya confirmó. Si Calendar falla, quedan los manuales.
+    forkJoin({
+      manual: this.calendarService.getAllUserEvents(),
+      clinic: this.appointmentService.getMine(Date.now(), 30, 180).pipe(
+        catchError(err => { console.error('❌ Error cargando citas con clínicas:', err); return of([] as Appointment[]); })
+      ),
+    }).subscribe({
+      next: ({ manual, clinic }) => {
+        this.calendarEvents = [
+          ...manual.filter(e => e.pet_id === petId).map(e => this.mapToPetCalendarEvent(e)),
+          ...confirmedForPet(clinic, petId).map(a => this.clinicToPetCalendarEvent(a)),
+        ];
       },
       error: (err) => console.error('❌ Error cargando eventos:', err)
     });
+  }
+
+  /** Cita confirmada por la clínica, en el calendario de la mascota (hora de Bogotá, como en "Mis citas"). */
+  private clinicToPetCalendarEvent(a: Appointment): PetCalendarEvent {
+    const hhmm = (iso: string) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Bogota' });
+    return {
+      id: `appt:${a.id}`,
+      title: a.serviceName || 'Cita en la clínica',
+      description: [a.clinicName, a.status === 'CHECKED_IN' ? 'En la clínica' : 'Confirmada por la clínica'].filter(Boolean).join(' · '),
+      date: dateKey(a.startsAt),
+      time: hhmm(a.startsAt),
+      endTime: a.endsAt ? hhmm(a.endsAt) : undefined,
+      type: 'VET_APPOINTMENT',
+      color: EVENT_TYPE_DEFAULTS.VET_APPOINTMENT?.color || '#4037BE',
+      fromClinic: true,
+      veterinaryId: a.veterinaryId,
+    };
   }
 
   private ensureUtc(dateStr: string): string {
@@ -510,12 +539,18 @@ private toLocalTimeString(d: Date): string {
   }
 
   onEditEvent(event: PetCalendarEvent): void {
+    // Las citas con la clínica se gestionan en "Mis citas" (cancelar o reprogramar).
+    if (event.fromClinic) {
+      this.router.navigate(['/vet/appointments'], { queryParams: event.veterinaryId ? { veterinaryId: event.veterinaryId } : {} });
+      return;
+    }
     this.router.navigate(['/calendar/add-event'], {
       queryParams: { eventId: event.id, petId: this.pet?.id }
     });
   }
 
   onDeleteEvent(event: PetCalendarEvent): void {
+    if (event.fromClinic) return; // no se borra desde aquí: se cancela en "Mis citas"
     this.calendarService.deleteEvent(event.id).subscribe({
       next: () => {
         this.calendarEvents = this.calendarEvents.filter(e => e.id !== event.id);

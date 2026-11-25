@@ -78,8 +78,8 @@
           {{ ev.time }}<span *ngIf="ev.endTime"> - {{ ev.endTime }}</span>
       </p>        
       <div class="event-actions" *ngIf="canEdit" (click)="$event.stopPropagation()">
-          <button class="action-btn edit" (click)="onEdit(ev, $event)"><ion-icon name="create-outline"></ion-icon></button>
-          <button class="action-btn delete" (click)="onDelete(ev, $event)"><ion-icon name="trash-outline"></ion-icon></button>
+          <button class="action-btn edit" *ngIf="!ev.fromClinic" (click)="onEdit(ev, $event)"><ion-icon name="create-outline"></ion-icon></button>
+          <button class="action-btn delete" *ngIf="!ev.fromClinic" (click)="onDelete(ev, $event)"><ion-icon name="trash-outline"></ion-icon></button>
         </div>
       </div>
       <p class="empty-events" *ngIf="selectedDayEvents.length === 0">Sin eventos este día</p>
@@ -100,8 +100,8 @@
           <p class="event-card-time">
               {{ ev.time }}<span *ngIf="ev.endTime"> - {{ ev.endTime }}</span>
         </p>          <div class="event-actions" *ngIf="canEdit" (click)="$event.stopPropagation()">
-            <button class="action-btn edit" (click)="onEdit(ev, $event)"><ion-icon name="create-outline"></ion-icon></button>
-            <button class="action-btn delete" (click)="onDelete(ev, $event)"><ion-icon name="trash-outline"></ion-icon></button>
+            <button class="action-btn edit" *ngIf="!ev.fromClinic" (click)="onEdit(ev, $event)"><ion-icon name="create-outline"></ion-icon></button>
+            <button class="action-btn delete" *ngIf="!ev.fromClinic" (click)="onDelete(ev, $event)"><ion-icon name="trash-outline"></ion-icon></button>
           </div>
         </div>
       </ng-container>
@@ -155,7 +155,7 @@
 
     </div>
 
-    <div class="event-modal-actions" *ngIf="canEdit">
+    <div class="event-modal-actions" *ngIf="canEdit && !selectedEvent?.fromClinic">
       <button class="modal-btn edit" (click)="onEdit(selectedEvent, $event); closeEventModal()">
         <ion-icon name="create-outline"></ion-icon> Editar
       </button>

@@ -11,6 +11,9 @@ export interface CalendarEvent {
   type: EventType;
   color: string;
   intervalHours?: number;
+  /** Cita con una clínica (viene de Calendar, no es un evento manual): no se edita ni se borra aquí. */
+  fromClinic?: boolean;
+  veterinaryId?: string;
 }
 
 @Component({

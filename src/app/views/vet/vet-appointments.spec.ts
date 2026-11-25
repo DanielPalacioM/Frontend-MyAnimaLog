@@ -1,3 +1,4 @@
+import { environment } from 'src/environments/environment';
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
@@ -122,7 +123,7 @@ describe('appointment.util', () => {
 describe('AppointmentService', () => {
   let svc: AppointmentService;
   let http: HttpTestingController;
-  const base = 'https://pets-api-gateway-20369076707.us-central1.run.app/api';
+  const base = (environment as { calendarUrl?: string }).calendarUrl || environment.apiUrl;
 
   beforeEach(() => {
     TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });

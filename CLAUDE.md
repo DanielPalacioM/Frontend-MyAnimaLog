@@ -96,7 +96,15 @@ Hechas con la lógica completa y **sin conectar todavía**: solo falta llenar `e
 - **Horas libres:** `GET …/availability` no existe todavía; si responde 404 la app usa una cuadrícula local (L–V 8–12 y 14–18, sábado 8–12, cada 30 min) y avisa "la clínica confirma tu cita". Cuando el endpoint exista no hay que tocar nada.
 - **Lógica pura** (fechas en hora de Bogotá, franjas, plazos, errores) en `shared/utils/appointment.util.ts`.
 - **Pruebas:** `npx ng test --watch=false --browsers=ChromeHeadless --ts-config=tsconfig.spec.vet.json --include='src/**/vet-appointments.spec.ts'`.
-- **Falta:** mostrar las citas en el calendario (separadas de los eventos manuales) y los avisos `APPOINTMENT_*` en el enum del backend.
+- **Sin vincular (25 nov):** en la vista previa de `/vet/link` está "Vincularme y pedir cita" (o "Pedir cita" si ya está vinculado): vincula y va a `/vet/book/:vetId`, que comparte la mascota si hace falta. Pedir cita exige estar vinculado.
+- **Calendario:** el calendario general muestra las citas abiertas (las pendientes marcadas "Pendiente de confirmación"). El **calendario de la mascota** (perfil) solo muestra las que la clínica ya validó (`CONFIRMED`/`CHECKED_IN`, `confirmedForPet`); no se editan ni se borran ahí: se gestionan en Mis citas.
+- **Falta:** los avisos `APPOINTMENT_*` en el enum del backend.
+
+### Home (25 nov): saludo del día, Para hoy, semana y clínica
+Diseño en Figma (archivo de siempre): componente `Home/Saludo` (5 momentos), guía "Saludo · guía de animación de la mascota" y pantallas "Home · propuesta".
+- **Orden:** encabezado → saludo (`app-home-greeting`) → **Para hoy** (máx. 3, lo más urgente primero) → accesos rápidos (Shared pet, Add pet, Calendar, Maps; **sin Vet**) → mascotas → **Esta semana** (L–D con puntos; reemplaza la tarjeta Calendar) → tarjeta MyAnimaLogVet y, si hay clínica vinculada, la clínica **pegada debajo** (Pedir cita / Llamar).
+- **Saludo:** según la hora y lo que pasa (sin mascotas → bienvenida; cumpleaños; noche → lo de mañana; pendientes → cuántos y "Ver lo de hoy"; todo al día → frase del banco del día). Textos oscuros sobre claro (el blanco sobre naranja no se leía). El perrito entra con salto y saluda **una vez por sesión** (`sessionStorage homeGreeted`), luego se balancea cada ~9 s; sin animación con reducir movimiento. Tocarlo abre el mini chat (es la cara de la IA). Para que salude "con el cuerpo" hay que redibujarlo por capas (ver la guía en Figma).
+- **Datos:** vacunas por mascota, `clinical-summary` (desparasitación), citas de Calendar y eventos; cada fuente falla por su cuenta. Lógica pura en `shared/utils/home-today.util.ts` (pruebas en `home-today.util.spec.ts`).
 
 ### Chat de IA (18 nov, `views/ai-chat/`, ruta `/ia`) y botón de IA
 Sin diseño de Figma; criterios del equipo.

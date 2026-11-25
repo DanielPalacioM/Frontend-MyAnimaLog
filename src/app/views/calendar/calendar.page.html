@@ -89,8 +89,9 @@
           <p class="event-card-time">{{ ev.time }}</p>
 
           <div class="event-actions" (click)="$event.stopPropagation()">
-            <button class="action-btn edit" (click)="onEditEvent(ev)"><ion-icon name="create-outline"></ion-icon></button>
-            <button class="action-btn delete" (click)="onDeleteEvent(ev)"><ion-icon name="trash-outline"></ion-icon></button>
+            <button class="action-btn edit" *ngIf="!ev.fromClinic" (click)="onEditEvent(ev)"><ion-icon name="create-outline"></ion-icon></button>
+            <button class="action-btn delete" *ngIf="!ev.fromClinic" (click)="onDeleteEvent(ev)"><ion-icon name="trash-outline"></ion-icon></button>
+            <button class="action-btn edit" *ngIf="ev.fromClinic" (click)="openClinicAppointment(ev)" aria-label="Ver la cita con la clínica"><ion-icon name="eye-outline"></ion-icon></button>
           </div>
         </div>
 
@@ -192,8 +193,9 @@
           <p class="event-card-desc" *ngIf="ev.description">{{ ev.description }}</p>
           <p class="event-card-time">{{ ev.time }}</p>
           <div class="event-actions" (click)="$event.stopPropagation()">
-            <button class="action-btn edit" (click)="onEditEvent(ev)"><ion-icon name="create-outline"></ion-icon></button>
-            <button class="action-btn delete" (click)="onDeleteEvent(ev)"><ion-icon name="trash-outline"></ion-icon></button>
+            <button class="action-btn edit" *ngIf="!ev.fromClinic" (click)="onEditEvent(ev)"><ion-icon name="create-outline"></ion-icon></button>
+            <button class="action-btn delete" *ngIf="!ev.fromClinic" (click)="onDeleteEvent(ev)"><ion-icon name="trash-outline"></ion-icon></button>
+            <button class="action-btn edit" *ngIf="ev.fromClinic" (click)="openClinicAppointment(ev)" aria-label="Ver la cita con la clínica"><ion-icon name="eye-outline"></ion-icon></button>
           </div>
         </div>
       </div>

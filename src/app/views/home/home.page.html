@@ -54,37 +54,28 @@
       </div>
     </div>
 
-    <!-- PROMO BANNER -->
-    <div class="promo-banner">
-      <img src="assets/images/Home_icons/logo app.png" alt="dog" class="promo-dog" />
-      <div class="promo-inner">
-        <div class="promo-ad-text">
-          <p>Don't forget to follow us on our networks</p>
-        </div>
-        <div class="promo-welcome-row">
-          <div class="promo-text-block">
-            <p class="welcome-line">Welcome To</p>
-            <div class="brand-name">
-              <span class="brand-myAnima">MyAnima</span>
-              <span class="brand-log-wrap">
-                <span class="brand-log">Log</span>
-              </span>
-            </div>
-          </div>
-        </div>
+    <!-- SALUDO DEL DÍA (Figma "Home/Saludo") -->
+    <app-home-greeting data-tour="home-greeting"
+      [view]="greeting" [animate]="greetAnimate"
+      (action)="onGreetingAction($event)" (dogTap)="onDogTap()">
+    </app-home-greeting>
+
+    <!-- PARA HOY: lo más urgente primero (máx. 3) -->
+    <div class="today-card" id="para-hoy" *ngIf="todayItems.length">
+      <div class="today-head">
+        <p class="today-title">Para hoy</p>
+        <span class="today-count">{{ todayItems.length }} {{ todayItems.length === 1 ? 'pendiente' : 'pendientes' }}</span>
       </div>
+      <div class="today-item" *ngFor="let it of todayItems.slice(0, 3)" [ngClass]="'tone-' + it.tone">
+        <span class="today-ico"><ion-icon [name]="it.icon"></ion-icon></span>
+        <span class="today-text"><strong>{{ it.title }}</strong><small>{{ it.detail }}</small></span>
+        <button type="button" class="today-btn" (click)="openTodayItem(it)">{{ it.action.label }}</button>
+      </div>
+      <p class="today-more" *ngIf="todayItems.length > 3">Y {{ todayItems.length - 3 }} más en el perfil de cada mascota.</p>
     </div>
 
     <!-- QUICK ACCESS -->
     <div class="quick-access">
-      <div class="quick-item" data-tour="home-quick-vet"
-        [class.active]="activeQuickItem === 'vet'"
-        (click)="onQuickItemTap('vet', '/vet')">
-        <div class="quick-icon-wrap">
-          <img src="assets/images/Home_icons/VetIcon.png" alt="vet" />
-        </div>
-        <span>Vet</span>
-      </div>
       <div class="quick-item" data-tour="home-quick-shared"
         [class.active]="activeQuickItem === 'shared'"
         (click)="onQuickItemTap('shared', '/shared-profiles')">
@@ -206,25 +197,28 @@
   
 </ng-container>
 
-    <!-- CALENDAR CARD -->
-<div class="calendar-card" data-tour="home-calendar-card">
-  <div class="card-content">
-    <p class="card-title">Calendar</p>
-    <div class="calendar-actions">
-      <button class="cal-btn" (click)="navigate('/calendar/add-event')">
-        Crear evento
-      </button>
-      <button class="cal-btn" (click)="navigate('/calendar')">
-        Ver eventos
-      </button>
+    <!-- ESTA SEMANA -->
+    <div class="week-card" data-tour="home-calendar-card">
+      <div class="week-head">
+        <p class="week-title">Esta semana</p>
+        <button type="button" class="week-link" (click)="navigate('/calendar')">Ver calendario <ion-icon name="chevron-forward-outline"></ion-icon></button>
+      </div>
+      <div class="week-days">
+        <button type="button" class="week-day" *ngFor="let d of week" [class.today]="d.today" (click)="navigate('/calendar')" [attr.aria-label]="d.num + (d.mark ? ', con citas o eventos' : '')">
+          <small>{{ d.letter }}</small>
+          <span class="num">{{ d.num }}</span>
+          <i class="dot" [ngClass]="d.mark ? 'dot-' + d.mark : ''"></i>
+        </button>
+      </div>
+      <div class="week-foot">
+        <p class="week-note">{{ weekNote || 'Sin citas esta semana.' }}</p>
+        <button type="button" class="week-add" (click)="navigate('/calendar/add-event')">+ Crear evento</button>
+      </div>
     </div>
-    <img src="assets/images/Home_icons/calendarIconDesing.png" alt="" class="cal-bg-icon" />
-  </div>
-  <img src="assets/images/Home_icons/calendarImage.png" class="calendar-side-img" alt="" />
-</div>
 
-    <!-- VET ASSOCIATION CARD -->
-    <div class="vet-card" data-tour="home-vet-card">
+    <!-- VETERINARIA: la tarjeta de siempre y, si hay una asociada, la clínica pegada debajo -->
+    <div class="vet-block">
+    <div class="vet-card" data-tour="home-vet-card" [class.linked]="!!linkedVet">
       <img src="assets/images/Home_icons/dalmataVet.png" class="dog-decoration" alt="" />
       <div class="card-content">
         <img src="assets/images/Home_icons/MyAnimaLogVetLogo.png" alt="MyAnimalogVet" class="vet-logo" />
@@ -241,5 +235,17 @@
       </div>
     </div>
 
+      <div class="clinic-card" *ngIf="linkedVet as v">
+        <button type="button" class="clinic-row" (click)="openLinkedVet()">
+          <app-vet-avatar [name]="v.name" [logoUrl]="v.logoUrl" [size]="46"></app-vet-avatar>
+          <span class="clinic-text"><strong>{{ v.name }}</strong><small>{{ linkedVetLine }}</small></span>
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </button>
+        <div class="clinic-actions">
+          <button type="button" class="clinic-btn primary" (click)="bookLinkedVet()"><ion-icon name="calendar-outline"></ion-icon>Pedir cita</button>
+          <button type="button" class="clinic-btn" [disabled]="!v.phone" (click)="callLinkedVet()"><ion-icon name="call-outline"></ion-icon>Llamar</button>
+        </div>
+      </div>
+    </div>
   </div>
 </ion-content>

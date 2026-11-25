@@ -10,6 +10,17 @@ import { SharedProfileService } from 'src/app/services/SharedProfileService/shar
 import { SharedPet } from 'src/app/models/shared-profile.model';
 import { TutorialService, TutorialKey, TutorialStep, TutorialSlide } from 'src/app/services/TutorialService/tutorial';
 import { ActionSheetController, ToastController } from '@ionic/angular';
+import { AppointmentService } from 'src/app/services/AppointmentService/appointment';
+import { VaccineService } from 'src/app/services/VaccineService/vaccine/vaccine';
+import { PetHealthService } from 'src/app/services/PetHealthService/pet-health';
+import { VeterinaryService } from 'src/app/services/VeterinaryService/veterinary';
+import { CalendarService } from 'src/app/services/CalendarService/calendar';
+import { AiAccessService } from 'src/app/services/AiAccessService/ai-access';
+import { Appointment } from 'src/app/models/appointment.model';
+import { LinkedVet } from 'src/app/models/veterinary.model';
+import {
+  GreetingView, PreventionLite, TodayItem, VaccineLite, WeekDay, buildGreeting, buildTodayItems, weekDays,
+} from 'src/app/shared/utils/home-today.util';
 
 @Component({
   selector: 'app-home',
@@ -39,6 +50,17 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   // Menú de tres líneas del header
   menuOpen = false;
 
+  // Saludo del día, "Para hoy", la semana y la veterinaria asociada
+  greeting: GreetingView | null = null;
+  /** Entrada animada del perrito: una vez por sesión. */
+  greetAnimate = false;
+  todayItems: TodayItem[] = [];
+  week: WeekDay[] = weekDays(new Date(), [], []);
+  weekNote = '';
+  linkedVet: LinkedVet | null = null;
+  linkedVetLine = '';
+  private todayLoaded = false;
+
   // --- Swipe / carrusel state ---
   @ViewChild('swipeContainer') swipeContainerRef!: ElementRef<HTMLDivElement>;
 
@@ -58,11 +80,22 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     private sharedProfileService: SharedProfileService,
     private tutorialService: TutorialService,
     private actionSheetCtrl: ActionSheetController,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private appointmentService: AppointmentService,
+    private vaccineService: VaccineService,
+    private petHealth: PetHealthService,
+    private vetService: VeterinaryService,
+    private calendarService: CalendarService,
+    private aiAccess: AiAccessService
   ) {}
 
 
   ngOnInit() {
+    try {
+      this.greetAnimate = sessionStorage.getItem('homeGreeted') !== '1';
+      sessionStorage.setItem('homeGreeted', '1');
+    } catch { /* sin animación */ }
+    this.loadLinkedVet();
     this.loadUserData();
     this.loadPets();
     this.loadEvents();
@@ -166,6 +199,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     this.profileService.getProfile().subscribe({
       next: (profile) => {
         this.username = profile.username;
+        if (this.todayLoaded) this.refreshGreeting();
         if (profile.profileImageUrl) {
           this.userAvatar = profile.profileImageUrl;
         }
@@ -192,6 +226,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
         this.pets = pets;
         this.loadCaregivers(mine);
         this.hasPets = this.pets.length > 0;
+        this.loadToday();
         if (this.currentPetIndex >= this.pets.length) {
           this.currentPetIndex = 0;
         }
@@ -201,6 +236,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
         console.error('❌ Error cargando mascotas:', err);
         this.pets = [];
         this.hasPets = false;
+        this.loadToday();
         this.maybeStartTutorial();
       }
     });
@@ -254,6 +290,94 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   loadEvents() {
     this.upcomingEvents = [];
   }
+
+  // ---------------------------------------------------------------- Saludo, Para hoy y semana
+
+  /**
+   * Junta lo que necesitan hoy las mascotas: citas con clínicas, vacunas y desparasitación.
+   * Cada fuente falla por su cuenta (Calendar o Medical sin publicar no tumban el Home).
+   */
+  private loadToday(): void {
+    const now = new Date();
+    const pets = this.pets;
+    const vaccines$ = pets.length
+      ? forkJoin(pets.map(p => this.vaccineService.getVaccinesByPet(p.id).pipe(
+          map(list => list.map((v): VaccineLite => ({
+            petId: p.id, petName: p.name, name: v.name,
+            applicationDate: (v.applicationDate || '').slice(0, 10), nextDoseDate: v.nextDoseDate ? v.nextDoseDate.slice(0, 10) : null,
+          }))),
+          catchError(() => of([] as VaccineLite[]))
+        ))).pipe(map(parts => ([] as VaccineLite[]).concat(...parts)))
+      : of([] as VaccineLite[]);
+    const prevention$ = pets.length
+      ? forkJoin(pets.map(p => this.petHealth.getSummary(p.id).pipe(
+          map(s => (['INTERNAL', 'EXTERNAL'] as const).map((k): PreventionLite => ({
+            petId: p.id, petName: p.name, kind: k, state: s.prevention[k].state, nextDoseDate: s.prevention[k].nextDoseDate,
+          }))),
+          catchError(() => of([] as PreventionLite[]))
+        ))).pipe(map(parts => ([] as PreventionLite[]).concat(...parts)))
+      : of([] as PreventionLite[]);
+    forkJoin({
+      vaccines: vaccines$,
+      prevention: prevention$,
+      appts: this.appointmentService.getMine(now.getTime(), 7, 30).pipe(catchError(() => of([] as Appointment[]))),
+      events: this.calendarService.getAllUserEvents().pipe(catchError(() => of([] as any[]))),
+    }).subscribe(({ vaccines, prevention, appts, events }) => {
+      this.todayItems = buildTodayItems({ now, appointments: appts, vaccines, prevention });
+      const open = appts.filter(a => ['REQUESTED', 'CONFIRMED', 'CHECKED_IN'].includes(a.status));
+      this.week = weekDays(now, open.map(a => a.startsAt), (events as any[]).map(e => e.start_date).filter(Boolean));
+      const inWeek = open
+        .filter(a => this.week.some(d => d.key === new Date(a.startsAt).toLocaleDateString('en-CA')))
+        .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0];
+      this.weekNote = inWeek
+        ? `${new Date(inWeek.startsAt).toLocaleDateString('es-ES', { weekday: 'long' }).replace(/^./, c => c.toUpperCase())}: cita en ${inWeek.clinicName || 'la clínica'}`
+        : '';
+      this.todayLoaded = true;
+      this.refreshGreeting();
+    });
+  }
+
+  private refreshGreeting(): void {
+    const name = this.username && this.username !== 'Username' ? this.username : '';
+    this.greeting = buildGreeting({
+      name, now: new Date(),
+      pets: this.pets.map(p => ({ id: p.id, name: p.name, birthDate: p.birthDate })),
+      items: this.todayItems,
+    });
+  }
+
+  onGreetingAction(cta: NonNullable<GreetingView['cta']>): void {
+    if (cta.kind === 'addPet') { this.onAddPet(); return; }
+    if (cta.kind === 'pet' && cta.petId) { this.router.navigate(['/pet-profile', cta.petId]); return; }
+    document.getElementById('para-hoy')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /** El perrito es la cara de la IA: tocarlo abre el mini chat. */
+  onDogTap(): void {
+    if (this.aiAccess.canUseAi()) this.aiAccess.openMini();
+  }
+
+  openTodayItem(it: TodayItem): void {
+    this.router.navigate(it.action.route, it.action.queryParams ? { queryParams: it.action.queryParams } : {});
+  }
+
+  // ---------------------------------------------------------------- Veterinaria asociada
+
+  private loadLinkedVet(): void {
+    this.vetService.getLinked().subscribe({
+      next: list => {
+        const v = list[0] ?? null;
+        this.linkedVet = v;
+        const n = v?.sharedPetsCount ?? 0;
+        this.linkedVetLine = !v ? '' : n ? `Tu veterinaria · ve a ${n} ${n === 1 ? 'mascota' : 'mascotas'}` : 'Tu veterinaria';
+      },
+      error: err => { console.error('❌ Error cargando la veterinaria asociada:', err); this.linkedVet = null; }
+    });
+  }
+
+  openLinkedVet(): void { if (this.linkedVet) this.router.navigate(['/vet/detail', this.linkedVet.veterinaryId]); }
+  bookLinkedVet(): void { if (this.linkedVet) this.router.navigate(['/vet/book', this.linkedVet.veterinaryId]); }
+  callLinkedVet(): void { if (this.linkedVet?.phone) window.open(`tel:${this.linkedVet.phone}`, '_self'); }
 
   get currentPet(): Pet {
     return this.pets[this.currentPetIndex];

@@ -6,6 +6,10 @@ import { CalendarEvent as BackendCalendarEvent } from 'src/app/models/calendar-e
 import { EVENT_TYPE_DEFAULTS, EventType } from 'src/app/models/calendar-event.model';
 import { CalendarEvent as WidgetCalendarEvent } from '../../shared/components/pet-calendar/pet-calendar.component';
 import { TutorialService, TutorialStep } from 'src/app/services/TutorialService/tutorial';
+import { AppointmentService } from 'src/app/services/AppointmentService/appointment';
+import { Appointment } from 'src/app/models/appointment.model';
+import { dateKey, isOpen } from 'src/app/shared/utils/appointment.util';
+import { catchError, forkJoin, of } from 'rxjs';
 
 @Component({
   selector: 'app-calendar',
@@ -50,7 +54,8 @@ export class CalendarPage implements OnInit {
     private router: Router,
     private petService: PetService,
     private calendarService: CalendarService,
-    private tutorialService: TutorialService
+    private tutorialService: TutorialService,
+    private appointmentService: AppointmentService
   ) {}
 
   ngOnInit(): void {
@@ -89,10 +94,14 @@ export class CalendarPage implements OnInit {
   }
 
   private loadEvents(): void {
-    this.calendarService.getAllUserEvents().subscribe({
-      next: (events) => {
-        this.rawEvents = events;
-        this.events = events.map(e => this.mapToWidgetEvent(e));
+    // Los eventos manuales y las citas con clínicas (Calendar) se piden juntos; si las citas fallan, el calendario sigue con lo manual.
+    forkJoin({
+      manual: this.calendarService.getAllUserEvents(),
+      clinic: this.appointmentService.getMine(Date.now(), 30, 180).pipe(catchError(() => of([] as Appointment[]))),
+    }).subscribe({
+      next: ({ manual, clinic }) => {
+        this.rawEvents = manual;
+        this.events = [...manual.map(e => this.mapToWidgetEvent(e)), ...clinic.filter(isOpen).map(a => this.appointmentToWidgetEvent(a))];
         this.buildMonthGrid();
         this.loading = false;
         this.maybeStartTutorial();
@@ -106,6 +115,30 @@ export class CalendarPage implements OnInit {
         this.maybeStartTutorial();
       }
     });
+  }
+
+  /** Una cita con la clínica, como evento del calendario (hora de Bogotá, igual que en "Mis citas"). */
+  private appointmentToWidgetEvent(a: Appointment): WidgetCalendarEvent {
+    const hhmm = (iso: string) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Bogota' });
+    const what = a.serviceName || 'Cita';
+    const who = a.petName && this.pets.length > 1 ? `${a.petName} · ` : '';
+    return {
+      id: `appt:${a.id}`,
+      title: `${who}${what}`,
+      description: [a.clinicName, a.status === 'REQUESTED' ? 'Pendiente de confirmación' : ''].filter(Boolean).join(' · '),
+      date: dateKey(a.startsAt),
+      time: hhmm(a.startsAt),
+      endTime: a.endsAt ? hhmm(a.endsAt) : undefined,
+      type: 'VET_APPOINTMENT',
+      color: EVENT_TYPE_DEFAULTS.VET_APPOINTMENT.color,
+      fromClinic: true,
+      veterinaryId: a.veterinaryId,
+    };
+  }
+
+  /** Las citas con clínicas se ven y se gestionan en "Mis citas", no aquí. */
+  openClinicAppointment(ev: WidgetCalendarEvent): void {
+    this.router.navigate(['/vet/appointments'], { queryParams: ev.veterinaryId ? { veterinaryId: ev.veterinaryId } : {} });
   }
 
   private mapToWidgetEvent(e: BackendCalendarEvent): WidgetCalendarEvent {

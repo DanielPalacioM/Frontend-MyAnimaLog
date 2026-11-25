@@ -87,9 +87,9 @@ export class AppointmentService {
     );
   }
 
-  /** Los últimos 30 días y los próximos 60 (de a 30 por llamada, que es el límite del servidor), sin repetidos. */
-  getMine(now: number = Date.now()): Observable<Appointment[]> {
-    const calls = monthRanges(now, 30, 60).map(r => this.getRange(r.from, r.to));
+  /** Los últimos 30 días y los próximos 60 por defecto (de a 30 por llamada, que es el límite del servidor), sin repetidos. */
+  getMine(now: number = Date.now(), pastDays = 30, futureDays = 60): Observable<Appointment[]> {
+    const calls = monthRanges(now, pastDays, futureDays).map(r => this.getRange(r.from, r.to));
     return forkJoin(calls).pipe(
       map(parts => {
         const byId = new Map<string, Appointment>();

@@ -72,13 +72,27 @@ export class VetLinkPage {
     });
   }
 
-  onLink(): void {
+  /**
+   * Vincularme y pedir cita: para pedir una cita hay que estar vinculado (la cita exige compartir la mascota).
+   * Se vincula y se va directo a Pedir cita, que comparte la mascota elegida si hace falta.
+   */
+  onLinkAndBook(): void {
+    this.onLink(true);
+  }
+
+  onLink(andBook = false): void {
     if (this.busy || !this.preview) return;
     this.busy = true;
     this.error = null;
     this.vetService.link(this.code).subscribe({
       next: async res => {
         this.busy = false;
+        const vetId = res.veterinaryId || this.preview?.veterinaryId || '';
+        if (andBook && vetId) {
+          if (!res.alreadyLinked) await this.showToast(`Te vinculaste a ${res.veterinaryName || this.preview?.name}. Ahora elige el servicio y la hora.`);
+          this.router.navigate(['/vet/book', vetId], { replaceUrl: true });
+          return;
+        }
         if (res.alreadyLinked) {
           await this.showToast(`Ya estás vinculado a ${res.veterinaryName || this.preview?.name}`);
           this.router.navigate(['/vet/detail', res.veterinaryId], { replaceUrl: true });

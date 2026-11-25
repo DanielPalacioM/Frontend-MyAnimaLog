@@ -26,9 +26,9 @@ export const TUTORIAL_STEPS: Record<TutorialKey, TutorialStep[]> = {
       text: 'El botón naranja con el perrito te acompaña en todas las pantallas. Tócalo para abrir un mini chat y pedirle cosas ahí mismo; mantenlo presionado para abrir el chat completo. Puedes moverlo: si lo arrastras a "Ocultar", se queda junto al menú (≡) del Inicio.',
     },
     {
-      target: 'home-quick-vet',
-      title: 'Vet',
-      text: 'Consulta información de veterinarias y gestiona la veterinaria de confianza de tus mascotas.',
+      target: 'home-greeting',
+      title: 'Tu saludo del día',
+      text: 'Cambia con la hora y con lo que pasa con tus mascotas: te dice lo más importante de hoy. Toca al perrito para hablar con el asistente.',
     },
     {
       target: 'home-quick-shared',
@@ -52,8 +52,8 @@ export const TUTORIAL_STEPS: Record<TutorialKey, TutorialStep[]> = {
     },
     {
       target: 'home-calendar-card',
-      title: 'Calendario',
-      text: '"Crear evento" agenda citas, vacunas, medicamentos o recordatorios para una mascota. "Ver eventos" abre tu agenda por día, semana o mes.',
+      title: 'Esta semana',
+      text: 'Los días con un punto tienen citas o recordatorios. "Crear evento" agenda algo para una mascota y "Ver calendario" abre tu agenda completa.',
     },
     {
       target: 'home-vet-card',

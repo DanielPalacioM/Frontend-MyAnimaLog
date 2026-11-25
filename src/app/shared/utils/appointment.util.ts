@@ -144,6 +144,14 @@ const OPEN: AppointmentStatus[] = ['REQUESTED', 'CONFIRMED', 'CHECKED_IN'];
 /** La cita sigue viva (se puede esperar, mover o cancelar). */
 export const isOpen = (a: Pick<Appointment, 'status'>): boolean => OPEN.includes(a.status);
 
+/**
+ * Citas que van al calendario de una mascota: solo las que la clínica ya **validó** (confirmada o en la clínica).
+ * Una solicitud pendiente todavía no es un compromiso; se ve en "Mis citas".
+ */
+export function confirmedForPet(list: Appointment[], petId: string): Appointment[] {
+  return list.filter(a => a.petId === petId && (a.status === 'CONFIRMED' || a.status === 'CHECKED_IN'));
+}
+
 /** Hasta cuándo puede cancelar el dueño: lo que diga el backend o `startsAt − 24 h`. */
 export function cancellableUntil(a: Pick<Appointment, 'startsAt' | 'cancellableUntil'>): number {
   return a.cancellableUntil ? new Date(a.cancellableUntil).getTime() : new Date(a.startsAt).getTime() - DEFAULT_CANCEL_HOURS * HOUR;
