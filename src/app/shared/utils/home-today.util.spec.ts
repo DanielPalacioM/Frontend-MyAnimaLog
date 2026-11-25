@@ -1,5 +1,5 @@
 import { Appointment } from 'src/app/models/appointment.model';
-import { GREETING_BANK, birthdayAge, buildGreeting, buildTodayItems, momentOf, petChip, petLine, petsLabel, weekDays } from './home-today.util';
+import { GREETING_BANK, agendaEntries, birthdayAge, buildGreeting, buildTodayItems, dayTitle, momentOf, petChip, petLine, petsLabel, weekDays, weekTitle } from './home-today.util';
 
 const at = (y: number, m: number, d: number, h = 10, min = 0) => new Date(y, m - 1, d, h, min);
 const NOW = at(2026, 11, 25, 15, 20); // miércoles 25 nov, 3:20 p. m.
@@ -142,5 +142,46 @@ describe('chip de salud de cada mascota', () => {
     expect(petLine({ breed: 'Labrador', birthDate: '2022-01-15' }, NOW2)).toBe('Labrador · 4 años');
     expect(petLine({ species: 'Gato', birthDate: '2026-03-10' }, NOW2)).toBe('Gato · 8 meses');
     expect(petLine({ breed: 'Pitbull' }, NOW2)).toBe('Pitbull');
+  });
+});
+
+describe('semana deslizable y agenda del día', () => {
+  const NOW3 = new Date(2026, 10, 25, 15); // miércoles 25 nov
+  const ap = (over: any) => ({ id: 'a', veterinaryId: 'v1', clinicName: 'Patitas', petName: 'Luna', serviceName: 'Control', status: 'CONFIRMED', startsAt: new Date(2026, 10, 26, 10).toISOString(), ...over });
+
+  it('cambia de semana hacia adelante y hacia atrás', () => {
+    expect(weekDays(NOW3, [], [], 1).map(d => d.num)).toEqual([30, 1, 2, 3, 4, 5, 6]);
+    expect(weekDays(NOW3, [], [], -1).map(d => d.num)).toEqual([16, 17, 18, 19, 20, 21, 22]);
+    expect(weekDays(NOW3, [], [], 1).some(d => d.today)).toBeFalse();
+  });
+
+  it('título de la semana', () => {
+    expect(weekTitle(weekDays(NOW3, [], []), 0)).toBe('Esta semana');
+    expect(weekTitle(weekDays(NOW3, [], [], 1), 1)).toBe('Próxima semana');
+    expect(weekTitle(weekDays(NOW3, [], [], -1), -1)).toBe('Semana pasada');
+    expect(weekTitle(weekDays(NOW3, [], [], 2), 2)).toContain('–');
+  });
+
+  it('título del día elegido', () => {
+    expect(dayTitle('2026-11-25', NOW3)).toBe('Hoy');
+    expect(dayTitle('2026-11-26', NOW3)).toBe('Mañana');
+    expect(dayTitle('2026-11-24', NOW3)).toBe('Ayer');
+    expect(dayTitle('2026-11-28', NOW3).toLowerCase()).toContain('sábado');
+  });
+
+  it('la agenda junta citas vivas y eventos, ordenados por día y hora', () => {
+    const list = agendaEntries(
+      [ap({}), ap({ id: 'x', status: 'CANCELLED' }), ap({ id: 'r', status: 'REQUESTED', startsAt: new Date(2026, 10, 26, 8).toISOString() })] as any,
+      [{ id: 'e1', title: 'Baño', start_date: '2026-11-26T15:00:00', pet_id: 'p1' }, { id: 'e2', title: 'Pastilla', start_date: '2026-11-25T09:00:00', pet_id: null }],
+      [{ id: 'p1', name: 'Luna' }]
+    );
+    expect(list.map(e => e.id)).toEqual(['ev:e2', 'appt:r', 'appt:a', 'ev:e1']);
+    const req = list.find(e => e.id === 'appt:r')!;
+    expect(req.detail).toContain('Pendiente de confirmación');
+    expect(req.route).toEqual(['/vet/appointments']);
+    const bath = list.find(e => e.id === 'ev:e1')!;
+    expect(bath.detail).toBe('Luna');
+    expect(bath.time).toBe('15:00');
+    expect(bath.queryParams).toEqual({ eventId: 'e1', petId: 'p1' });
   });
 });

@@ -144,21 +144,37 @@
       </div>
     </ng-container>
 
-    <!-- ESTA SEMANA -->
-    <div class="week-card" data-tour="home-calendar-card">
+    <!-- ESTA SEMANA: desliza para cambiar de semana, toca un día para ver lo que tiene, mantén presionado para abrir el calendario -->
+    <div class="week-card" data-tour="home-calendar-card"
+      (touchstart)="onWeekTouchStart($event)" (touchend)="onWeekTouchEnd($event)"
+      (pointerdown)="onWeekPressStart($event)" (pointerup)="onWeekPressEnd()" (pointercancel)="onWeekPressEnd()" (pointerleave)="onWeekPressEnd()"
+      (contextmenu)="$event.preventDefault()">
       <div class="week-head">
-        <p class="week-title">Esta semana</p>
-        <button type="button" class="week-link" (click)="navigate('/calendar')">Ver calendario <ion-icon name="chevron-forward-outline"></ion-icon></button>
+        <button type="button" class="week-nav" (click)="shiftWeek(-1)" aria-label="Semana anterior"><ion-icon name="chevron-back-outline"></ion-icon></button>
+        <button type="button" class="week-title" (click)="goToday()" [attr.aria-label]="weekOffset ? 'Volver a esta semana' : weekLabel">{{ weekLabel }}</button>
+        <button type="button" class="week-nav" (click)="shiftWeek(1)" aria-label="Semana siguiente"><ion-icon name="chevron-forward-outline"></ion-icon></button>
+        <span class="week-grow"></span>
+        <button type="button" class="week-link" (click)="openCalendar()">Ver calendario <ion-icon name="chevron-forward-outline"></ion-icon></button>
       </div>
-      <div class="week-days">
-        <button type="button" class="week-day" *ngFor="let d of week" [class.today]="d.today" (click)="navigate('/calendar')" [attr.aria-label]="d.num + (d.mark ? ', con citas o eventos' : '')">
+      <div class="week-days" [ngClass]="weekAnim ? 'anim-' + weekAnim : ''">
+        <button type="button" class="week-day" *ngFor="let d of week" [class.today]="d.today" [class.selected]="d.key === selectedDay"
+          (pointerdown)="pressDay = d.key" (click)="pickWeekDay(d.key)" [attr.aria-label]="d.num + (d.mark ? ', con citas o eventos' : '')" [attr.aria-pressed]="d.key === selectedDay">
           <small>{{ d.letter }}</small>
           <span class="num">{{ d.num }}</span>
           <i class="dot" [ngClass]="d.mark ? 'dot-' + d.mark : ''"></i>
         </button>
       </div>
+      <div class="week-agenda">
+        <p class="agenda-day">{{ selectedDayLabel }}</p>
+        <button type="button" class="agenda-item" *ngFor="let e of dayEntries" [ngClass]="'kind-' + e.kind" (click)="openAgenda(e)">
+          <span class="agenda-time">{{ e.time || 'Todo el día' }}</span>
+          <span class="agenda-text"><strong>{{ e.title }}</strong><small>{{ e.detail }}</small></span>
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </button>
+        <p class="agenda-empty" *ngIf="!dayEntries.length">Nada agendado este día.</p>
+      </div>
       <div class="week-foot">
-        <p class="week-note">{{ weekNote || 'Sin citas esta semana.' }}</p>
+        <p class="week-note">Mantén presionada la tarjeta para abrir el calendario.</p>
         <button type="button" class="week-add" (click)="navigate('/calendar/add-event')">+ Crear evento</button>
       </div>
     </div>

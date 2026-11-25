@@ -60,11 +60,24 @@ export class CalendarPage implements OnInit {
 
   ngOnInit(): void {
     this.selectedDate = this.toDateKey(new Date());
+    this.applyDateParam();
     this.loadData();
   }
 
   ionViewWillEnter(): void {
+    this.applyDateParam();
     this.loadData();
+  }
+
+  /** Atajo desde el Home ("Esta semana"): `/calendar?date=YYYY-MM-DD` abre ese día y su mes. */
+  private applyDateParam(): void {
+    let date = '';
+    try { date = String(this.router.parseUrl(this.router.url).queryParams['date'] ?? ''); } catch { return; }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+    const [y, m] = date.split('-').map(Number);
+    this.selectedDate = date;
+    this.currentYear = y;
+    this.currentMonth = m - 1;
   }
 
   private loadData(): void {

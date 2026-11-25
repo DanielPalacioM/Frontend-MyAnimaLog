@@ -19,7 +19,8 @@ import { AiAccessService } from 'src/app/services/AiAccessService/ai-access';
 import { Appointment } from 'src/app/models/appointment.model';
 import { LinkedVet } from 'src/app/models/veterinary.model';
 import {
-  GreetingView, PetChip, PreventionLite, TodayItem, VaccineLite, WeekDay, buildGreeting, buildTodayItems, petChip, petLine, weekDays,
+  AgendaEntry, GreetingView, PetChip, PreventionLite, TodayItem, VaccineLite, WeekDay, agendaEntries, buildGreeting, buildTodayItems, dayTitle,
+  petChip, petLine, todayKey, weekDays, weekTitle,
 } from 'src/app/shared/utils/home-today.util';
 
 @Component({
@@ -57,6 +58,19 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   todayItems: TodayItem[] = [];
   week: WeekDay[] = weekDays(new Date(), [], []);
   weekNote = '';
+  /** Semana que se ve (0 = esta), día elegido y la agenda de todas las semanas cargadas. */
+  weekOffset = 0;
+  selectedDay = todayKey();
+  weekAnim: 'next' | 'prev' | '' = '';
+  pressDay = '';
+  private agenda: AgendaEntry[] = [];
+  private apptDates: string[] = [];
+  private eventDates: string[] = [];
+  private touchX = 0;
+  private touchY = 0;
+  private pressTimer?: ReturnType<typeof setTimeout>;
+  /** Tras mantener presionado o deslizar, el "click" que sigue no debe elegir un día. */
+  private swallowClick = false;
   linkedVet: LinkedVet | null = null;
   linkedVetLine = '';
   private todayLoaded = false;
@@ -326,7 +340,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     forkJoin({
       vaccines: vaccines$,
       prevention: prevention$,
-      appts: this.appointmentService.getMine(now.getTime(), 7, 30).pipe(catchError(() => of([] as Appointment[]))),
+      appts: this.appointmentService.getMine(now.getTime(), 35, 70).pipe(catchError(() => of([] as Appointment[]))),
       events: this.calendarService.getAllUserEvents().pipe(catchError(() => of([] as any[]))),
     }).subscribe(({ vaccines, prevention, appts, events }) => {
       this.todayItems = buildTodayItems({ now, appointments: appts, vaccines, prevention });
@@ -335,7 +349,10 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
         vaccines: vaccines.filter(v => v.petId === p.id), prevention: prevention.filter(x => x.petId === p.id),
       }) }), {} as Record<string, PetChip>);
       const open = appts.filter(a => ['REQUESTED', 'CONFIRMED', 'CHECKED_IN'].includes(a.status));
-      this.week = weekDays(now, open.map(a => a.startsAt), (events as any[]).map(e => e.start_date).filter(Boolean));
+      this.apptDates = open.map(a => a.startsAt);
+      this.eventDates = (events as any[]).map(e => e.start_date).filter(Boolean);
+      this.agenda = agendaEntries(appts, events as any[], pets.map(p => ({ id: p.id, name: p.name })));
+      this.refreshWeek();
       const inWeek = open
         .filter(a => this.week.some(d => d.key === new Date(a.startsAt).toLocaleDateString('en-CA')))
         .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0];
@@ -348,6 +365,81 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   petLineOf(p: Pet): string { return petLine(p, new Date()); }
+
+  // ---------------------------------------------------------------- Semana
+
+  private refreshWeek(): void {
+    this.week = weekDays(new Date(), this.apptDates, this.eventDates, this.weekOffset);
+  }
+
+  get weekLabel(): string { return weekTitle(this.week, this.weekOffset); }
+  get selectedDayLabel(): string { return dayTitle(this.selectedDay, new Date()); }
+  get dayEntries(): AgendaEntry[] { return this.agenda.filter(e => e.dateKey === this.selectedDay); }
+
+  shiftWeek(dir: 1 | -1): void {
+    this.weekOffset += dir;
+    this.refreshWeek();
+    // En la semana actual queda elegido hoy; en otra, el lunes.
+    this.selectedDay = this.weekOffset === 0 ? todayKey() : this.week[0].key;
+    this.weekAnim = '';
+    setTimeout(() => (this.weekAnim = dir > 0 ? 'next' : 'prev'));
+  }
+
+  goToday(): void {
+    const dir = this.weekOffset > 0 ? 'prev' : 'next';
+    this.selectedDay = todayKey();
+    if (this.weekOffset === 0) return;
+    this.weekOffset = 0;
+    this.refreshWeek();
+    this.weekAnim = '';
+    setTimeout(() => (this.weekAnim = dir));
+  }
+
+  pickWeekDay(key: string): void {
+    if (this.swallowClick) { this.swallowClick = false; return; }
+    this.selectedDay = key;
+  }
+
+  openAgenda(e: AgendaEntry): void {
+    if (this.swallowClick) { this.swallowClick = false; return; }
+    this.router.navigate(e.route, e.queryParams ? { queryParams: e.queryParams } : {});
+  }
+
+  /** Abre el calendario en el día elegido (o el que se mantuvo presionado). */
+  openCalendar(day?: string): void {
+    this.router.navigate(['/calendar'], { queryParams: { date: day || this.selectedDay } });
+  }
+
+  onWeekTouchStart(ev: TouchEvent): void {
+    const t = ev.touches[0]; this.touchX = t.clientX; this.touchY = t.clientY;
+  }
+
+  onWeekTouchEnd(ev: TouchEvent): void {
+    const t = ev.changedTouches[0];
+    const dx = t.clientX - this.touchX, dy = t.clientY - this.touchY;
+    if (Math.abs(dx) > 50 && Math.abs(dy) < 40) {
+      this.onWeekPressEnd();
+      this.swallowClick = true;
+      setTimeout(() => (this.swallowClick = false), 400);
+      this.shiftWeek(dx < 0 ? 1 : -1);
+    }
+  }
+
+  onWeekPressStart(ev: PointerEvent): void {
+    clearTimeout(this.pressTimer);
+    const day = this.pressDay;
+    this.pressTimer = setTimeout(() => {
+      this.swallowClick = true;
+      setTimeout(() => (this.swallowClick = false), 600);
+      navigator.vibrate?.(15);
+      this.openCalendar(day || undefined);
+    }, 550);
+  }
+
+  onWeekPressEnd(): void {
+    clearTimeout(this.pressTimer);
+    this.pressDay = '';
+  }
 
   private refreshGreeting(): void {
     const name = this.username && this.username !== 'Username' ? this.username : '';

@@ -53,7 +53,7 @@ export const TUTORIAL_STEPS: Record<TutorialKey, TutorialStep[]> = {
     {
       target: 'home-calendar-card',
       title: 'Esta semana',
-      text: 'Los días con un punto tienen citas o recordatorios. "Crear evento" agenda algo para una mascota y "Ver calendario" abre tu agenda completa.',
+      text: 'Los días con un punto tienen citas o recordatorios. Toca un día para ver lo que tiene, desliza para ver otras semanas y mantén presionada la tarjeta (o toca "Ver calendario") para abrir tu agenda en ese día.',
     },
     {
       target: 'home-vet-card',

@@ -189,10 +189,10 @@ export function buildGreeting(input: { name: string; now: Date; pets: PetLite[];
 
 export interface WeekDay { key: string; letter: string; num: number; today: boolean; mark: 'appointment' | 'event' | null; }
 
-/** Lunes a domingo de la semana de `now`, con un punto en los días que tienen cita (prioridad) o evento. */
-export function weekDays(now: Date, appointmentDates: string[], eventDates: string[]): WeekDay[] {
+/** Lunes a domingo de la semana de `now` (o `weekOffset` semanas antes/después), con un punto en los días que tienen cita (prioridad) o evento. */
+export function weekDays(now: Date, appointmentDates: string[], eventDates: string[], weekOffset = 0): WeekDay[] {
   const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+  start.setDate(start.getDate() - ((start.getDay() + 6) % 7) + weekOffset * 7);
   const appt = new Set(appointmentDates.map(d => localKey(new Date(d))));
   const ev = new Set(eventDates.map(d => localKey(new Date(d))));
   const today = localKey(now);
@@ -239,3 +239,69 @@ export function petLine(p: { breed?: string; species?: string; birthDate?: strin
   }
   return parts.filter(Boolean).join(' · ');
 }
+
+// ---------------------------------------------------------------- Agenda de un día (tira de la semana)
+
+export interface AgendaEntry {
+  id: string;
+  /** YYYY-MM-DD local. */
+  dateKey: string;
+  /** HH:mm o vacío. */
+  time: string;
+  title: string;
+  detail: string;
+  kind: 'appointment' | 'event';
+  route: any[];
+  queryParams?: Record<string, string>;
+}
+
+export interface CalendarEventLite { id: string; title: string; start_date: string; pet_id?: string | null; }
+
+/** Citas con clínicas (vivas) y eventos manuales como entradas de agenda, para la lista del día elegido. */
+export function agendaEntries(appointments: Appointment[], events: CalendarEventLite[], pets: { id: string; name: string }[]): AgendaEntry[] {
+  const petName = (id?: string | null) => pets.find(p => p.id === id)?.name ?? '';
+  const out: AgendaEntry[] = [];
+  for (const a of appointments) {
+    if (!['REQUESTED', 'CONFIRMED', 'CHECKED_IN'].includes(a.status)) continue;
+    const d = new Date(a.startsAt);
+    out.push({
+      id: `appt:${a.id}`, dateKey: localKey(d),
+      time: d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Bogota' }),
+      title: [a.serviceName || 'Cita', a.petName].filter(Boolean).join(' · '),
+      detail: [a.clinicName, a.status === 'REQUESTED' ? 'Pendiente de confirmación' : a.status === 'CHECKED_IN' ? 'En la clínica' : 'Confirmada'].filter(Boolean).join(' · '),
+      kind: 'appointment', route: ['/vet/appointments'], queryParams: a.veterinaryId ? { veterinaryId: a.veterinaryId } : undefined,
+    });
+  }
+  for (const e of events) {
+    if (!e?.start_date) continue;
+    const key = e.start_date.slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(key)) continue;
+    out.push({
+      id: `ev:${e.id}`, dateKey: key, time: e.start_date.length > 15 ? e.start_date.slice(11, 16) : '',
+      title: e.title || 'Evento', detail: petName(e.pet_id) || 'Evento del calendario',
+      kind: 'event', route: ['/calendar/add-event'], queryParams: e.pet_id ? { eventId: e.id, petId: e.pet_id } : { eventId: e.id },
+    });
+  }
+  return out.sort((x, y) => (x.dateKey + (x.time || '99')).localeCompare(y.dateKey + (y.time || '99')));
+}
+
+/** "Esta semana", "Próxima semana", "Semana pasada" o el rango ("30 nov – 6 dic"). */
+export function weekTitle(days: WeekDay[], weekOffset: number): string {
+  if (weekOffset === 0) return 'Esta semana';
+  if (weekOffset === 1) return 'Próxima semana';
+  if (weekOffset === -1) return 'Semana pasada';
+  const fmt = (k: string) => new Date(keyToUtc(k)).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', timeZone: 'UTC' }).replace('.', '');
+  return days.length ? `${fmt(days[0].key)} – ${fmt(days[6].key)}` : '';
+}
+
+/** "Hoy", "Mañana", "Ayer" o "Jueves 26 nov". */
+export function dayTitle(key: string, now: Date): string {
+  const d = daysFrom(now, key);
+  if (d === 0) return 'Hoy';
+  if (d === 1) return 'Mañana';
+  if (d === -1) return 'Ayer';
+  const t = new Date(keyToUtc(key)).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short', timeZone: 'UTC' }).replace('.', '').replace(',', '');
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+export const todayKey = (now: Date = new Date()): string => localKey(now);
