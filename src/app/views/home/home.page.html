@@ -61,10 +61,15 @@
     </app-home-greeting>
 
     <!-- PARA HOY: lo más urgente primero (máx. 3) -->
-    <div class="today-card" id="para-hoy" *ngIf="todayItems.length">
+    <div class="today-card" id="para-hoy" *ngIf="hasPets">
       <div class="today-head">
         <p class="today-title">Para hoy</p>
-        <span class="today-count">{{ todayItems.length }} {{ todayItems.length === 1 ? 'pendiente' : 'pendientes' }}</span>
+        <span class="today-count" *ngIf="todayItems.length">{{ todayItems.length }} {{ todayItems.length === 1 ? 'pendiente' : 'pendientes' }}</span>
+        <span class="today-count ok" *ngIf="!todayItems.length">✓ Al día</span>
+      </div>
+      <div class="today-empty" *ngIf="!todayItems.length">
+        <span class="today-ico"><ion-icon name="checkmark-circle"></ion-icon></span>
+        <span class="today-text"><strong>Nada pendiente por hoy</strong><small>Te avisamos aquí cuando toque una vacuna, una desparasitación o una cita.</small></span>
       </div>
       <div class="today-item" *ngFor="let it of todayItems.slice(0, 3)" [ngClass]="'tone-' + it.tone">
         <span class="today-ico"><ion-icon [name]="it.icon"></ion-icon></span>
@@ -114,88 +119,30 @@
       </div>
     </div>
 
-    <!-- PET CARD — solo si hay mascotas -->
-<ng-container *ngIf="hasPets">
-  
-<div class="pet-swipe-container" #swipeContainer data-tour="home-pet-card"
-   (touchstart)="onTouchStart($event)"
-   (touchmove)="onTouchMove($event)"
-   (touchend)="onTouchEnd($event)"
-   (mousedown)="onMouseDown($event)"
-   (mousemove)="onMouseMove($event)"
-   (mouseup)="onMouseUp($event)"
-   (mouseleave)="onMouseUp($event)">
-
-  <div class="pet-carousel-track"
-    [style.transform]="'translateX(calc(-100% + ' + currentTranslateX + '%))'"
-    [style.transition]="cardTransition">
-
-    <!-- Card anterior (se asoma al arrastrar a la derecha) -->
-    <div class="pet-detail-card">
-      <span class="in-care-tag" *ngIf="pets[prevPetIndex].inCare">A mi cuidado</span>
-      <div class="pet-image-side" [style.background-color]="!pets[prevPetIndex].imageUrl ? getSexColor(pets[prevPetIndex].sex) : null">
-        <img *ngIf="pets[prevPetIndex].imageUrl" [src]="pets[prevPetIndex].imageUrl" [alt]="pets[prevPetIndex].name" />
-        <span *ngIf="!pets[prevPetIndex].imageUrl" class="species-fallback-icon">{{ getPetIconFallback(pets[prevPetIndex].species) }}</span>
+    <!-- TUS MASCOTAS (Figma "Home/Mascota") -->
+    <ng-container *ngIf="hasPets">
+      <div class="pets-head">
+        <p class="pets-title">Tus mascotas</p>
+        <button type="button" class="pets-add" (click)="onAddPet()">+ Agregar</button>
       </div>
-      <div class="pet-info-side">
-        <p class="pet-name">{{ pets[prevPetIndex].name }}</p>
-        <p class="pet-breed">{{ pets[prevPetIndex].breed }} - {{ pets[prevPetIndex].species }}</p>
-      </div>
-    </div>
-
-    <!-- Card actual -->
-    <div class="pet-detail-card" (click)="onPetCardTap()">
-      <span class="in-care-tag" *ngIf="currentPet.inCare">A mi cuidado</span>
-      <div class="pet-image-side" [style.background-color]="!currentPet.imageUrl ? getSexColor(currentPet.sex) : null">
-        <img *ngIf="currentPet.imageUrl" [src]="currentPet.imageUrl" [alt]="currentPet.name" />
-        <span *ngIf="!currentPet.imageUrl" class="species-fallback-icon">{{ getPetIconFallback(currentPet.species) }}</span>
-      </div>
-      <div class="pet-info-side">
-        <p class="pet-name">{{ currentPet.name }}</p>
-        <p class="pet-breed">{{ currentPet.breed }} - {{ currentPet.species }}</p>
-        <p class="pet-birthdate" *ngIf="currentPet.birthDate">{{ currentPet.birthDate | date:'dd/MM/yyyy' }}</p>
-        <p class="pet-sex" *ngIf="currentPet.sex">Sexo: {{ currentPet.sex }}</p>
-        <div class="pet-shared" *ngIf="!currentPet.inCare && currentPet.sharedWith?.length">
-          Tambien lo cuida:
-          <span class="shared-avatars">
-            <img *ngFor="let s of currentPet.sharedWith.slice(0,3)" [src]="s.avatarUrl" appImgFallback alt="" class="shared-avatar" />
-            <span class="shared-count">{{ currentPet.sharedWith.length }}</span>
-          </span>
+      <div class="pets-row" data-tour="home-pet-card">
+        <div class="pet-tile" *ngFor="let p of pets" (click)="router.navigate(['/pet-profile', p.id])">
+          <div class="pet-photo" [style.background]="p.imageUrl ? '#F1F0FB' : '#FFF1DA'">
+            <img *ngIf="p.imageUrl" [src]="p.imageUrl" alt="" />
+            <span *ngIf="!p.imageUrl" class="pet-emoji">{{ getPetIconFallback(p.species) }}</span>
+            <span class="pet-care" *ngIf="p.inCare">A mi cuidado</span>
+          </div>
+          <p class="pet-tile-name">{{ p.name }}</p>
+          <p class="pet-tile-line">{{ petLineOf(p) }}</p>
+          <span class="pet-chip" *ngIf="petChips[p.id] as c" [ngClass]="'tone-' + c.tone"><ion-icon [name]="c.icon"></ion-icon>{{ c.label }}</span>
+          <div class="pet-actions" (click)="$event.stopPropagation()">
+            <button type="button" aria-label="Vacunas" (click)="router.navigate(['/vaccine-timeline'], { queryParams: { petId: p.id } })"><ion-icon name="medkit-outline"></ion-icon></button>
+            <button type="button" aria-label="Salud y alertas" (click)="router.navigate(['/pet-health', p.id])"><ion-icon name="heart-outline"></ion-icon></button>
+            <button type="button" aria-label="Agendar" (click)="router.navigate(['/calendar/add-event'], { queryParams: { petId: p.id } })"><ion-icon name="calendar-outline"></ion-icon></button>
+          </div>
         </div>
       </div>
-      <ion-icon
-        name="chevron-forward-outline"
-        class="swipe-arrow"
-        *ngIf="pets.length > 1"
-        (click)="onArrowTap(); $event.stopPropagation()">
-      </ion-icon>
-    </div>
-
-    <!-- Card siguiente (se asoma al arrastrar a la izquierda) -->
-    <div class="pet-detail-card">
-      <span class="in-care-tag" *ngIf="pets[nextPetIndex].inCare">A mi cuidado</span>
-      <div class="pet-image-side" [style.background-color]="!pets[nextPetIndex].imageUrl ? getSexColor(pets[nextPetIndex].sex) : null">
-        <img *ngIf="pets[nextPetIndex].imageUrl" [src]="pets[nextPetIndex].imageUrl" [alt]="pets[nextPetIndex].name" />
-        <span *ngIf="!pets[nextPetIndex].imageUrl" class="species-fallback-icon">{{ getPetIconFallback(pets[nextPetIndex].species) }}</span>
-      </div>
-      <div class="pet-info-side">
-        <p class="pet-name">{{ pets[nextPetIndex].name }}</p>
-        <p class="pet-breed">{{ pets[nextPetIndex].breed }} - {{ pets[nextPetIndex].species }}</p>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="dots" *ngIf="pets.length > 1">
-    <span
-      *ngFor="let pet of pets; let i = index"
-      class="dot"
-      [class.active]="i === currentPetIndex">
-    </span>
-  </div>
-</div>
-  
-</ng-container>
+    </ng-container>
 
     <!-- ESTA SEMANA -->
     <div class="week-card" data-tour="home-calendar-card">

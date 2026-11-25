@@ -202,3 +202,40 @@ export function weekDays(now: Date, appointmentDates: string[], eventDates: stri
     return { key, letter: 'LMMJVSD'[i], num: d.getDate(), today: key === today, mark: appt.has(key) ? 'appointment' : ev.has(key) ? 'event' : null };
   });
 }
+
+// ---------------------------------------------------------------- Chip de salud de cada mascota
+
+export interface PetChip { label: string; tone: 'ok' | 'warn' | 'bad' | 'mute'; icon: string; }
+
+/**
+ * Un solo chip por mascota en su tarjeta del Home, el más importante: alergia grave > algo vencido > algo por vencer
+ * > vacunas al día > sin vacunas registradas.
+ */
+export function petChip(input: { now: Date; severeAllergy: boolean; vaccines: VaccineLite[]; prevention: PreventionLite[] }): PetChip {
+  if (input.severeAllergy) return { label: 'Alergia grave', tone: 'bad', icon: 'warning' };
+  const latest = new Map<string, VaccineLite>();
+  for (const v of input.vaccines) {
+    const k = (v.name || '').trim().toLowerCase();
+    const prev = latest.get(k);
+    if (!prev || (v.applicationDate || '') > (prev.applicationDate || '')) latest.set(k, v);
+  }
+  const days = [...latest.values()].filter(v => v.nextDoseDate).map(v => daysFrom(input.now, v.nextDoseDate as string));
+  const prevOverdue = input.prevention.some(p => p.state === 'OVERDUE');
+  if (days.some(d => d < 0)) return { label: 'Vacuna vencida', tone: 'bad', icon: 'alert-circle' };
+  if (prevOverdue) return { label: 'Toca desparasitar', tone: 'bad', icon: 'alert-circle' };
+  if (days.some(d => d <= 7)) return { label: 'Vacuna por vencer', tone: 'warn', icon: 'time' };
+  if (input.prevention.some(p => p.state === 'DUE_SOON')) return { label: 'Desparasitar pronto', tone: 'warn', icon: 'time' };
+  if (latest.size) return { label: 'Vacunas al día', tone: 'ok', icon: 'checkmark-circle' };
+  return { label: 'Sin vacunas registradas', tone: 'mute', icon: 'remove-circle' };
+}
+
+/** "Labrador · 3 años" / "Siamés · 8 meses". */
+export function petLine(p: { breed?: string; species?: string; birthDate?: string | null }, now: Date): string {
+  const parts = [p.breed || p.species || ''];
+  if (p.birthDate && /^\d{4}-\d{2}-\d{2}/.test(p.birthDate)) {
+    const [y, m, d] = p.birthDate.slice(0, 10).split('-').map(Number);
+    const months = (now.getFullYear() - y) * 12 + (now.getMonth() + 1 - m) - (now.getDate() < d ? 1 : 0);
+    if (months >= 0) parts.push(months < 12 ? `${months} ${months === 1 ? 'mes' : 'meses'}` : `${Math.floor(months / 12)} ${Math.floor(months / 12) === 1 ? 'año' : 'años'}`);
+  }
+  return parts.filter(Boolean).join(' · ');
+}

@@ -228,10 +228,6 @@
 }
 
 .quick-icon-wrap.add {
-  width: clamp(50px, 15vw, 60px);
-  height: clamp(50px, 15vw, 60px);
-  border-radius: 50%;
-  background: #f5a623;
 
   img {
     width: 32px;
@@ -266,225 +262,6 @@
 
 .quick-item.pulse .quick-icon-wrap.add {
   animation: pulse 1.5s infinite;
-}
-
-/* ==========================
-   PET CARD (Section header + swipe + detail)
-========================== */
-
-.section-header {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.see-all-options {
-  display: flex;
-  gap: 14px;
-
-  span {
-    font-size: 12px;
-    font-weight: 600;
-    color: #4037BE;
-    cursor: pointer;
-  }
-}
-
-.pet-swipe-container {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  overflow: hidden ;
-}
-
-.pet-carousel-track {
-  display: flex;
-  width: 100%;
-
-  .pet-detail-card {
-    flex: 0 0 100%;
-    width: 100%;
-  }
-}
-
-.pet-detail-card {
-  display: flex;
-  background: #FFB84F;
-  border-radius: 20px;
-  overflow: hidden;
-  min-height: 180px;
-  position: relative;
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-drag: none;
-
-  img {
-    -webkit-user-drag: none;
-    user-select: none;
-    pointer-events: none;
-  }
-}
-
-.pet-image-side {
-  width: 40%;
-  min-height: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  flex-shrink: 0;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-.species-fallback-icon {
-  font-size: 64px;
-  line-height: 1;
-}
-
-.pet-info-side {
-  flex: 1;
-  min-width: 0;
-  padding: 18px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  justify-content: center;
-}
-
-.pet-name {
-  margin: 0;
-  font-size: clamp(20px, 6.5vw, 26px);
-  overflow-wrap: anywhere;
-  font-weight: 700;
-  color: #1a1a2e;
-  font-family: 'Jua', sans-serif;
-  line-height: 1.1;
-}
-
-.pet-breed {
-  margin: 0;
-  font-size: 13px;
-  color: #4a4a4a;
-  font-weight: 500;
-}
-
-.pet-birthdate,
-.pet-sex {
-  margin: 0;
-  background: white;
-  color: #1a1a2e;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 8px 14px;
-  border-radius: 10px;
-  width: fit-content;
-}
-
-.pet-shared {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: white;
-  color: #1a1a2e;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 8px 12px;
-  border-radius: 10px;
-  width: fit-content;
-}
-
-.shared-avatars {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  padding-right: 8px;
-}
-
-// Fotos encimadas, como una pila.
-.shared-avatar {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid white;
-  margin-left: -10px;
-
-  &:first-child {
-    margin-left: 0;
-  }
-}
-
-// Burbuja roja con el total de cuidadores, arriba a la derecha.
-.shared-count {
-  position: absolute;
-  top: -8px;
-  right: -4px;
-  background: #FD0D0D;
-  color: white;
-  font-size: 10px;
-  font-weight: 700;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.in-care-tag {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 2;
-  background: #2E7FD8;
-  color: white;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 5px 10px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-
-.swipe-arrow {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: white;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  color: #1a1a2e;
-  box-shadow: 0 2px 6px rgba(0,0,0,.15);
-}
-
-.dots {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-
-  .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: rgba(64,55,190,0.25);
-    transition: background 0.3s;
-
-    &.active {
-      background: #4037BE;
-      width: 18px;
-      border-radius: 4px;
-    }
-  }
 }
 
 /* ==========================
@@ -623,7 +400,7 @@
   &.tone-warn .today-ico { background: #FFF4E0; color: #B26A00; }
   &.tone-bad .today-ico { background: #FEF3F2; color: #B42318; }
   .today-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;
-    strong { font-size: 14px; font-weight: 700; line-height: 1.25; }
+    strong { font-size: 14px; font-weight: 400; line-height: 1.25; }
     small { font-size: 12px; color: #6b6b80; line-height: 1.3; } }
   .today-btn { flex-shrink: 0; border: none; border-radius: 999px; padding: 7px 12px; background: #4037BE; color: #fff; font-family: 'Actor', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; }
 }
@@ -662,3 +439,30 @@
   &.primary { background: #4037BE; color: #fff; }
   &:disabled { opacity: .45; }
 }
+
+/* Tus mascotas (Figma "Home/Mascota") */
+.pets-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: -6px; }
+.pets-title { margin: 0; font-family: 'Jua', sans-serif; font-size: 20px; color: #1a1a2e; }
+.pets-add { border: none; background: none; padding: 0; color: #4037BE; font-family: 'Actor', sans-serif; font-size: 14px; cursor: pointer; }
+.pets-row { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -16px; padding: 4px 16px 10px; scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
+.pet-tile {
+  flex: 0 0 168px; scroll-snap-align: start; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 20px; background: #fff;
+  box-shadow: 0 4px 18px rgba(26, 26, 46, .07); font-family: 'Actor', sans-serif; cursor: pointer;
+  &:active { transform: scale(.98); }
+}
+.pet-photo { position: relative; height: 104px; border-radius: 14px; overflow: hidden; display: flex; align-items: center; justify-content: center;
+  img { width: 100%; height: 100%; object-fit: cover; }
+  .pet-emoji { font-size: 52px; } }
+.pet-care { position: absolute; left: 6px; top: 6px; padding: 2px 8px; border-radius: 999px; background: #2E7FD8; color: #fff; font-size: 10px; }
+.pet-tile-name { margin: 2px 0 0; font-family: 'Jua', sans-serif; font-size: 20px; color: #1a1a2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pet-tile-line { margin: 0; font-size: 12px; color: #6b6b80; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pet-chip { align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; font-size: 11px;
+  ion-icon { font-size: 13px; }
+  &.tone-ok { background: #E8F5E9; color: #2E7D32; } &.tone-warn { background: #FFF4E0; color: #B26A00; }
+  &.tone-bad { background: #FEF3F2; color: #B42318; } &.tone-mute { background: #F0F0F3; color: #6b6b80; } }
+.pet-actions { display: flex; gap: 6px; margin-top: 2px;
+  button { flex: 1; height: 34px; border: none; border-radius: 10px; background: #F1F0FB; color: #4037BE; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; } }
+.today-count.ok { background: #E8F5E9; color: #2E7D32; }
+.today-empty { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 16px; background: #F7F6FF;
+  .today-ico { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 22px; background: #E8F5E9; color: #2E7D32; }
+  .today-text { display: flex; flex-direction: column; gap: 2px; strong { font-size: 14px; } small { font-size: 12px; color: #6b6b80; line-height: 1.3; } } }

@@ -19,7 +19,7 @@ import { AiAccessService } from 'src/app/services/AiAccessService/ai-access';
 import { Appointment } from 'src/app/models/appointment.model';
 import { LinkedVet } from 'src/app/models/veterinary.model';
 import {
-  GreetingView, PreventionLite, TodayItem, VaccineLite, WeekDay, buildGreeting, buildTodayItems, weekDays,
+  GreetingView, PetChip, PreventionLite, TodayItem, VaccineLite, WeekDay, buildGreeting, buildTodayItems, petChip, petLine, weekDays,
 } from 'src/app/shared/utils/home-today.util';
 
 @Component({
@@ -60,6 +60,8 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   linkedVet: LinkedVet | null = null;
   linkedVetLine = '';
   private todayLoaded = false;
+  /** Chip de salud de cada mascota (tarjetas de "Tus mascotas"). */
+  petChips: Record<string, PetChip> = {};
 
   // --- Swipe / carrusel state ---
   @ViewChild('swipeContainer') swipeContainerRef!: ElementRef<HTMLDivElement>;
@@ -309,11 +311,15 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
           catchError(() => of([] as VaccineLite[]))
         ))).pipe(map(parts => ([] as VaccineLite[]).concat(...parts)))
       : of([] as VaccineLite[]);
+    const severe = new Set<string>();
     const prevention$ = pets.length
       ? forkJoin(pets.map(p => this.petHealth.getSummary(p.id).pipe(
-          map(s => (['INTERNAL', 'EXTERNAL'] as const).map((k): PreventionLite => ({
-            petId: p.id, petName: p.name, kind: k, state: s.prevention[k].state, nextDoseDate: s.prevention[k].nextDoseDate,
-          }))),
+          map(s => {
+            if (s.allergies.some(a => (a.state === 'SUSPECTED' || a.state === 'CONFIRMED') && a.severity === 'SEVERE')) severe.add(p.id);
+            return (['INTERNAL', 'EXTERNAL'] as const).map((k): PreventionLite => ({
+              petId: p.id, petName: p.name, kind: k, state: s.prevention[k].state, nextDoseDate: s.prevention[k].nextDoseDate,
+            }));
+          }),
           catchError(() => of([] as PreventionLite[]))
         ))).pipe(map(parts => ([] as PreventionLite[]).concat(...parts)))
       : of([] as PreventionLite[]);
@@ -324,6 +330,10 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
       events: this.calendarService.getAllUserEvents().pipe(catchError(() => of([] as any[]))),
     }).subscribe(({ vaccines, prevention, appts, events }) => {
       this.todayItems = buildTodayItems({ now, appointments: appts, vaccines, prevention });
+      this.petChips = pets.reduce((acc, p) => ({ ...acc, [p.id]: petChip({
+        now, severeAllergy: severe.has(p.id),
+        vaccines: vaccines.filter(v => v.petId === p.id), prevention: prevention.filter(x => x.petId === p.id),
+      }) }), {} as Record<string, PetChip>);
       const open = appts.filter(a => ['REQUESTED', 'CONFIRMED', 'CHECKED_IN'].includes(a.status));
       this.week = weekDays(now, open.map(a => a.startsAt), (events as any[]).map(e => e.start_date).filter(Boolean));
       const inWeek = open
@@ -336,6 +346,8 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
       this.refreshGreeting();
     });
   }
+
+  petLineOf(p: Pet): string { return petLine(p, new Date()); }
 
   private refreshGreeting(): void {
     const name = this.username && this.username !== 'Username' ? this.username : '';

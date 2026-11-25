@@ -1,5 +1,5 @@
 import { Appointment } from 'src/app/models/appointment.model';
-import { GREETING_BANK, birthdayAge, buildGreeting, buildTodayItems, momentOf, petsLabel, weekDays } from './home-today.util';
+import { GREETING_BANK, birthdayAge, buildGreeting, buildTodayItems, momentOf, petChip, petLine, petsLabel, weekDays } from './home-today.util';
 
 const at = (y: number, m: number, d: number, h = 10, min = 0) => new Date(y, m - 1, d, h, min);
 const NOW = at(2026, 11, 25, 15, 20); // miércoles 25 nov, 3:20 p. m.
@@ -124,5 +124,23 @@ describe('home-today.util', () => {
     expect(w[3].mark).toBe('appointment'); // la cita gana sobre el evento del mismo día
     expect(w[6].mark).toBe('event');
     expect(w[0].mark).toBeNull();
+  });
+});
+
+describe('chip de salud de cada mascota', () => {
+  const NOW2 = new Date(2026, 10, 25, 15);
+  const vac = (next: string, app = '2025-11-01') => ({ petId: 'p', petName: 'L', name: 'Rabia', applicationDate: app, nextDoseDate: next });
+  it('prioridad: alergia grave > vencido > por vencer > al día > sin vacunas', () => {
+    expect(petChip({ now: NOW2, severeAllergy: true, vaccines: [vac('2026-01-01')], prevention: [] }).label).toBe('Alergia grave');
+    expect(petChip({ now: NOW2, severeAllergy: false, vaccines: [vac('2026-01-01')], prevention: [] }).label).toBe('Vacuna vencida');
+    expect(petChip({ now: NOW2, severeAllergy: false, vaccines: [], prevention: [{ petId: 'p', petName: 'L', kind: 'EXTERNAL', state: 'OVERDUE', nextDoseDate: '' }] }).label).toBe('Toca desparasitar');
+    expect(petChip({ now: NOW2, severeAllergy: false, vaccines: [vac('2026-11-30')], prevention: [] }).label).toBe('Vacuna por vencer');
+    expect(petChip({ now: NOW2, severeAllergy: false, vaccines: [vac('2027-06-01')], prevention: [] }).label).toBe('Vacunas al día');
+    expect(petChip({ now: NOW2, severeAllergy: false, vaccines: [], prevention: [] }).label).toBe('Sin vacunas registradas');
+  });
+  it('raza y edad', () => {
+    expect(petLine({ breed: 'Labrador', birthDate: '2022-01-15' }, NOW2)).toBe('Labrador · 4 años');
+    expect(petLine({ species: 'Gato', birthDate: '2026-03-10' }, NOW2)).toBe('Gato · 8 meses');
+    expect(petLine({ breed: 'Pitbull' }, NOW2)).toBe('Pitbull');
   });
 });
