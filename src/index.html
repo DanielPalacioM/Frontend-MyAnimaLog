@@ -22,6 +22,18 @@
 </head>
 
 <body>
+  <!-- Pantalla de carga: el perrito salta y saluda mientras arranca la app. AppComponent la quita al abrir la primera pantalla. -->
+  <div id="boot-splash" aria-label="Cargando MyAnimaLog" role="status">
+    <img src="assets/images/mascota-animada.svg" alt="" width="150" height="150" />
+    <p>MyAnimaLog</p>
+  </div>
+  <style>
+    #boot-splash { position: fixed; inset: 0; z-index: 100000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+      background: linear-gradient(160deg, #FFF4E0, #FFE1AE); transition: opacity .35s ease; }
+    #boot-splash img { width: 150px; height: 150px; }
+    #boot-splash p { margin: 0; font: 700 22px/1 'Jua', 'Actor', system-ui, sans-serif; color: #3D254D; letter-spacing: .3px; }
+    #boot-splash.gone { opacity: 0; pointer-events: none; }
+  </style>
   <app-root></app-root>
 </body>
 

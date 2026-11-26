@@ -65,12 +65,14 @@ describe('home-today.util', () => {
     it('sin mascotas: bienvenida con "Agregar mascota"', () => {
       const g = buildGreeting({ name: 'Luis', now: NOW, pets: [], items: [] });
       expect(g.mood).toBe('welcome');
+      expect(g.pose).toBe('hello');
       expect(g.cta?.kind).toBe('addPet');
     });
 
     it('el cumpleaños de una mascota gana sobre todo lo demás', () => {
       const g = buildGreeting({ name: 'Luis', now: at(2026, 1, 15, 9), pets, items: buildTodayItems({ now: NOW, appointments: [appt({})], vaccines: [], prevention: [] }) });
       expect(g.mood).toBe('birthday');
+      expect(g.pose).toBe('celebrate');
       expect(g.title).toBe('¡Hoy Luna cumple 4 años!');
       expect(g.cta).toEqual({ label: 'Ver a Luna', kind: 'pet', petId: 'p1' });
       expect(birthdayAge('2026-01-15', at(2026, 1, 15))).toBeNull(); // el día que nace no "cumple"
@@ -80,6 +82,7 @@ describe('home-today.util', () => {
       const items = buildTodayItems({ now: NOW, appointments: [appt({})], vaccines: [], prevention: [{ petId: 'p1', petName: 'Luna', kind: 'EXTERNAL', state: 'OVERDUE', nextDoseDate: '2026-11-18' }] });
       const g = buildGreeting({ name: 'Luis', now: NOW, pets, items });
       expect(g.mood).toBe('afternoon');
+      expect(g.pose).toBe('curious'); // hay pendientes: inclina la cabeza
       expect(g.title).toBe('¡Buenas tardes, Luis!');
       expect(g.line).toBe('Hoy hay 2 cosas para Luna y Thor. Vamos paso a paso.');
       expect(g.cta?.label).toBe('Ver lo de hoy (2)');
@@ -96,6 +99,7 @@ describe('home-today.util', () => {
       const a = buildGreeting({ name: 'Luis', now: NOW, pets, items: [] });
       const b = buildGreeting({ name: 'Luis', now: at(2026, 11, 25, 16), pets, items: [] });
       expect(a.chip).toBe('✓ Todo al día');
+      expect(a.pose).toBe('celebrate');
       expect(a.line).toBe(b.line);
       const lines = new Set([20, 21, 22, 23, 24].map(d => buildGreeting({ name: 'Luis', now: at(2026, 11, d, 15), pets, items: [] }).line));
       expect(lines.size).toBe(GREETING_BANK.length);
@@ -106,6 +110,7 @@ describe('home-today.util', () => {
       const items = buildTodayItems({ now: night, appointments: [appt({})], vaccines: [], prevention: [] });
       const g = buildGreeting({ name: 'Luis', now: night, pets, items });
       expect(g.mood).toBe('night');
+      expect(g.pose).toBe('sleep');
       expect(g.line).toContain('Mañana tienes cita');
       expect(g.bubble).toBe('zzz');
       expect(buildGreeting({ name: 'Luis', now: night, pets, items: [] }).line).toBe('Luna y Thor ya están soñando. Descansa.');

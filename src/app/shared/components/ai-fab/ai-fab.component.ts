@@ -1,9 +1,10 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { NavController, ToastController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { AiAccessService } from 'src/app/services/AiAccessService/ai-access';
+import { MascotComponent } from '../mascot/mascot.component';
 import {
   Bounds, DRAG_THRESHOLD, FAB_SIZE, FabPos, LONG_PRESS_MS, clampPos, dropZone, fabVisibleOn, fromStored, isOverDropZone, isTap,
   snapToSide, toStored,
@@ -39,6 +40,9 @@ export class AiFabComponent implements OnInit, OnDestroy {
   overZone = false;
   snapping = false;
   bubbleOpen = false;
+  /** El perrito entra saltando y saluda la primera vez de la sesión (con el mensajito). */
+  dogIntro = false;
+  @ViewChild(MascotComponent) private dog?: MascotComponent;
 
   private bounds: Bounds = { width: 360, height: 700, top: 56, bottom: 84 };
   private start: { x: number; y: number; t: number; px: number; py: number } | null = null;
@@ -116,7 +120,9 @@ export class AiFabComponent implements OnInit, OnDestroy {
     try { greeted = sessionStorage.getItem('aiFabGreeted') === 'true'; } catch { /* nada */ }
     if (greeted) return;
     try { sessionStorage.setItem('aiFabGreeted', 'true'); } catch { /* nada */ }
-    this.bubbleTimers.push(setTimeout(() => (this.bubbleOpen = true), 1400));
+    this.dogIntro = true;
+    // Cuando aparece el mensajito, el perrito vuelve a saludar con la pata
+    this.bubbleTimers.push(setTimeout(() => { this.bubbleOpen = true; this.dog?.greet(); }, 1400));
     this.bubbleTimers.push(setTimeout(() => (this.bubbleOpen = false), 1400 + 7000));
   }
 

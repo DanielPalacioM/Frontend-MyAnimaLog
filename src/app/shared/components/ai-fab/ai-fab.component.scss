@@ -12,7 +12,7 @@ $orange-dark: #e8940f;
   background: radial-gradient(circle at 30% 25%, #ffc65c, $orange 60%, $orange-dark);
   box-shadow: 0 6px 16px rgba(178, 106, 0, .38), 0 2px 5px rgba(0, 0, 0, .18);
   display: flex; align-items: center; justify-content: center; transition: transform .15s, box-shadow .15s;
-  img { width: 38px; height: 38px; object-fit: contain; pointer-events: none; -webkit-user-drag: none; }
+  .fab-dog { width: 44px; height: 44px; pointer-events: none; }
   &:active { cursor: grabbing; }
 }
 .fab-wrap.pressing .fab { transform: scale(1.14); box-shadow: 0 10px 22px rgba(178, 106, 0, .5), 0 3px 8px rgba(0, 0, 0, .22); }

@@ -3,7 +3,7 @@
 <aside class="mini" [class.open]="open" role="dialog" aria-label="Mini chat con la IA" [attr.aria-hidden]="!open">
 
   <header class="mini-head">
-    <img src="assets/images/logo app.png" alt="" class="mini-logo" />
+    <app-mascot class="mini-logo" [pose]="conv.typing ? 'think' : 'hello'" [intro]="open"></app-mascot>
     <div class="mini-titles">
       <strong>{{ aiName }}</strong>
       <small>Estás en: {{ screen.label }}</small>
@@ -40,7 +40,7 @@
     </ng-container>
 
     <div class="m-row assistant" *ngIf="conv.typing" aria-live="polite">
-      <img src="assets/images/logo app.png" alt="" class="m-avatar" />
+      <app-mascot class="m-avatar" pose="think"></app-mascot>
       <div class="m-answer"><span class="dots" aria-label="Escribiendo"><i></i><i></i><i></i></span></div>
     </div>
   </div>

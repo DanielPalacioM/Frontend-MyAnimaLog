@@ -16,7 +16,7 @@ import { LONG_PRESS_MS } from 'src/app/shared/utils/ai-fab.util';
       <button type="button" class="dock-btn" [class.pressing]="pressing" data-tour="ai-dock" aria-label="Abrir el asistente de IA"
               (pointerdown)="onDown()" (pointerup)="onUp()" (pointercancel)="cancel()" (pointerleave)="cancel()"
               (keydown.enter)="open()" (contextmenu)="onContextMenu($event)">
-        <img src="assets/images/logo app.png" alt="" draggable="false" />
+        <app-mascot class="dock-dog" pose="hello"></app-mascot>
       </button>
 
       <div class="dock-backdrop" *ngIf="menuOpen" (click)="menuOpen = false"></div>
@@ -36,7 +36,7 @@ import { LONG_PRESS_MS } from 'src/app/shared/utils/ai-fab.util';
       background: radial-gradient(circle at 30% 25%, #ffc65c, #f5a623 60%, #e8940f);
       box-shadow: 0 4px 12px rgba(178, 106, 0, .35); display: flex; align-items: center; justify-content: center; transition: transform .15s;
     }
-    .dock-btn img { width: 25px; height: 25px; object-fit: contain; pointer-events: none; }
+    .dock-dog { width: 25px; height: 25px; pointer-events: none; }
     .dock-btn.pressing { transform: scale(1.14); }
     /* Al aparecer "salta" y emite dos ondas, para que se note dónde quedó */
     .dock-btn { animation: dockPop .45s cubic-bezier(.22, .8, .3, 1), dockRing 1.2s ease-out .35s 2; }

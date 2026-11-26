@@ -19,7 +19,7 @@ $muted: #6b6b80;
 @media (prefers-reduced-motion: reduce) { .mini { transition: none; } .mini-backdrop { animation: none; } }
 
 .mini-head { display: flex; align-items: center; gap: 8px; padding: 12px 10px 10px 14px; background: $orange; }
-.mini-logo { width: 30px; height: 30px; object-fit: contain; background: #fff; border-radius: 50%; padding: 2px; flex-shrink: 0; }
+.mini-logo { display: block; width: 30px; height: 30px; object-fit: contain; background: #fff; border-radius: 50%; padding: 2px; flex-shrink: 0; box-sizing: border-box; overflow: hidden; }
 .mini-titles { flex: 1; min-width: 0; display: flex; flex-direction: column;
   strong { font-weight: 700; font-size: 14px; }
   small { font-size: 11.5px; color: rgba(26, 26, 46, .78); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
@@ -40,7 +40,7 @@ $muted: #6b6b80;
 .m-row.assistant { gap: 7px; align-items: flex-start; }
 .m-bubble { max-width: 86%; background: $orange; color: $text; border-radius: 14px 14px 4px 14px; padding: 6px 10px; line-height: 1.4; white-space: pre-wrap; word-break: break-word; }
 .m-files { display: block; font-size: 11.5px; margin-bottom: 2px; color: $orange-dark; }
-.m-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: contain; background: $orange-soft; padding: 2px; flex-shrink: 0; }
+.m-avatar { display: block; width: 24px; height: 24px; border-radius: 50%; object-fit: contain; background: $orange-soft; padding: 2px; flex-shrink: 0; box-sizing: border-box; overflow: hidden; }
 .m-answer { flex: 1; min-width: 0; padding-top: 2px; line-height: 1.45;
   &.error { background: #FFF1EF; border-radius: 10px; padding: 6px 9px; .rich { color: #B3261E; } } }
 

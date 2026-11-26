@@ -5,6 +5,8 @@ import { PreventionState } from 'src/app/models/pet-health.model';
 // Diseño en Figma: componente "Home/Saludo" (5 momentos) y pantallas "Home · propuesta".
 
 export type GreetingMood = 'morning' | 'afternoon' | 'night' | 'welcome' | 'birthday';
+/** Qué hace el perrito después de saludar (Figma «Saludo · guía de animación»). */
+export type MascotPose = 'hello' | 'curious' | 'celebrate' | 'sleep' | 'think';
 
 export interface TodayItem {
   id: string;
@@ -22,6 +24,8 @@ export interface TodayItem {
 
 export interface GreetingView {
   mood: GreetingMood;
+  /** Bienvenida: hello · pendientes: curious · cumpleaños o todo al día: celebrate · noche: sleep. */
+  pose: MascotPose;
   date: string;
   title: string;
   line: string;
@@ -153,14 +157,14 @@ export function buildGreeting(input: { name: string; now: Date; pets: PetLite[];
   const date = capital(now.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }));
 
   if (!pets.length) {
-    return { mood: 'welcome', date, title: name ? `¡Hola, ${name}! Qué bueno tenerte aquí` : '¡Hola! Qué bueno tenerte aquí',
+    return { mood: 'welcome', pose: 'hello', date, title: name ? `¡Hola, ${name}! Qué bueno tenerte aquí` : '¡Hola! Qué bueno tenerte aquí',
       line: 'Te ayudo a cuidar a tus mascotas. Empecemos por la primera.', bubble: '¡Hola!', cta: { label: 'Agregar mascota', kind: 'addPet' } };
   }
 
   for (const p of pets) {
     const age = birthdayAge(p.birthDate, now);
     if (age) {
-      return { mood: 'birthday', date, title: `¡Hoy ${p.name} cumple ${age} ${age === 1 ? 'año' : 'años'}!`,
+      return { mood: 'birthday', pose: 'celebrate', date, title: `¡Hoy ${p.name} cumple ${age} ${age === 1 ? 'año' : 'años'}!`,
         line: `Feliz cumpleaños, ${p.name}. ¿Le tomas una foto?`, bubble: '¡Feliz cumple!', cta: { label: `Ver a ${p.name}`, kind: 'pet', petId: p.id } };
     }
   }
@@ -171,18 +175,18 @@ export function buildGreeting(input: { name: string; now: Date; pets: PetLite[];
 
   if (moment === 'night') {
     const tomorrow = items.find(i => i.kind === 'appointment' && i.title.includes('mañana'));
-    if (tomorrow) return { mood: 'night', date, title: hi('¡Buenas noches'), line: `Mañana tienes cita (${tomorrow.detail.split(' · ')[0]}). Descansa.`, bubble: 'zzz', chip: 'Cita mañana' };
-    if (n) return { mood: 'night', date, title: hi('¡Buenas noches'), line: 'Mañana seguimos con lo pendiente. Descansa.', bubble: 'zzz', chip: `${n} por atender` };
-    return { mood: 'night', date, title: hi('¡Buenas noches'), line: `${capital(label)} ya ${pets.length > 1 ? 'están' : 'está'} soñando. Descansa.`, bubble: 'zzz' };
+    if (tomorrow) return { mood: 'night', pose: 'sleep', date, title: hi('¡Buenas noches'), line: `Mañana tienes cita (${tomorrow.detail.split(' · ')[0]}). Descansa.`, bubble: 'zzz', chip: 'Cita mañana' };
+    if (n) return { mood: 'night', pose: 'sleep', date, title: hi('¡Buenas noches'), line: 'Mañana seguimos con lo pendiente. Descansa.', bubble: 'zzz', chip: `${n} por atender` };
+    return { mood: 'night', pose: 'sleep', date, title: hi('¡Buenas noches'), line: `${capital(label)} ya ${pets.length > 1 ? 'están' : 'está'} soñando. Descansa.`, bubble: 'zzz' };
   }
 
   const base = moment === 'morning' ? '¡Buenos días' : '¡Buenas tardes';
   if (n) {
     const line = n === 1 ? `${items[0].title}. Vamos paso a paso.` : `Hoy hay ${n} cosas para ${label}. Vamos paso a paso.`;
-    return { mood: moment, date, title: hi(base), line, bubble: '¡Guau!', cta: { label: `Ver lo de hoy (${n})`, kind: 'today' } };
+    return { mood: moment, pose: 'curious', date, title: hi(base), line, bubble: '¡Guau!', cta: { label: `Ver lo de hoy (${n})`, kind: 'today' } };
   }
   const phrase = GREETING_BANK[daySeed(now) % GREETING_BANK.length].replace('{pets}', capital(label));
-  return { mood: moment, date, title: hi(base), line: phrase.replace(' están al día', pets.length > 1 ? ' están al día' : ' está al día'), bubble: '¡Bien!', chip: '✓ Todo al día' };
+  return { mood: moment, pose: 'celebrate', date, title: hi(base), line: phrase.replace(' están al día', pets.length > 1 ? ' están al día' : ' está al día'), bubble: '¡Bien!', chip: '✓ Todo al día' };
 }
 
 // ---------------------------------------------------------------- Semana

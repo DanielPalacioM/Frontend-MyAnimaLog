@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+<g class="leg">
+        <g transform="translate(122 222)">
+          <path fill="#f2b67a" d="M-16-12C-16 14-17 40-17 50C-25 55-25 75-7 77L9 77C24 75 25 56 16 51C16 40 16 14 16-12C16-25-16-25-16-12Z"/>
+          <path fill="none" stroke="#3e0402" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round" d="M-16 4C-16.5 25-17 40-17 50C-25 55-25 75-7 77L9 77C24 75 25 56 16 51C16 42 16 22 16 4"/>
+          <path fill="none" stroke="#c98e56" stroke-width="6" stroke-linecap="round" d="M9 12C10 26 10 36 9 46"/>
+          <ellipse fill="#ffe4c5" cx="1" cy="66" rx="10" ry="6.5"/>
+          <circle fill="#ffe4c5" cx="-9" cy="55.5" r="3"/><circle fill="#ffe4c5" cx="1" cy="53" r="3"/><circle fill="#ffe4c5" cx="11" cy="55.5" r="3"/>
+        </g>
+      </g>
+</svg>

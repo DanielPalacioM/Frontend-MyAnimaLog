@@ -1,0 +1,198 @@
+/*
+ * Perrito por capas (Figma «Saludo · guía de animación de la mascota»).
+ * Las piezas giran desde su articulación: transform-box: view-box hace que transform-origin use las mismas
+ * coordenadas del dibujo (viewBox 0 0 300 300). El navegador interpola cada fotograma a la frecuencia de la
+ * pantalla (60–120 fps), así que la fluidez sale de las curvas: cada tramo va con ease-in-out para que la cola
+ * y la cabeza se muevan como un péndulo y no a saltos.
+ *
+ *  Entrada   0–450 ms     salta desde abajo y cae con rebote (una vez por sesión)
+ *  Saluda    450–1600 ms  levanta la pata junto a la cara y la agita 3 veces (siempre al entrar, también de noche)
+ *  Reposo    en bucle     respira; la cabeza mira a los lados cada ~6 s, la cola cada ~4 s, las orejas y el parpadeo
+ *  Curioso   al entrar    inclina la cabeza (hay pendientes)
+ *  Celebra   al entrar    dos saltos de alegría (todo al día, cumpleaños)
+ *  Duerme    noche        respira hondo, cabecea y la cola se mece despacio
+ *  Piensa    IA           ladea la cabeza de un lado a otro mientras la IA responde
+ *  Al tocarlo (act-*): saluda, salta, se ríe meneándose, ladea la cabeza, mueve la cola feliz o se despierta
+ *  Reducir movimiento: sin saltos ni desplazamientos; lo demás (en su sitio) sí se mueve.
+ */
+:host { display: block; width: 100%; height: 100%; }
+
+.pet { display: block; width: 100%; height: 100%; overflow: visible; }
+.pet g, .pet ellipse { transform-box: view-box; }
+
+.shadow { transform-origin: 170px 284px; }
+.dog, .joy, .breath { transform-origin: 150px 290px; }
+.tail { transform-origin: 250px 262px; }
+.head, .head-pose, .head-idle { transform-origin: 150px 182px; }
+.ear-l { transform-origin: 62px 40px; }
+.ear-r { transform-origin: 212px 26px; }
+.eye-l { transform-origin: 101px 104px; }
+.eye-r { transform-origin: 179px 78px; }
+.leg { transform-origin: 122px 222px; }
+.leg, .chest { opacity: 0; }
+
+/* ---- Poses fijas ---- */
+:host(.pose-curious) .head-pose { transform: rotate(-11deg); }
+:host(.pose-sleep) .head-pose { transform: translateY(4px) rotate(7deg); }
+
+/* ---- Reposo: siempre algo vivo, pero suave ---- */
+.breath { animation: breathe 3.6s ease-in-out infinite; }
+.tail { animation: wag 4.2s ease-in-out 1.6s infinite; }
+.head-idle { animation: look 6.4s ease-in-out 2s infinite; }
+.ear-l { animation: flickL 5.3s ease-in-out 2.4s infinite; }
+.ear-r { animation: flickR 7.1s ease-in-out 3.1s infinite; }
+.eye { animation: blink 4.6s linear 2.2s infinite; }
+
+/* Dormido: respira hondo, cabecea, la cola se mece y los ojos ya están cerrados */
+:host(.pose-sleep) .breath { animation: breatheDeep 5s ease-in-out infinite; }
+:host(.pose-sleep) .tail { animation: lazy 7s ease-in-out 1s infinite; }
+:host(.pose-sleep) .head-idle { animation: nod 6s ease-in-out 2.2s infinite; }
+:host(.pose-sleep) .ear-l { animation: none; transform: rotate(-4deg); }
+:host(.pose-sleep) .ear-r { animation: none; transform: rotate(4deg); }
+:host(.pose-sleep) .eye { animation: none; }
+
+/* Piensa (la IA está respondiendo) */
+:host(.pose-think) .head-idle { animation: think 1.8s ease-in-out infinite; }
+:host(.pose-think) .tail { animation: lazy 2.4s ease-in-out infinite; }
+
+/* ---- Entrada ---- */
+:host(.intro) .dog { animation: hop .45s linear both; }
+:host(.intro) .shadow { animation: shadowIn .45s linear both; }
+:host(.intro) .ear-l { animation: flopL .5s ease-out .25s, flickL 5.3s ease-in-out 2.4s infinite; }
+:host(.intro) .ear-r { animation: flopR .5s ease-out .25s, flickR 7.1s ease-in-out 3.1s infinite; }
+:host(.intro.pose-sleep) .ear-l, :host(.intro.pose-sleep) .ear-r { animation: none; }
+
+/* ---- Saluda con la pata (3 veces): al entrar, en todas las poses ---- */
+:host(.intro) .leg { animation: wave 1.15s ease-in-out .45s forwards; }
+:host(.intro) .chest { animation: show 1.15s linear .45s forwards; }
+:host(.intro) .head { animation: lean 1.15s ease-in-out .45s both; }
+
+/* ---- Después del saludo, la pose ---- */
+:host(.intro.pose-curious) .head-pose { animation: curious .5s cubic-bezier(.3, 1.4, .5, 1) 1.6s both; }
+:host(.intro.pose-sleep) .head-pose { animation: doze .9s ease-in-out 1.6s both; }
+:host(.intro.pose-celebrate) .joy { animation: joy .8s ease-in-out 1.6s both; }
+:host(.intro.pose-celebrate) .tail { animation: happy .8s ease-in-out 1.6s, wag 4.2s ease-in-out 2.7s infinite; }
+
+@keyframes hop {
+  0% { transform: translateY(170px) scale(.8); opacity: 0; animation-timing-function: cubic-bezier(.2, .7, .4, 1); }
+  15% { opacity: 1; }
+  55% { transform: translateY(-26px) scale(.98, 1.04); animation-timing-function: cubic-bezier(.5, 0, .9, .5); }
+  78% { transform: translateY(0) scale(1.08, .9); animation-timing-function: ease-out; }
+  100% { transform: none; opacity: 1; }
+}
+@keyframes shadowIn {
+  0% { transform: scale(.3); opacity: 0; }
+  55% { transform: scale(.75); opacity: .7; }
+  78% { transform: scale(1.06, 1); opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+@keyframes flopL { 0%, 100% { transform: none; } 35% { transform: rotate(5deg); } 70% { transform: rotate(-2deg); } }
+@keyframes flopR { 0%, 100% { transform: none; } 35% { transform: rotate(-5deg); } 70% { transform: rotate(2deg); } }
+
+@keyframes wave {
+  0% { transform: rotate(22deg); opacity: 1; }
+  16% { transform: rotate(158deg); }
+  28% { transform: rotate(130deg); }
+  40% { transform: rotate(160deg); }
+  52% { transform: rotate(130deg); }
+  64% { transform: rotate(160deg); }
+  76% { transform: rotate(132deg); }
+  86% { transform: rotate(152deg); opacity: 1; }
+  99.9% { transform: rotate(22deg); opacity: 1; }
+  100% { transform: rotate(22deg); opacity: 0; }
+}
+@keyframes show { 0%, 99.9% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes lean { 0%, 100% { transform: none; } 15%, 85% { transform: rotate(-4deg); } }
+/* Copias con otro nombre: así el navegador vuelve a empezar la animación cuando se saluda de nuevo */
+@keyframes wave2 {
+  0% { transform: rotate(22deg); opacity: 1; }
+  16% { transform: rotate(158deg); }
+  28% { transform: rotate(130deg); }
+  40% { transform: rotate(160deg); }
+  52% { transform: rotate(130deg); }
+  64% { transform: rotate(160deg); }
+  76% { transform: rotate(132deg); }
+  86% { transform: rotate(152deg); opacity: 1; }
+  99.9% { transform: rotate(22deg); opacity: 1; }
+  100% { transform: rotate(22deg); opacity: 0; }
+}
+@keyframes show2 { 0%, 99.9% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes lean2 { 0%, 100% { transform: none; } 15%, 85% { transform: rotate(-4deg); } }
+
+@keyframes curious { from { transform: none; } to { transform: rotate(-11deg); } }
+@keyframes doze { from { transform: none; } to { transform: translateY(4px) rotate(7deg); } }
+
+@keyframes joy {
+  0%, 50%, 100% { transform: none; }
+  20% { transform: translateY(-34px) scale(.98, 1.03); }
+  42% { transform: translateY(0) scale(1.06, .93); }
+  70% { transform: translateY(-24px); }
+  92% { transform: translateY(0) scale(1.04, .95); }
+}
+@keyframes happy { 0%, 100% { transform: none; } 12%, 37%, 62%, 87% { transform: rotate(-16deg); } 25%, 50%, 75% { transform: rotate(14deg); } }
+
+/* Reposo: tramos cortos con ease-in-out = movimiento de péndulo */
+@keyframes breathe { 0%, 100% { transform: none; } 50% { transform: scale(1.006, 1.014); } }
+@keyframes breatheDeep { 0%, 100% { transform: none; } 45% { transform: scale(1.01, 1.025); } }
+@keyframes wag {
+  0%, 30%, 100% { transform: none; }
+  4% { transform: rotate(-16deg); }
+  8% { transform: rotate(14deg); }
+  12% { transform: rotate(-14deg); }
+  16% { transform: rotate(12deg); }
+  20% { transform: rotate(-8deg); }
+  25% { transform: rotate(4deg); }
+}
+@keyframes lazy { 0%, 100% { transform: none; } 50% { transform: rotate(7deg); } }
+@keyframes look {
+  0%, 78%, 100% { transform: none; }
+  14%, 30% { transform: rotate(-5deg); }
+  46%, 62% { transform: translateY(-1px) rotate(4deg); }
+}
+@keyframes nod {
+  0%, 30%, 100% { transform: none; }
+  10%, 16% { transform: translateY(3px) rotate(6deg); }
+  22% { transform: rotate(-2deg); }
+}
+@keyframes think { 0%, 100% { transform: rotate(-8deg); } 50% { transform: translateY(-1px) rotate(6deg); } }
+@keyframes flickL { 0%, 88%, 100% { transform: none; } 92% { transform: rotate(5deg); } 96% { transform: rotate(-2deg); } }
+@keyframes flickR { 0%, 86%, 100% { transform: none; } 90% { transform: rotate(-5deg); } 94% { transform: rotate(2deg); } }
+@keyframes blink { 0%, 93%, 100% { transform: none; } 96.5% { transform: scaleY(.3); } }
+
+/* ---- Reacciones al tocarlo (clase act-*, la pone MascotComponent.play) ---- */
+:host(.act-wave) .leg { animation: wave2 1.15s ease-in-out forwards; }
+:host(.act-wave) .chest { animation: show2 1.15s linear forwards; }
+:host(.act-wave) .head { animation: lean2 1.15s ease-in-out both; }
+:host(.act-jump) .joy { animation: boing .75s ease-in-out; }
+:host(.act-jump) .tail, :host(.act-wag) .tail { animation: happy .9s ease-in-out; }
+:host(.act-jump) .ear-l, :host(.act-shake) .ear-l { animation: flopL .5s ease-out .3s; }
+:host(.act-jump) .ear-r, :host(.act-shake) .ear-r { animation: flopR .5s ease-out .3s; }
+:host(.act-shake) .breath { animation: giggle .8s ease-in-out; }
+:host(.act-shake) .eye { animation: squint .8s ease-in-out; }
+:host(.act-tilt) .head-idle { animation: tiltAct 1.2s cubic-bezier(.3, 1.3, .5, 1); }
+:host(.act-tilt) .ear-l { animation: perk 1.2s ease-in-out; }
+:host(.act-wag) .joy { animation: bob .9s ease-in-out; }
+:host(.act-wake) .head-idle { animation: wake 1.3s ease-in-out; }
+:host(.act-wake) .ear-l { animation: flopL .5s ease-out .15s; }
+:host(.act-wake) .ear-r { animation: flopR .5s ease-out .15s; }
+
+@keyframes boing {
+  0%, 100% { transform: none; }
+  18% { transform: scale(1.06, .9); }
+  45% { transform: translateY(-38px) scale(.97, 1.04); }
+  72% { transform: translateY(0) scale(1.07, .9); }
+  86% { transform: translateY(-6px); }
+}
+@keyframes giggle { 0%, 100% { transform: none; } 15%, 45%, 75% { transform: rotate(-4deg); } 30%, 60%, 90% { transform: rotate(4deg); } }
+@keyframes squint { 0%, 100% { transform: none; } 20%, 80% { transform: scaleY(.6); } }
+@keyframes tiltAct { 0%, 100% { transform: none; } 25%, 70% { transform: rotate(-14deg); } }
+@keyframes perk { 0%, 100% { transform: none; } 25%, 70% { transform: rotate(-7deg); } }
+@keyframes bob { 0%, 100% { transform: none; } 25%, 75% { transform: translateY(-6px); } 50% { transform: none; } }
+@keyframes wake { 0%, 100% { transform: none; } 20%, 70% { transform: translateY(-5px) rotate(-9deg); } 35% { transform: translateY(-5px) rotate(-6deg); } }
+
+/* «Reducir movimiento» (en Windows: efectos de animación apagados): sin saltos ni desplazamientos.
+   Lo pequeño y en su sitio (cola, cabeza, orejas, parpadeo, pata) se queda: no marea y el perrito sigue vivo.
+   Las reacciones al tocarlo (act-*) también, porque las provoca la persona. */
+@media (prefers-reduced-motion: reduce) {
+  :host(.intro) .dog, :host(.intro) .shadow, :host(.intro.pose-celebrate) .joy { animation: none; }
+}

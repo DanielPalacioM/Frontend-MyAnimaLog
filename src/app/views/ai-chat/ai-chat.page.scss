@@ -29,7 +29,7 @@ ion-header { background: $orange; }
 
 // ---- Logo, nombre y saludo, al centro
 .welcome { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 6px 0 14px; }
-.welcome-logo { width: 64px; height: 64px; object-fit: contain; }
+.welcome-logo { display: block; width: 64px; height: 64px; }
 .welcome-name {
   margin-top: 6px; padding: 3px 12px; border-radius: 999px; background: rgba(255, 255, 255, .42);
   font-family: 'Actor', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: .2px;
@@ -56,7 +56,7 @@ ion-header { background: $orange; }
   small { color: $orange-dark; flex-shrink: 0; font-size: 11px; }
 }
 
-.avatar { width: 26px; height: 26px; border-radius: 50%; object-fit: contain; background: #fff; flex-shrink: 0; padding: 2px; box-shadow: 0 1px 2px rgba(120, 70, 0, .2); }
+.avatar { display: block; width: 26px; height: 26px; border-radius: 50%; object-fit: contain; background: #fff; flex-shrink: 0; padding: 2px; box-shadow: 0 1px 2px rgba(120, 70, 0, .2); box-sizing: border-box; overflow: hidden; }
 // La respuesta va en una tarjeta blanca: el texto oscuro se lee bien y se separa del fondo naranja.
 // La esquina junto al avatar queda recta para que se vea que "habla" la IA.
 .answer {

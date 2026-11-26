@@ -45,7 +45,7 @@
 
     <!-- Nombre de la IA y saludo, al centro -->
     <div class="welcome">
-      <img src="assets/images/logo app.png" alt="MyAnimaLog" class="welcome-logo" />
+      <app-mascot class="welcome-logo" [pose]="typing ? 'think' : 'hello'" [intro]="true" role="img" aria-label="MyAnimaLog"></app-mascot>
       <span class="welcome-name">{{ aiName }}</span>
       <h1>{{ greeting }}</h1>
       <p class="welcome-sub" *ngIf="!firstTime">¿En qué te puedo ayudar hoy?</p>
@@ -86,7 +86,7 @@
 
     <!-- "Escribiendo..." -->
     <div class="row assistant" *ngIf="typing" aria-live="polite">
-      <img src="assets/images/logo app.png" alt="" class="avatar" />
+      <app-mascot class="avatar" pose="think"></app-mascot>
       <div class="answer"><span class="dots" aria-label="Escribiendo"><i></i><i></i><i></i></span></div>
     </div>
 

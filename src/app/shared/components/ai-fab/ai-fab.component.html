@@ -21,7 +21,7 @@
             (pointerdown)="onPointerDown($event)" (pointermove)="onPointerMove($event)"
             (pointerup)="onPointerUp($event)" (pointercancel)="onPointerCancel()" (keydown)="onKeydown($event)"
             (contextmenu)="$event.preventDefault()">
-      <img src="assets/images/logo app.png" alt="" draggable="false" />
+      <app-mascot class="fab-dog" pose="hello" [intro]="dogIntro"></app-mascot>
     </button>
   </div>
 
