@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
+import { forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Pet, PetService } from 'src/app/services/PetService/pet';
@@ -13,6 +13,7 @@ import {
   AllergyStatus,
   DewormingEntry,
   DewormingOverview,
+  HealthError,
   HealthSummary,
   Neutered,
   NeuteredStatus,
@@ -67,7 +68,34 @@ export class PetHealthService {
 
   /** Esterilización, alergias y prevención en una sola consulta (para el perfil de la mascota). */
   getSummary(petId: string): Observable<HealthSummary> {
-    return this.http.get<unknown>(`${this.baseUrl}/pets/${petId}/clinical-summary`).pipe(map(r => normalizeSummary(r)), this.mapError());
+    // Si ya sabemos que la ruta no está publicada, no la volvemos a pedir en esta sesión (evita un 404 por mascota).
+    if (PetHealthService.summaryMissing) return this.summaryFromParts(petId);
+    return this.http.get<unknown>(`${this.baseUrl}/pets/${petId}/clinical-summary`).pipe(
+      map(r => normalizeSummary(r)),
+      this.mapError(),
+      // El gateway aún no enruta /pets/{id}/clinical-* (404 "Ruta no encontrada", verificado el 26 nov),
+      // pero /dewormings y /allergies sí: se arma el resumen con esas dos y solo la esterilización queda pendiente.
+      catchError((e: HealthError) => {
+        if (e.code !== 'NOT_AVAILABLE') return throwError(() => e);
+        PetHealthService.summaryMissing = true;
+        return this.summaryFromParts(petId);
+      }),
+    );
+  }
+
+  /** `/pets/{id}/clinical-summary` respondió 404/503: se recuerda hasta recargar la app. */
+  static summaryMissing = false;
+
+  private summaryFromParts(petId: string): Observable<HealthSummary> {
+    return forkJoin({ d: this.getDewormings(petId), a: this.getAllergies(petId) }).pipe(
+      map(({ d, a }) => ({
+        neutered: normalizeNeutered(null),
+        neuteredUnavailable: true,
+        allergyStatus: a.allergyStatus,
+        allergies: a.allergies,
+        prevention: { INTERNAL: d.INTERNAL, EXTERNAL: d.EXTERNAL },
+      })),
+    );
   }
 
   // ---------- Desparasitación ----------

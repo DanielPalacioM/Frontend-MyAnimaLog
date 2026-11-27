@@ -5,6 +5,7 @@ import { AuthService } from 'src/app/services/authServices/auth';
 import { ProfileService } from 'src/app/services/ProfileService/profile';
 import { UpdateUsernameModalComponent } from 'src/app/shared/components/update-username-modal/update-username-modal.component';
 import { jwtDecode } from 'jwt-decode';
+import { displayName, formatPhone } from 'src/app/shared/utils/user-identity.util';
 
 @Component({
   selector: 'app-profile',
@@ -15,7 +16,18 @@ import { jwtDecode } from 'jwt-decode';
 export class ProfilePage implements OnInit {
 
   username: string = 'Username';
+  /** Nombre para mostrar (User service: cae al username si no hay). */
+  fullName: string = '';
+  phone: string = '';
   email: string = '';
+
+  get shownName(): string {
+    return this.fullName || this.username;
+  }
+
+  get phoneLabel(): string {
+    return formatPhone(this.phone);
+  }
   profileImage: string = 'assets/images/Profile/ImageUser.png';;
   showLanguage: boolean = false;
   selectedLanguage: string = 'en';
@@ -67,10 +79,9 @@ export class ProfilePage implements OnInit {
       console.log("✅ Perfil recibido:", profile);
 
       this.username = profile.username;
+      this.fullName = displayName(profile);
+      this.phone = profile.phone || '';
       this.email = profile.email;
-
-      console.log("USERNAME COMPONENT:", this.username);
-      console.log("EMAIL COMPONENT:", this.email);
 
      if (profile.profileImageUrl) {
   this.profileImage = profile.profileImageUrl;
@@ -119,6 +130,8 @@ export class ProfilePage implements OnInit {
     component: UpdateUsernameModalComponent,
     componentProps: {
       currentUsername: this.username,
+      currentFullName: this.fullName,
+      currentPhone: this.phone,
       profileImage: this.profileImage
     },
     cssClass: 'transparent-modal'

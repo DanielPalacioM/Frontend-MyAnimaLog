@@ -1,328 +1,89 @@
-.step-medical {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+@use '../../add-pet-common';
 
-// NOTA OPCIONAL
-.optional-note {
+.step-medical { display: flex; flex-direction: column; gap: 20px; }
+
+.note {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  background: #FFF8EC;
-  border: 1px solid #FFB84F;
-  border-radius: 12px;
-  padding: 12px 14px;
-
-  ion-icon {
-    font-size: 18px;
-    color: #FFB84F;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
-  span {
-    flex: 1;
-    font-size: 12px;
-    color: #7a5c00;
-    font-family: 'Actor', sans-serif;
-    line-height: 1.4;
-  }
-
-  .note-close {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    flex-shrink: 0;
-
-    ion-icon { font-size: 18px; color: #aaa; }
-  }
-}
-
-// CARD MÉDICA
-.medical-card {
-  background: #f8f8ff;
-  border: 1.5px solid #e8e8f5;
-  border-radius: 16px;
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
   gap: 10px;
-  cursor: pointer;
-  transition: border-color 0.2s;
-
-  &:active { border-color: #4037BE; }
-  &.clickable:active { border-color: #4037BE; }
+  padding: 12px 14px 12px 12px;
+  border-radius: 14px;
+  background: #F3FFFB;
+  ion-icon { font-size: 20px; color: #00796B; flex-shrink: 0; }
+  p { margin: 0; font-size: 13px; line-height: 18px; color: #1a1a2e; }
 }
 
-.medical-card-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.card-title .ct { display: flex; flex-direction: column; gap: 1px; }
+.card-title small { font-family: 'Actor', sans-serif; font-size: 12.5px; line-height: 16px; color: #6B6880; }
 
-  .card-icon {
-    font-size: 22px;
-    color: #4037BE;
-    flex-shrink: 0;
-  }
+.q { margin: 0; font-size: 15px; }
 
-  .card-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: #1a1a2e;
-    font-family: 'Actor', sans-serif;
-    flex: 1;
-  }
-}
-
-.card-sub {
-  font-size: 11px;
-  color: #888;
-  margin: 0;
-  font-family: 'Actor', sans-serif;
-  padding-left: 32px;
-}
-
-// CAMPOS VACUNA
-.card-fields {
+.allergy {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding: 8px 8px 10px 14px;
+  border: 1px solid #E4E2F4;
+  border-radius: 14px;
+  background: #fff;
 }
 
-.field-row {
-  display: flex;
-  gap: 8px;
-
-  > * { min-width: 0; }
-}
-
-.select-wrap {
-  flex: 1;
+.allergy-top {
   display: flex;
   align-items: center;
   gap: 8px;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 10px;
-  padding: 10px 12px;
-  background: #fff;
-  cursor: pointer;
 
-  .select-arrow {
-    font-size: 16px;
-    color: #4037BE;
-    flex-shrink: 0;
-  }
-
-  .select-value {
-    font-size: 13px;
-    color: #1a1a2e;
-    font-family: 'Actor', sans-serif;
-
-    &.placeholder { color: #bbb; }
-  }
-}
-
-.input-wrap {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 10px;
-  padding: 10px 12px;
-  background: #fff;
-
-  .input-icon {
-    font-size: 16px;
-    color: #4037BE;
-    flex-shrink: 0;
-  }
-
-  .field-input {
+  input {
     flex: 1;
+    min-width: 0;
+    min-height: 36px;
     border: none;
     outline: none;
-    font-size: 13px;
-    color: #1a1a2e;
-    font-family: 'Actor', sans-serif;
     background: transparent;
-    min-width: 0;
-  }
-}
-
-// DROPDOWN VACUNA
-.vaccine-dropdown {
-  background: #fff;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 12px;
-  overflow-y: auto;
-  max-height: 160px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-}
-
-.vaccine-option {
-  padding: 11px 14px;
-  font-size: 13px;
-  color: #1a1a2e;
-  font-family: 'Actor', sans-serif;
-  border-bottom: 1px solid #f0f0f0;
-  cursor: pointer;
-
-  &:last-child { border-bottom: none; }
-  &:active { background: #f5f5ff; }
-}
-
-// PRÓXIMA VACUNA
-.next-vaccine {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: #fff;
-  border-radius: 10px;
-  border: 1px solid #e0e0e0;
-
-  ion-icon {
-    font-size: 16px;
-    color: #4037BE;
-    flex-shrink: 0;
-  }
-
-  span {
-    font-size: 12px;
-    color: #1a1a2e;
     font-family: 'Actor', sans-serif;
-
-    strong { color: #4037BE; }
+    font-size: 15.5px;
+    color: #1a1a2e;
+    &::placeholder { color: #6B6880; }
   }
 
-  &.placeholder-next span { color: #bbb; }
-  &.placeholder-next ion-icon { color: #ccc; }
+  .x {
+    width: 32px; height: 32px; border: none; border-radius: 50%; background: #F7F6FF; padding: 0;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    ion-icon { font-size: 18px; color: #6B6880; }
+  }
 }
 
-// ARCHIVO SELECCIONADO
-.file-selected {
+.sev {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #fff;
-  border-radius: 10px;
-  padding: 10px 12px;
-  border: 1px solid #e0e0e0;
+  gap: 6px;
 
-  ion-icon {
-    font-size: 18px;
-    color: #4037BE;
-    flex-shrink: 0;
-  }
-
-  span {
-    flex: 1;
-    font-size: 12px;
-    color: #1a1a2e;
+  button {
+    padding: 5px 10px;
+    border: 1px solid #E4E2F4;
+    border-radius: 999px;
+    background: #F7F6FF;
     font-family: 'Actor', sans-serif;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .file-remove {
-    background: transparent;
-    border: none;
+    font-size: 12.5px;
+    color: #6B6880;
     cursor: pointer;
-    padding: 0;
-    flex-shrink: 0;
 
-    ion-icon { font-size: 18px; color: #e74c3c; }
+    &.on.s-MILD { background: #E3F9F3; border-color: #00796B; color: #00796B; }
+    &.on.s-MODERATE { background: #FFF3E0; border-color: #f5a623; color: #8C5200; }
+    &.on.s-SEVERE { background: #FDECEA; border-color: #B42318; color: #B42318; }
   }
 }
 
-.hidden-input { display: none; }
-
-// VETERINARIA
-.vet-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.vet-section-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #1a1a2e;
+.add {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
   font-family: 'Actor', sans-serif;
-  margin: 0;
-}
-
-.vet-card {
-  cursor: pointer;
-
-  .medical-card-header {
-    align-items: flex-start;
-  }
-
-  .vet-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .vet-arrow {
-    font-size: 20px;
-    color: #4037BE;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-}
-
-.card-text {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.card-arrow {
-  font-size: 20px;
+  font-size: 14.5px;
   color: #4037BE;
-  flex-shrink: 0;
+  cursor: pointer;
+  ion-icon { font-size: 16px; }
 }
-
-.vet-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-} 
-
-.card-img-icon {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-
-.next-icon {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-
-
-// Salud: esterilización y alergias (Actor, como el resto de pantallas nuevas)
-.health-block { background: #fff; border-radius: 16px; padding: 14px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0, 0, 0, .06); display: flex; flex-direction: column; gap: 8px; font-family: 'Actor', sans-serif; }
-.health-title { margin: 0; font-size: 16px; font-weight: 700; color: #1a1a2e; }
-.health-q { margin: 6px 0 0; font-size: 13px; font-weight: 700; color: #1a1a2e; }
-.health-hint { margin: 0; font-size: 12px; color: #6b6b80; line-height: 1.35; }
-.health-seg { display: flex; gap: 8px; }
-.health-seg button { flex: 1; padding: 10px 6px; border: 1.5px solid #E4E2F4; border-radius: 12px; background: #fff; color: #1a1a2e; font-family: 'Actor', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; }
-.health-seg button.on { border-color: #4037BE; background: #F1F0FB; color: #4037BE; }
-.allergy-row { display: flex; gap: 6px; align-items: center; }
-.allergy-input { flex: 1; min-width: 0; padding: 10px; border: 1px solid #E0E0E0; border-radius: 12px; font-family: 'Actor', sans-serif; font-size: 13px; }
-.allergy-sev { padding: 10px 4px; border: 1px solid #E0E0E0; border-radius: 12px; background: #fff; font-family: 'Actor', sans-serif; font-size: 12px; }
-.allergy-x { border: none; background: transparent; color: #6b6b80; font-size: 20px; padding: 0 2px; cursor: pointer; }
-.health-add { align-self: flex-start; border: none; background: none; color: #4037BE; font-family: 'Actor', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; padding: 2px 0; }

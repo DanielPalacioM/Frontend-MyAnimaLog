@@ -301,6 +301,20 @@ describe('VetBookPage', () => {
     expect(page.daySlots.some(s => s.ok)).toBeTrue();
   });
 
+  it('un día sin horas explica por qué: hoy ya no queda tiempo; con horas reales no se afirma que la clínica cierre', () => {
+    const { page } = build({ shared: true });
+    page.ionViewWillEnter();
+    page.pickService(page.services[0]);
+    const today = page.today;
+    page.availability = { days: [{ date: today, slots: [], closed: true }, { date: '2026-12-13', slots: [], closed: true }], source: 'server' };
+    page.pickDay(today);
+    expect(page.emptyDayText).toContain('Ya no quedan horas para hoy');
+    page.pickDay('2026-12-13');
+    expect(page.emptyDayText).toBe('No hay horas libres este día. Prueba con otro.');
+    page.availability = { days: [{ date: '2026-12-13', slots: [], closed: true }], source: 'grid' };
+    expect(page.emptyDayText).toBe('La clínica no atiende este día. Prueba con otro.');
+  });
+
   it('PET_NOT_SHARED con la mascota marcada como compartida: comparte y reintenta una vez', () => {
     let n = 0;
     const { page, calls } = build({

@@ -17,6 +17,7 @@ import { VeterinaryService } from 'src/app/services/VeterinaryService/veterinary
 import { CalendarService } from 'src/app/services/CalendarService/calendar';
 import { AiAccessService } from 'src/app/services/AiAccessService/ai-access';
 import { Appointment } from 'src/app/models/appointment.model';
+import { displayName } from 'src/app/shared/utils/user-identity.util';
 import { LinkedVet } from 'src/app/models/veterinary.model';
 import {
   AgendaEntry, GreetingView, PetChip, PreventionLite, TodayItem, VaccineLite, WeekDay, agendaEntries, buildGreeting, buildTodayItems, dayTitle,
@@ -32,6 +33,8 @@ import {
 export class HomePage implements OnInit, AfterViewInit, OnDestroy {
 
   username: string = 'Username';
+  /** Primer nombre para el saludo (fullName del User service). */
+  greetName = '';
   userAvatar: string = 'assets/images/default-avatar.svg';
   hasPets: boolean = false;
   currentPetIndex: number = 0;
@@ -215,6 +218,8 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
     this.profileService.getProfile().subscribe({
       next: (profile) => {
         this.username = profile.username;
+        // Saludo con el primer nombre si tiene nombre completo (si no, el username).
+        this.greetName = (displayName(profile) || "").split(" ")[0];
         if (this.todayLoaded) this.refreshGreeting();
         if (profile.profileImageUrl) {
           this.userAvatar = profile.profileImageUrl;
@@ -442,7 +447,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private refreshGreeting(): void {
-    const name = this.username && this.username !== 'Username' ? this.username : '';
+    const name = this.greetName || (this.username && this.username !== 'Username' ? this.username : '');
     this.greeting = buildGreeting({
       name, now: new Date(),
       pets: this.pets.map(p => ({ id: p.id, name: p.name, birthDate: p.birthDate })),

@@ -118,7 +118,16 @@ export class HealthPage {
 
   loadHealth(): void {
     this.health.getSummary(this.petId).subscribe({
-      next: (s) => { this.neutered = s.neutered; this.neuteredFailed = null; },
+      next: (s) => {
+        if (s.neuteredUnavailable) {
+          // El resumen se armó sin /clinical-profile: la esterilización todavía no se puede ver ni guardar.
+          this.neutered = null;
+          this.neuteredFailed = { code: 'NOT_AVAILABLE', status: 404, message: '' };
+          return;
+        }
+        this.neutered = s.neutered;
+        this.neuteredFailed = null;
+      },
       error: (e: HealthError) => { console.error('❌ Esterilización:', e); this.neuteredFailed = e; }
     });
     this.health.getAllergies(this.petId).subscribe({

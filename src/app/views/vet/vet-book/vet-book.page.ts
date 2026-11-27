@@ -234,6 +234,18 @@ export class VetBookPage {
     return d ? `Horas libres el ${dayLabel(d.date + 'T12:00:00-05:00')}` : 'Horas libres';
   }
 
+  /**
+   * Por qué un día no tiene horas. Calendar devuelve el día vacío tanto si la clínica no atiende como si ya está lleno o,
+   * siendo hoy, ya no queda tiempo (se pide al menos 1 h de anticipación): solo la cuadrícula local sabe que está cerrado.
+   */
+  get emptyDayText(): string {
+    const d = this.day;
+    if (!d) return '';
+    if (d.date === this.today) return 'Ya no quedan horas para hoy: pedimos al menos 1 hora de anticipación. Prueba con mañana.';
+    if (this.gridNote && d.closed) return 'La clínica no atiende este día. Prueba con otro.';
+    return 'No hay horas libres este día. Prueba con otro.';
+  }
+
   /** La clínica confirma la hora: se avisa cuando las franjas son una guía local y no del servidor. */
   get gridNote(): boolean { return this.availability?.source === 'grid'; }
 

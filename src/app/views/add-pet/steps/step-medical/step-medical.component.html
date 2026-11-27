@@ -1,124 +1,47 @@
 <div class="step-medical">
 
-  <!-- NOTA OPCIONAL -->
-  <div class="optional-note" *ngIf="showOptionalNote">
+  <div class="note">
     <ion-icon name="information-circle-outline"></ion-icon>
-    <span>Puedes completar este campo después desde el perfil de la mascota</span>
-    <button class="note-close" (click)="showOptionalNote = false">
-      <ion-icon name="close-outline"></ion-icon>
-    </button>
+    <p>Todo en este paso es opcional. Si no lo sabes, elige «No sé»: puedes completarlo después desde el perfil.</p>
   </div>
 
-  <!-- SALUD: esterilización y alergias -->
-  <div class="health-block" *ngIf="!editMode">
-    <p class="health-title">Salud</p>
-
-    <p class="health-q">¿Está esterilizada?</p>
-    <div class="health-seg" role="radiogroup" aria-label="Esterilización">
+  <!-- ESTERILIZACIÓN -->
+  <section class="card">
+    <h3 class="card-title">
+      <span class="card-ic"><ion-icon name="shield-checkmark-outline"></ion-icon></span>
+      <span class="ct">Esterilización<small>Ayuda a la clínica en una cirugía o un tratamiento.</small></span>
+    </h3>
+    <p class="q">¿Está {{ data.sex === 'FEMALE' ? 'esterilizada' : 'esterilizado' }}?</p>
+    <div class="seg" role="radiogroup" aria-label="Esterilización">
       <button type="button" role="radio" *ngFor="let o of yesNo" [class.on]="neuteredStatus === o.value" [attr.aria-checked]="neuteredStatus === o.value" (click)="pickNeutered(o.value)">{{ o.label }}</button>
     </div>
     <app-date-picker-field *ngIf="neuteredStatus === 'YES'" placeholder="¿Cuándo? (opcional)" [value]="neuteredAt" [max]="today" (valueChange)="neuteredAt = $event; emit()"></app-date-picker-field>
-    <p class="health-hint">Ayuda a la clínica a cuidarla mejor en una cirugía o un tratamiento.</p>
+  </section>
 
-    <p class="health-q">¿Tiene alergias conocidas?</p>
-    <div class="health-seg" role="radiogroup" aria-label="Alergias">
+  <!-- ALERGIAS -->
+  <section class="card">
+    <h3 class="card-title">
+      <span class="card-ic"><ion-icon name="warning-outline"></ion-icon></span>
+      <span class="ct">Alergias<small>Un veterinario puede confirmarlas después.</small></span>
+    </h3>
+    <p class="q">¿Tiene alergias conocidas?</p>
+    <div class="seg" role="radiogroup" aria-label="Alergias">
       <button type="button" role="radio" *ngFor="let o of yesNo" [class.on]="allergyAnswer === o.value" [attr.aria-checked]="allergyAnswer === o.value" (click)="pickAllergy(o.value)">{{ o.label }}</button>
     </div>
-    <div class="allergy-row" *ngFor="let a of allergies; let i = index">
-      <input type="text" class="allergy-input" placeholder="¿A qué? Ej. Penicilina, pollo" maxlength="80" [(ngModel)]="a.allergen" (ngModelChange)="emit()" [attr.aria-label]="'Alergia ' + (i + 1)" />
-      <select class="allergy-sev" [(ngModel)]="a.severity" (ngModelChange)="emit()" aria-label="Gravedad">
-        <option *ngFor="let s of severities" [value]="s.value">{{ s.label }}</option>
-      </select>
-      <button type="button" class="allergy-x" (click)="removeAllergyRow(i)" aria-label="Quitar alergia"><ion-icon name="close-outline"></ion-icon></button>
-    </div>
-    <button type="button" class="health-add" *ngIf="allergyAnswer === 'YES'" (click)="addAllergyRow()">+ Agregar otra alergia</button>
-    <p class="health-hint">"No sé" no significa que no tenga: la clínica te lo volverá a preguntar. Un veterinario puede confirmarlas después.</p>
-  </div>
 
-  <!-- VACUNA -->
-<div class="medical-card" (click)="goToRegisterVaccine()">
-  <div class="medical-card-header">
-    <img src="assets/images/AddPet/VacunaIcon.png" alt="" class="card-img-icon" />
-    <div class="card-text">
-      <span class="card-title">Agregar vacuna</span>
-    </div>
-    <ion-icon name="arrow-forward-outline" class="card-arrow"></ion-icon>
-  </div>
+    <ng-container *ngIf="allergyAnswer === 'YES'">
+      <div class="allergy" *ngFor="let a of allergies; let i = index">
+        <div class="allergy-top">
+          <input type="text" placeholder="¿A qué? Ej. Penicilina, pollo" maxlength="80" [(ngModel)]="a.allergen" (ngModelChange)="emit()" [attr.aria-label]="'Alergia ' + (i + 1)" />
+          <button type="button" class="x" (click)="removeAllergyRow(i)" aria-label="Quitar alergia"><ion-icon name="close-outline"></ion-icon></button>
+        </div>
+        <div class="sev" role="radiogroup" aria-label="Gravedad">
+          <button type="button" role="radio" *ngFor="let s of severities" [ngClass]="'s-' + s.value" [class.on]="a.severity === s.value" [attr.aria-checked]="a.severity === s.value" (click)="a.severity = s.value; emit()">{{ s.label }}</button>
+        </div>
+      </div>
+      <button type="button" class="add" (click)="addAllergyRow()"><ion-icon name="add"></ion-icon> Agregar otra alergia</button>
+    </ng-container>
+    <p class="hint" *ngIf="allergyAnswer === 'UNKNOWN'">"No sé" no significa que no tenga: la clínica te lo volverá a preguntar.</p>
+  </section>
+
 </div>
-
-    <div class="card-fields">
-      <div class="field-row">
-        <div class="select-wrap" (click)="toggleVaccineDropdown()">
-          <ion-icon name="chevron-down-outline" class="select-arrow"></ion-icon>
-          <span class="select-value" [class.placeholder]="!selectedVaccineType">
-            {{ selectedVaccineType || 'Tipo vacuna' }}
-          </span>
-        </div>
-        <app-date-picker-field placeholder="Fecha" [value]="vaccineDate" (valueChange)="vaccineDate = $event; onVaccineDateChange()"></app-date-picker-field>
-      </div>
-
-      <div class="vaccine-dropdown" *ngIf="showVaccineTypeDropdown">
-        <div class="vaccine-option" *ngFor="let t of vaccineTypes" (click)="selectVaccineType(t)">
-          {{ t }}
-        </div>
-      </div>
-
-      <div class="next-vaccine" *ngIf="nextVaccineDate">
-        <img src="assets/images/AddPet/ProximaDosisIcon.png" alt="" class="next-icon" />
-        <span>Próxima: <strong>{{ nextVaccineDate }}</strong></span>
-      </div>
-      <div class="next-vaccine placeholder-next" *ngIf="!nextVaccineDate">
-        <img src="assets/images/AddPet/ProximaDosisIcon.png" alt="" class="next-icon" />
-        <span>Próxima calculada automáticamente</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- SUBIR DOCUMENTO -->
-  <div class="medical-card" (click)="openFileInput()">
-    <div class="medical-card-header">
-      <img src="assets/images/AddPet/SubirDocIcon.png" alt="" class="card-img-icon" />
-      <div class="card-text">
-        <span class="card-title">Subir documento</span>
-        <p class="card-sub">Historial médico, petDocument, resultados médicos</p>
-      </div>
-    </div>
-
-    <div class="file-selected" *ngIf="selectedFileName" (click)="$event.stopPropagation()">
-      <ion-icon name="document-attach-outline"></ion-icon>
-      <span>{{ selectedFileName }}</span>
-      <button class="file-remove" (click)="$event.stopPropagation(); removeFile()">
-        <ion-icon name="close-outline"></ion-icon>
-      </button>
-    </div>
-
-    <input #fileInput type="file" accept=".pdf,image/*" class="hidden-input" (change)="onFileChange($event)" />
-  </div>
-
-  <!-- AGENDAR PRIMERA CITA -->
-  <div class="medical-card" (click)="agendarCita()">
-    <div class="medical-card-header">
-      <img src="assets/images/AddPet/AgendarCitaIcon.png" alt="" class="card-img-icon" />
-      <div class="card-text">
-        <span class="card-title">Agendar primera cita</span>
-        <p class="card-sub">Appointment</p>
-      </div>
-      <ion-icon name="arrow-forward-outline" class="card-arrow"></ion-icon>
-    </div>
-  </div>
-
-  <!-- VETERINARIA ASOCIADA -->
-  <div class="vet-section">
-    <p class="vet-section-title">Veterinaria asociada</p>
-    <div class="medical-card" (click)="asociarVeterinaria()">
-      <div class="medical-card-header">
-        <img src="assets/images/AddPet/AsociarVeterinariaIcon.png" alt="" class="card-img-icon" />
-        <div class="vet-info">
-          <span class="card-title">Asociar veterinaria</span>
-          <p class="card-sub">Encuentra y conecta con veterinarias locales que usen MyAnimalog</p>
-        </div>
-        <ion-icon name="arrow-forward-outline" class="card-arrow"></ion-icon>
-      </div>
-    </div>
-  </div>
-

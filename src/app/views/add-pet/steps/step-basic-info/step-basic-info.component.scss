@@ -1,174 +1,194 @@
-.step-basic {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
+@use '../../add-pet-common';
 
-// CAMPO
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  position: relative;
-}
+.step-basic { display: flex; flex-direction: column; gap: 22px; }
+.card .field + .field, .card .field + .two, .card .two + .hint { margin-top: 2px; }
+.card .label { font-size: 13.5px; color: #6B6880; }
 
-.field-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: #1a1a2e;
-  font-family: 'Actor', sans-serif;
-}
-
-.field-row {
-  display: flex;
-  gap: 12px;
-
-  .field {
-    flex: 1;
-  }
-
-  > * { min-width: 0; }
-}
-
-.input-wrap {
-  display: flex;
-  align-items: center;
+// Especies: cuadros en el registro, chips en la edición
+.species {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 12px 14px;
-  background: #fff;
-  transition: border-color 0.2s;
 
-  &:focus-within {
-    border-color: #4037BE;
-  }
-
-  .input-icon {
-    font-size: 18px;
-    color: #4037BE;
-    flex-shrink: 0;
-  }
-
-  .field-input {
-    flex: 1;
-    border: none;
-    outline: none;
+  .sp {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 4px 10px;
+    border: 1px solid #E4E2F4;
+    border-radius: 16px;
+    background: #F7F6FF;
+    font-family: 'Actor', sans-serif;
     font-size: 14px;
     color: #1a1a2e;
-    font-family: 'Actor', sans-serif;
-    background: transparent;
+    cursor: pointer;
+    min-width: 0;
 
-    &::placeholder { color: #bbb; }
+    span:not(.emoji):not(.tick) { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    &.on { border: 2px solid #4037BE; padding: 11px 3px 9px; background: #F1F0FB; color: #4037BE; }
+  }
+
+  .emoji { font-size: 26px; line-height: 1.15; }
+  .emoji.plus { color: #4037BE; }
+
+  .tick {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #4037BE;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    ion-icon { font-size: 13px; color: #fff; }
+  }
+
+  &.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    .sp, .sp.on {
+      flex-direction: row;
+      gap: 4px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 13.5px;
+      border-width: 1px;
+    }
+    .sp.on { background: #4037BE; border-color: #4037BE; color: #fff; }
+    .emoji { font-size: 14px; }
+    .sp.on .emoji.plus { color: #fff; }
   }
 }
 
-// ESPECIES
-.species-row {
+.tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #F3FFFB;
+  span { font-size: 18px; }
+  p { margin: 0; font-size: 13px; line-height: 18px; color: #1a1a2e; }
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px 10px 10px;
+  border: 1px solid #E4E2F4;
+  border-radius: 16px;
+  background: #F7F6FF;
+
+  .sum-av {
+    width: 44px; height: 44px; border-radius: 50%; background: #F1F0FB;
+    display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+  }
+  p { margin: 0; }
+  .sum-name { font-family: 'Jua', sans-serif; font-size: 18px; }
+  .sum-sub { font-size: 13px; color: #6B6880; }
+}
+
+.suggest {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-}
 
-.species-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border-radius: 20px;
-  border: 1.5px solid #e0e0e0;
-  background: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  color: #1a1a2e;
-  font-family: 'Actor', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  .species-emoji { font-size: 16px; }
-
-  &.active {
-    background: #4037BE;
-    border-color: #4037BE;
-    color: #fff;
+  button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 999px;
+    background: #F1F0FB;
+    font-family: 'Actor', sans-serif;
+    font-size: 13px;
+    color: #4037BE;
+    cursor: pointer;
+    &.on { background: #4037BE; color: #fff; }
   }
 }
 
-.other-btn {
-  border-style: dashed;
-}
-
-// DROPDOWN RAZA
 .breed-dropdown {
-  background: #fff;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-  max-height: 180px;
-  overflow-y: auto;
-}
-
-.breed-option {
-  padding: 12px 14px;
-  font-size: 13px;
-  color: #1a1a2e;
-  font-family: 'Actor', sans-serif;
-  cursor: pointer;
-  border-bottom: 1px solid #f0f0f0;
-  transition: background 0.15s;
-
-  &:last-child { border-bottom: none; }
-  &:active { background: #f5f5ff; }
-}
-
-// FECHA
-.date-row {
   display: flex;
-  gap: 10px;
-  align-items: center;
+  flex-direction: column;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #E4E2F4;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(26, 26, 46, .08);
 
-  > * { min-width: 0; }
+  .breed-option {
+    padding: 12px 14px;
+    border: none;
+    border-bottom: 1px solid #F1F0FB;
+    background: transparent;
+    text-align: left;
+    font-family: 'Actor', sans-serif;
+    font-size: 15px;
+    color: #1a1a2e;
+    cursor: pointer;
+    &:last-child { border-bottom: none; }
+    &:active { background: #F7F6FF; }
+  }
 }
 
-.date-input {
-  flex: 1;
-}
+.date-row { display: flex; align-items: center; gap: 10px; }
+.date-input { flex: 1; min-width: 0; }
 
-.age-badge {
-  background: #4037BE;
-  color: #fff;
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 700;
-  font-family: 'Actor', sans-serif;
-  white-space: nowrap;
+.age {
   flex-shrink: 0;
+  min-width: 92px;
+  min-height: 52px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: #F1F0FB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Jua', sans-serif;
+  font-size: 16px;
+  color: #4037BE;
 }
 
-// MODAL OTRO
+.link {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: 'Actor', sans-serif;
+  font-size: 13.5px;
+  color: #4037BE;
+  cursor: pointer;
+}
+
+.two { display: flex; gap: 12px; > .field { flex: 1; } }
+
+// Modal "Otro"
 .other-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
   z-index: 300;
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  background: rgba(26, 26, 46, .5);
 }
 
 .other-modal {
-  background: #fff;
-  border-radius: 24px 24px 0 0;
   width: 100%;
   max-width: 480px;
   max-height: 60vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  border-radius: 28px 28px 0 0;
+  background: #fff;
 }
 
 .other-modal-header {
@@ -176,61 +196,32 @@
   align-items: center;
   justify-content: space-between;
   padding: 20px 20px 12px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #F1F0FB;
 
-  .other-modal-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: #1a1a2e;
-    font-family: 'Actor', sans-serif;
-  }
-
+  .other-modal-title { font-family: 'Jua', sans-serif; font-size: 18px; color: #1a1a2e; }
   .other-modal-close {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-
-    ion-icon { font-size: 22px; color: #888; }
+    border: none; background: transparent; padding: 0; cursor: pointer;
+    ion-icon { font-size: 22px; color: #6B6880; }
   }
 }
 
-.other-modal-list {
-  overflow-y: auto;
-  flex: 1;
-}
+.other-modal-list { overflow-y: auto; flex: 1; }
 
 .other-modal-item {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid #f5f5f5;
+  border: none;
+  border-bottom: 1px solid #F7F6FF;
+  background: transparent;
+  font-family: 'Actor', sans-serif;
+  font-size: 15px;
+  color: #1a1a2e;
   cursor: pointer;
-  transition: background 0.15s;
 
-  span {
-    font-size: 14px;
-    color: #1a1a2e;
-    font-family: 'Actor', sans-serif;
-    font-weight: 500;
-  }
-
-  ion-icon {
-    font-size: 16px;
-    color: #bbb;
-  }
-
-  &:active { background: #f5f5ff; }
+  ion-icon { font-size: 16px; color: #6B6880; }
+  &:active { background: #F7F6FF; }
   &:last-child { border-bottom: none; }
-}
-.field-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.edit-icon {
-  font-size: 13px;
-  color: #e74c3c;
 }

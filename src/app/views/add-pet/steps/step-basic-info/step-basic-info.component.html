@@ -1,169 +1,150 @@
-<div class="step-basic">
-
-  <!-- NOMBRE -->
+<!-- QUIÉN ES: nombre, especie y sexo -->
+<ng-template #who>
   <div class="field">
-    <label class="field-label">
-      <ion-icon name="create-outline" class="edit-icon" *ngIf="editMode"></ion-icon>
-      Nombre
-    </label>
-    <div class="input-wrap">
-      <ion-icon name="paw-outline" class="input-icon"></ion-icon>
-      <input
-        class="field-input"
-        type="text"
-        placeholder="Nombre de tu mascota"
-        [(ngModel)]="name"
-        (ngModelChange)="emit()" />
+    <label class="label" for="pet-name">{{ editMode ? 'Nombre' : '¿Cómo se llama?' }}</label>
+    <div class="input" [class.focus]="nameFocus">
+      <ion-icon name="paw" class="ic"></ion-icon>
+      <input id="pet-name" type="text" placeholder="Nombre de tu mascota" maxlength="40" autocomplete="off"
+             [(ngModel)]="name" (ngModelChange)="emit()" (focus)="nameFocus = true" (blur)="nameFocus = false" />
     </div>
   </div>
 
-  <!-- ESPECIE -->
   <div class="field">
-    <label class="field-label">
-      <ion-icon name="create-outline" class="edit-icon" *ngIf="editMode"></ion-icon>
-      Especie
-    </label>
-    <div class="species-row">
-      <button
-        class="species-btn"
-        *ngFor="let sp of speciesList"
-        [class.active]="selectedSpecies === sp.key"
-        (click)="selectSpecies(sp.key)">
-        <span class="species-emoji">{{ sp.emoji }}</span>
-        <span>{{ sp.label }}</span>
+    <span class="label">{{ editMode ? 'Especie' : '¿Qué es?' }}</span>
+    <div class="species" [class.chips]="editMode" role="radiogroup" aria-label="Especie">
+      <button type="button" role="radio" class="sp" *ngFor="let sp of speciesList"
+              [class.on]="selectedSpecies === sp.key" [attr.aria-checked]="selectedSpecies === sp.key" (click)="selectSpecies(sp.key)">
+        <span class="emoji">{{ sp.emoji }}</span><span>{{ sp.label }}</span>
+        <span class="tick" *ngIf="selectedSpecies === sp.key && !editMode"><ion-icon name="checkmark"></ion-icon></span>
       </button>
-      <button
-        class="species-btn other-btn"
-        [class.active]="!['perro','gato','conejo'].includes(selectedSpecies) && selectedSpecies !== ''"
-        (click)="openOtherModal()">
-        <span>+ Otro</span>
+      <button type="button" role="radio" class="sp" [class.on]="isOther" [attr.aria-checked]="isOther" (click)="openOtherModal()">
+        <span class="emoji plus" *ngIf="!isOther">＋</span>
+        <span class="emoji" *ngIf="isOther">🐾</span>
+        <span>{{ isOther ? otherLabel : 'Otro' }}</span>
+        <span class="tick" *ngIf="isOther && !editMode"><ion-icon name="checkmark"></ion-icon></span>
       </button>
     </div>
   </div>
 
-  <!-- SEXO -->
-<div class="field">
-  <label class="field-label">
-    <ion-icon name="create-outline" class="edit-icon" *ngIf="editMode"></ion-icon>
-    Sexo
-  </label>
-  <div class="species-row">
-    <button
-      class="species-btn"
-      [class.active]="sex === 'MALE'"
-      (click)="selectSex('MALE')">
-      <span class="species-emoji">♂️</span>
-      <span>Macho</span>
-    </button>
-    <button
-      class="species-btn"
-      [class.active]="sex === 'FEMALE'"
-      (click)="selectSex('FEMALE')">
-      <span class="species-emoji">♀️</span>
-      <span>Hembra</span>
-    </button>
+  <div class="field">
+    <span class="label">Sexo</span>
+    <div class="seg" role="radiogroup" aria-label="Sexo">
+      <button type="button" role="radio" [class.on]="sex === 'MALE'" [attr.aria-checked]="sex === 'MALE'" (click)="selectSex('MALE')">♂&nbsp; Macho</button>
+      <button type="button" role="radio" [class.on]="sex === 'FEMALE'" [attr.aria-checked]="sex === 'FEMALE'" (click)="selectSex('FEMALE')">♀&nbsp; Hembra</button>
+    </div>
   </div>
-</div>
+</ng-template>
 
-  <!-- RAZA -->
-  <div class="field" *ngIf="selectedSpecies">
-    <label class="field-label">
-      <ion-icon name="create-outline" class="edit-icon" *ngIf="editMode"></ion-icon>
-      Raza
-    </label>
-    <div class="input-wrap">
-      <ion-icon name="search-outline" class="input-icon"></ion-icon>
-      <input
-        class="field-input"
-        type="text"
-        placeholder="Buscar raza..."
-        [(ngModel)]="breedSearch"
-        (ngModelChange)="onBreedInput()" />
+<!-- CÓMO ES: raza, nacimiento, peso y altura -->
+<ng-template #how>
+  <div class="field">
+    <label class="label" for="pet-breed">Raza <small *ngIf="!editMode">opcional</small></label>
+    <div class="input">
+      <ion-icon name="search-outline" class="ic"></ion-icon>
+      <input id="pet-breed" type="text" placeholder="Buscar raza..." autocomplete="off"
+             [(ngModel)]="breedSearch" (ngModelChange)="onBreedInput()" />
     </div>
     <div class="breed-dropdown" *ngIf="showBreedDropdown">
-      <div
-        class="breed-option"
-        *ngFor="let b of filteredBreeds"
-        (click)="selectBreed(b)">
-        {{ b }}
-      </div>
+      <button type="button" class="breed-option" *ngFor="let b of filteredBreeds" (click)="selectBreed(b)">{{ b }}</button>
+    </div>
+    <div class="suggest" *ngIf="!editMode && !showBreedDropdown">
+      <button type="button" *ngFor="let s of breedSuggestions" [class.on]="breedSearch === s" (click)="selectBreed(s)">{{ s }}</button>
     </div>
   </div>
 
-  <!-- FECHA DE NACIMIENTO -->
   <div class="field">
-    <label class="field-label">
-      <ion-icon name="create-outline" class="edit-icon" *ngIf="editMode"></ion-icon>
-      Fecha de nacimiento / Edad
-    </label>
-    <div class="date-row">
+    <span class="label">Fecha de nacimiento <small *ngIf="!editMode">opcional</small></span>
+    <div class="date-row" *ngIf="!approxAge">
       <div class="date-input">
-        <app-date-picker-field placeholder="Fecha de nacimiento" [value]="birthDate" (valueChange)="birthDate = $event; onBirthDateChange()"></app-date-picker-field>
+        <app-date-picker-field placeholder="Fecha de nacimiento" [value]="birthDate" [max]="today" (valueChange)="birthDate = $event; onBirthDateChange()"></app-date-picker-field>
       </div>
-      <div class="age-badge" *ngIf="ageMonths !== null">
-        {{ ageMonths }} meses
+      <div class="age" *ngIf="ageMonths !== null">{{ ageLabel }}</div>
+    </div>
+    <div class="date-row" *ngIf="approxAge">
+      <div class="input">
+        <ion-icon name="calendar-outline" class="ic"></ion-icon>
+        <input type="number" min="0" max="40" step="1" placeholder="Años" aria-label="Años" [(ngModel)]="approxYears" (ngModelChange)="onApproxChange()" />
+        <span class="unit">años</span>
+      </div>
+      <div class="input">
+        <input type="number" min="0" max="11" step="1" placeholder="Meses" aria-label="Meses" [(ngModel)]="approxMonths" (ngModelChange)="onApproxChange()" />
+        <span class="unit">meses</span>
+      </div>
+    </div>
+    <button type="button" class="link" (click)="toggleApprox()">
+      {{ approxAge ? 'Prefiero poner la fecha exacta' : '¿No sabes la fecha? Pon la edad aproximada' }}
+    </button>
+  </div>
+
+  <div class="two">
+    <div class="field">
+      <label class="label" for="pet-weight">Peso</label>
+      <div class="input">
+        <ion-icon name="barbell-outline" class="ic"></ion-icon>
+        <input id="pet-weight" type="number" min="0" step="0.1" placeholder="Ej: 4.5" [(ngModel)]="weightKg" (ngModelChange)="emit()" />
+        <span class="unit">kg</span>
+      </div>
+    </div>
+    <div class="field">
+      <label class="label" for="pet-height">Altura</label>
+      <div class="input">
+        <ion-icon name="resize-outline" class="ic"></ion-icon>
+        <input id="pet-height" type="number" min="0" step="1" placeholder="Ej: 30" [(ngModel)]="heightCm" (ngModelChange)="emit()" />
+        <span class="unit">cm</span>
       </div>
     </div>
   </div>
+  <p class="hint" *ngIf="!editMode">El peso ayuda a la clínica a calcular dosis. Puedes actualizarlo cuando quieras.</p>
+</ng-template>
 
+<!-- Registro: un bloque por paso -->
+<div class="step-basic" *ngIf="section !== 'all'">
+  <ng-container *ngIf="section === 'who'">
+    <ng-container *ngTemplateOutlet="who"></ng-container>
+    <div class="tip">
+      <span aria-hidden="true">🐾</span>
+      <p>Lo demás (raza, edad, peso y salud) va en los siguientes pasos. Solo el nombre, la especie y el sexo son obligatorios.</p>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="section === 'how'">
+    <div class="summary">
+      <span class="sum-av">{{ speciesEmoji }}</span>
+      <div>
+        <p class="sum-name">{{ name || 'Tu mascota' }}</p>
+        <p class="sum-sub">{{ summaryLine }}</p>
+      </div>
+    </div>
+    <ng-container *ngTemplateOutlet="how"></ng-container>
+  </ng-container>
 </div>
 
-<!-- PESO Y ALTURA -->
-<div class="field-row">
-  <div class="field">
-    <label class="field-label">
-      <ion-icon name="create-outline" class="edit-icon" *ngIf="editMode"></ion-icon>
-      Peso (kg)
-    </label>
-    <div class="input-wrap">
-      <ion-icon name="scale-outline" class="input-icon"></ion-icon>
-      <input
-        class="field-input"
-        type="number"
-        min="0"
-        step="0.1"
-        placeholder="Ej: 4.5"
-        [(ngModel)]="weightKg"
-        (ngModelChange)="emit()" />
-    </div>
-  </div>
-
-  <div class="field">
-    <label class="field-label">
-      <ion-icon name="create-outline" class="edit-icon" *ngIf="editMode"></ion-icon>
-      Altura (cm)
-    </label>
-    <div class="input-wrap">
-      <ion-icon name="resize-outline" class="input-icon"></ion-icon>
-      <input
-        class="field-input"
-        type="number"
-        min="0"
-        step="1"
-        placeholder="Ej: 30"
-        [(ngModel)]="heightCm"
-        (ngModelChange)="emit()" />
-    </div>
-  </div>
+<!-- Edición: todo en tarjetas -->
+<div class="step-basic" *ngIf="section === 'all'">
+  <section class="card">
+    <h3 class="card-title"><span class="card-ic"><ion-icon name="paw"></ion-icon></span>Datos básicos</h3>
+    <ng-container *ngTemplateOutlet="who"></ng-container>
+  </section>
+  <section class="card">
+    <h3 class="card-title"><span class="card-ic"><ion-icon name="resize-outline"></ion-icon></span>Detalles</h3>
+    <ng-container *ngTemplateOutlet="how"></ng-container>
+  </section>
 </div>
 
 <!-- MODAL OTRO -->
 <div class="other-modal-backdrop" *ngIf="showOtherModal" (click)="closeOtherModal()">
-  <div class="other-modal" (click)="$event.stopPropagation()">
+  <div class="other-modal" (click)="$event.stopPropagation()" role="dialog" aria-label="Selecciona una especie">
     <div class="other-modal-header">
       <span class="other-modal-title">Selecciona una especie</span>
-      <button class="other-modal-close" (click)="closeOtherModal()">
+      <button type="button" class="other-modal-close" (click)="closeOtherModal()" aria-label="Cerrar">
         <ion-icon name="close-outline"></ion-icon>
       </button>
     </div>
     <div class="other-modal-list">
-      <div
-        class="other-modal-item"
-        *ngFor="let sp of otherSpecies"
-        (click)="selectOtherSpecies(sp)">
+      <button type="button" class="other-modal-item" *ngFor="let sp of otherSpecies" (click)="selectOtherSpecies(sp)">
         <span>{{ sp }}</span>
         <ion-icon name="chevron-forward-outline"></ion-icon>
-      </div>
+      </button>
     </div>
   </div>
 </div>

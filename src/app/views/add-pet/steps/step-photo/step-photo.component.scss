@@ -1,168 +1,106 @@
+:host { display: block; font-family: 'Actor', sans-serif; color: #1a1a2e; }
+
 .step-photo {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  padding: 8px 0;
+  gap: 12px;
+
+  &.row { flex-direction: row; gap: 14px; }
 }
 
-// ZONA FOTO — siempre el mismo tamaño, solo cambia el contenido
-.photo-zone {
-  width: 100%;
-  min-height: 220px;
+.avatar {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
   border: 2px dashed #4037BE;
-  border-radius: 20px;
-  background: #FFF5E6;
+  background: #F1F0FB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  > ion-icon { font-size: 46px; color: #4037BE; }
+  > img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+  &.has-photo { border-style: solid; }
+
+  .row & {
+    width: 80px; height: 80px; border: none;
+    > ion-icon { font-size: 32px; }
+  }
+}
+
+.badge {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f5a623;
+  border: 3px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  ion-icon { font-size: 18px; color: #1a1a2e; }
+}
+
+.remove {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: #1a1a2e;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+
+  ion-icon { font-size: 16px; }
+}
+
+.side {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 12px;
-  padding: 24px;
-  box-sizing: border-box;
+
+  .row & { align-items: flex-start; gap: 6px; }
 }
 
-// PLACEHOLDER — círculo con ícono
-.photo-circle-placeholder {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  background: #4037BE;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-
-  img {
-    width: 52px;
-    height: 52px;
-    object-fit: contain;
-    filter: brightness(0) invert(1); // lo pone blanco sobre el fondo morado
-  }
-}
-
-.photo-placeholder-text {
-  font-size: 15px;
-  font-weight: 700;
-  color: #1a1a2e;
+.hint {
   margin: 0;
-  font-family: 'Actor', sans-serif;
-}
-
-.photo-placeholder-sub {
-  font-size: 12px;
-  color: #888;
-  margin: 0;
-  font-family: 'Actor', sans-serif;
-  text-align: center;
-}
-
-// CON FOTO — círculo con la imagen
-.photo-circle-preview {
-  position: relative;
-  width: 140px;
-  height: 140px;
-
-  .photo-preview {
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #4037BE;
-    display: block;
-  }
-
-  .photo-change-btn {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    background: rgba(0,0,0,0.45);
-    border: none;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-
-    ion-icon {
-      font-size: 18px;
-      color: #fff;
-    }
-  }
-}
-
-// BOTONES
-.photo-actions {
-  display: flex;
-  gap: 12px;
-  width: 100%;
-}
-
-.photo-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px;
-  background: #4037BE;
-  color: #fff;
-  border: none;
-  border-radius: 12px;
   font-size: 14px;
-  font-weight: 600;
-  font-family: 'Actor', sans-serif;
+  color: #6B6880;
+
+  .row & { font-size: 15.5px; color: #1a1a2e; }
+}
+
+.actions { display: flex; gap: 10px; }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px 9px 14px;
+  border: 1.5px solid #4037BE;
+  border-radius: 999px;
+  color: #4037BE;
+  font-size: 14.5px;
   cursor: pointer;
+  background: #fff;
 
   ion-icon { font-size: 18px; }
-}
 
-.gallery-label { cursor: pointer; }
+  .row & { padding: 7px 12px 7px 10px; font-size: 13.5px; ion-icon { font-size: 16px; } }
+}
 
 .file-input-hidden { display: none; }
-
-.edit-badge {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #e74c3c;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #fff;
-
-  ion-icon {
-    font-size: 12px;
-    color: #fff;
-  }
-}
-
-.photo-circle-placeholder {
-  position: relative; // agrega esto para que el badge se posicione bien
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  background: #4037BE;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: visible; // cambia de hidden a visible
-
-  img {
-    width: 52px;
-    height: 52px;
-    object-fit: contain;
-    filter: brightness(0) invert(1);
-  }
-}
-
-.photo-circle-preview {
-  position: relative;
-  width: 140px;
-  height: 140px;
-}

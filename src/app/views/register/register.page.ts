@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/authServices/auth';
 import { Router } from '@angular/router';
+import { fullNameError, normalizeFullName, phoneError, userErrorMessage, USERNAME_RE } from 'src/app/shared/utils/user-identity.util';
 
 @Component({
   selector: 'app-register',
@@ -11,6 +12,9 @@ import { Router } from '@angular/router';
 export class RegisterPage implements OnInit {
 
   username: string = '';
+  /** Opcionales: nombre para mostrar (con espacios y tildes) y teléfono. */
+  fullName: string = '';
+  phone: string = '';
   email: string = '';
   password: string = '';
   passwordVisible: boolean = false;
@@ -33,15 +37,26 @@ export class RegisterPage implements OnInit {
   this.email = this.email.trim();
 
   // Username
-  const usernameRegex = /^[a-zA-Z0-9_]+$/;
-
   if (!this.username) {
     alert('El nombre de usuario es obligatorio');
     return;
   }
 
-  if (!usernameRegex.test(this.username)) {
-    alert('El nombre de usuario solo puede contener letras, números y guiones bajos (_)');
+  if (!USERNAME_RE.test(this.username)) {
+    alert('El nombre de usuario debe tener de 3 a 50 caracteres: letras, números y guion bajo (_), sin espacios.');
+    return;
+  }
+
+  // Nombre completo y teléfono (opcionales)
+  this.fullName = normalizeFullName(this.fullName);
+  const nameErr = fullNameError(this.fullName);
+  if (nameErr) {
+    alert(nameErr);
+    return;
+  }
+  const phoneErr = phoneError(this.phone);
+  if (phoneErr) {
+    alert(phoneErr);
     return;
   }
 
@@ -64,13 +79,13 @@ export class RegisterPage implements OnInit {
     return;
   }
 
-  const userData = {
+  const userData: { username: string; email: string; password: string; fullName?: string; phone?: string } = {
     username: this.username,
     email: this.email,
     password: this.password
   };
-
-  console.log('Datos a enviar:', userData);
+  if (this.fullName) userData.fullName = this.fullName;
+  if (this.phone.trim()) userData.phone = this.phone.trim();
 
   this.authService.register(userData).subscribe({
     next: (response) => {
@@ -96,15 +111,9 @@ export class RegisterPage implements OnInit {
         return;
       }
 
-      // Si el backend devuelve errores de validación
-      if (error.status === 400 && error.error?.errors) {
-        const errors = Object.values(error.error.errors).join('\n');
-        alert(errors);
-        return;
-      }
-
-      console.error(error);
-      alert('Ocurrió un error al registrar el usuario.');
+      // Validación del backend: teléfono (INVALID_PHONE), nombre completo o username
+      console.error('❌ Error registrando usuario:', error);
+      alert(userErrorMessage(error, 'Ocurrió un error al registrar el usuario.'));
     }
   });
 }

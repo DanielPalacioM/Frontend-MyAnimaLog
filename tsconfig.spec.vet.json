@@ -11,6 +11,7 @@
     "src/**/ai-*.spec.ts",
     "src/**/pet-health*.spec.ts",
     "src/**/home-today*.spec.ts",
+    "src/**/user-identity*.spec.ts",
     "src/**/mascot*.spec.ts",
     "src/app/app.component.spec.ts",
     "src/**/*.d.ts"

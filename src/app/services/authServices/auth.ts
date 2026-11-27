@@ -38,7 +38,8 @@ export class AuthService {
     private router: Router
   ) {}
 
-  register(userData: { username: string; email: string; password: string }): Observable<any> {
+  /** `fullName` y `phone` son opcionales: si vienen vacíos no se mandan (el teléfono se guarda en E.164). */
+  register(userData: { username: string; email: string; password: string; fullName?: string; phone?: string }): Observable<any> {
     return this.http.post(`${this.baseUrl}/user/register`, userData);
   }
 

@@ -28,6 +28,8 @@ export class StepBasicInfoComponent implements OnInit {
   @Input() data!: PetForm;
   @Output() dataChange = new EventEmitter<Partial<PetForm>>();
   @Input() editMode = false;
+  /** Qué parte se muestra: 'who' (paso 1: nombre, especie, sexo), 'how' (paso 2: raza, edad, medidas) o 'all' (edición, en tarjetas). */
+  @Input() section: 'who' | 'how' | 'all' = 'all';
 
   speciesList = SPECIES_LIST;
   otherSpecies = OTHER_SPECIES;
@@ -44,10 +46,48 @@ export class StepBasicInfoComponent implements OnInit {
   sex: 'MALE' | 'FEMALE' | '' = '';
   weightKg: number | null = null;
   heightCm: number | null = null;
+  nameFocus = false;
+  /** Sin fecha exacta: el dueño pone años y meses y se calcula una fecha aproximada. */
+  approxAge = false;
+  approxYears: number | null = null;
+  approxMonths: number | null = null;
+  readonly today = new Date().toISOString().slice(0, 10);
+
+  get isOther(): boolean {
+    return !!this.selectedSpecies && !SPECIES_LIST.some(s => s.key === this.selectedSpecies);
+  }
+
+  get otherLabel(): string {
+    const s = this.customSpecies || this.selectedSpecies;
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
+  get speciesEmoji(): string {
+    return SPECIES_LIST.find(s => s.key === this.selectedSpecies)?.emoji || '🐾';
+  }
+
+  /** "Perro · Macho" en el resumen del paso 2. */
+  get summaryLine(): string {
+    const sp = SPECIES_LIST.find(s => s.key === this.selectedSpecies)?.label || (this.selectedSpecies ? this.otherLabel : '');
+    const sx = this.sex === 'MALE' ? 'Macho' : this.sex === 'FEMALE' ? 'Hembra' : '';
+    return [sp, sx].filter(Boolean).join(' · ');
+  }
+
+  /** Atajos debajo de la raza: Mestizo y las dos más comunes de la especie. */
+  get breedSuggestions(): string[] {
+    return ['Mestizo', ...(BREEDS[this.selectedSpecies] || []).slice(0, 2)];
+  }
+
+  get ageLabel(): string {
+    const m = this.ageMonths ?? 0;
+    if (m < 12) return m === 1 ? '1 mes' : `${m} meses`;
+    const y = Math.floor(m / 12), r = m % 12;
+    return (y === 1 ? '1 año' : `${y} años`) + (r ? ` ${r} m` : '');
+  }
 
   ngOnInit() {
     this.name           = this.data.name       || '';
-    this.selectedSpecies = this.data.species   || '';
+    this.selectedSpecies = (this.data.species  || '').toLowerCase();
     this.breedSearch    = this.data.breed      || '';
     this.birthDate      = this.data.birthDate  || '';
     this.ageMonths      = this.data.ageMonths  || null;
@@ -109,6 +149,32 @@ export class StepBasicInfoComponent implements OnInit {
       const diff  = (now.getFullYear() - birth.getFullYear()) * 12
                   + (now.getMonth()    - birth.getMonth());
       this.ageMonths = Math.max(0, diff);
+    }
+    this.emit();
+  }
+
+  toggleApprox() {
+    this.approxAge = !this.approxAge;
+    if (this.approxAge && this.ageMonths !== null) {
+      this.approxYears = Math.floor(this.ageMonths / 12);
+      this.approxMonths = this.ageMonths % 12;
+    }
+  }
+
+  /** Edad aproximada → fecha de nacimiento aproximada (hoy menos años y meses). */
+  onApproxChange() {
+    const y = Math.max(0, Math.floor(Number(this.approxYears) || 0));
+    const m = Math.max(0, Math.floor(Number(this.approxMonths) || 0));
+    if (!y && !m) {
+      this.birthDate = '';
+      this.ageMonths = null;
+    } else {
+      // Día 1 del mes (o 2 si hoy es 1): con la fecha de hoy el Home celebraba un "cumpleaños" falso el mismo día.
+      const d = new Date();
+      d.setDate(d.getDate() === 1 ? 2 : 1);
+      d.setMonth(d.getMonth() - (y * 12 + m));
+      this.birthDate = d.toISOString().slice(0, 10);
+      this.ageMonths = y * 12 + m;
     }
     this.emit();
   }

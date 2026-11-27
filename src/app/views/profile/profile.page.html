@@ -28,8 +28,10 @@
     (imageRemove)="onImageRemove()">
   </app-avatar>
   <div class="user-info">
-    <p class="user-name">{{ username }}</p>
+    <p class="user-name">{{ shownName }}</p>
+    <p class="user-email" *ngIf="shownName !== username">&#64;{{ username }}</p>
     <p class="user-email">{{ email }}</p>
+    <p class="user-email" *ngIf="phone">{{ phoneLabel }}</p>
   </div>
 </div>
 

@@ -1,63 +1,134 @@
-<ion-content [fullscreen]="true" class="add-pet-content">
+<ion-content [fullscreen]="true" class="add-pet-content" [class.done]="!!saved">
 
-  <div class="add-pet-wrap">
-
-    <!-- HEADER -->
-    <div class="add-pet-header">
-      <button class="back-btn" (click)="goBack()">
-        <ion-icon name="arrow-back-outline"></ion-icon>
-      </button>
-      <h1 class="add-pet-title">{{ isEditMode ? 'Editar perfil' : 'Agregar mascota' }}</h1>
+  <!-- ¡LISTO! La mascota quedó registrada: el perrito salta y le da la bienvenida -->
+  <div class="welcome" *ngIf="saved as pet" role="status" aria-live="polite">
+    <div class="confetti" aria-hidden="true">
+      <span *ngFor="let c of confetti" [ngStyle]="c"></span>
     </div>
 
-    <!-- STEPPER -->
-    <div class="stepper">
-      <div class="step-item" *ngFor="let s of [1,2,3]" [class.done]="currentStep > s" [class.active]="currentStep === s">
-        <div class="step-circle">
-          <ion-icon name="checkmark-outline" *ngIf="currentStep > s"></ion-icon>
-          <span *ngIf="currentStep <= s">{{ s }}</span>
+    <div class="stage">
+      <span class="bubble">¡Bienvenido, {{ pet.name }}! 🎉</span>
+      <app-mascot class="dog" pose="celebrate" [intro]="true"></app-mascot>
+    </div>
+
+    <h1 class="w-title">¡{{ pet.name }} ya está en MyAnimaLog!</h1>
+    <p class="w-sub">Su perfil quedó guardado. Ahora puedes completar su historial cuando quieras.</p>
+
+    <div class="pet-card">
+      <div class="pc-av">
+        <img *ngIf="petForm.photo" [src]="petForm.photo" alt="" />
+        <span *ngIf="!petForm.photo">{{ speciesEmoji }}</span>
+      </div>
+      <div class="pc-txt">
+        <p class="pc-name">{{ pet.name }}</p>
+        <p class="pc-sub">{{ petLine }}</p>
+        <div class="pc-chips" *ngIf="healthChips.length">
+          <span *ngFor="let ch of healthChips" [ngClass]="ch.kind">{{ ch.label }}</span>
         </div>
-        <span class="step-label">{{ s === 1 ? 'Foto' : s === 2 ? 'Info básica' : 'Médico' }}</span>
       </div>
     </div>
 
-    <!-- CONTENIDO POR PASO -->
-    <div class="step-content">
-
-      <app-step-photo
-      [photo]="petForm.photo"
-      [editMode]="isEditMode"
-      (photoChange)="onStepDataChange({ photo: $event })"
-      (photoRemoved)="onPhotoRemoved()">
-      </app-step-photo>
-
-      <app-step-basic-info
-        *ngIf="currentStep === 2"
-        [data]="petForm"
-        [editMode]="isEditMode"
-        (dataChange)="onStepDataChange($event)">
-      </app-step-basic-info>
-
-      <app-step-medical
-        *ngIf="currentStep === 3"
-        [data]="petForm"
-        [editMode]="isEditMode"
-        (dataChange)="onStepDataChange($event)">
-      </app-step-medical>
-
-    </div>
-
-    <!-- BOTONES -->
-    <div class="add-pet-footer">
-      <button class="btn-primary" (click)="currentStep < totalSteps ? goNext() : savePet()" [disabled]="!canProceed()">
-        {{ currentStep < totalSteps ? 'Siguiente' : (isEditMode ? 'Actualizar' : 'Guardar mascota') }}
+    <div class="next">
+      <p class="next-title">¿Qué quieres hacer ahora?</p>
+      <button type="button" class="row" (click)="goVaccines()">
+        <span class="row-ic"><ion-icon name="medkit-outline"></ion-icon></span>
+        <span class="row-txt"><b>Registrar sus vacunas</b><small>Te avisamos cuando toque la próxima dosis</small></span>
+        <ion-icon name="chevron-forward" class="chev"></ion-icon>
       </button>
-      <div class="footer-secondary" *ngIf="currentStep === totalSteps && !isEditMode">
-        <button class="btn-secondary" (click)="goBack()">Después</button>
-        <button class="btn-danger" (click)="cancel()">Cancelar</button>
-      </div>
+      <button type="button" class="row" (click)="goDocuments()">
+        <span class="row-ic"><ion-icon name="document-text-outline"></ion-icon></span>
+        <span class="row-txt"><b>Subir documentos</b><small>Historia médica, exámenes, carné</small></span>
+        <ion-icon name="chevron-forward" class="chev"></ion-icon>
+      </button>
+      <button type="button" class="row" (click)="goVet()">
+        <span class="row-ic"><ion-icon name="business-outline"></ion-icon></span>
+        <span class="row-txt"><b>Asociar su veterinaria</b><small>Comparte su perfil y pide citas desde la app</small></span>
+        <ion-icon name="chevron-forward" class="chev"></ion-icon>
+      </button>
     </div>
 
+    <button type="button" class="btn-primary" (click)="goProfile()">Ver perfil de {{ pet.name }}</button>
+    <button type="button" class="btn-link" (click)="goHome()">Ir al inicio</button>
+  </div>
+
+  <div class="add-pet-wrap" *ngIf="!saved">
+
+    <!-- ENCABEZADO -->
+    <header class="add-pet-header">
+      <div class="head-row">
+        <button type="button" class="back-btn" (click)="goBack()" [attr.aria-label]="currentStep > 1 && !isEditMode ? 'Paso anterior' : 'Salir'">
+          <ion-icon name="arrow-back"></ion-icon>
+        </button>
+        <h1 class="add-pet-title">{{ isEditMode ? ('Editar a ' + (petForm.name || 'tu mascota')) : 'Agregar mascota' }}</h1>
+      </div>
+
+      <div class="progress" *ngIf="!isEditMode" aria-label="Progreso">
+        <div class="seg" *ngFor="let l of stepLabels; let i = index" [class.on]="currentStep > i" [class.current]="currentStep === i + 1">
+          <span class="bar"></span>
+          <span class="lbl">{{ i + 1 }} · {{ l }}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENIDO -->
+    <main class="step-content">
+
+      <!-- Registro, paso a paso -->
+      <ng-container *ngIf="!isEditMode">
+        <ng-container *ngIf="currentStep === 1">
+          <app-step-photo [photo]="petForm.photo" (photoChange)="onStepDataChange({ photo: $event })" (photoRemoved)="onPhotoRemoved()"></app-step-photo>
+          <app-step-basic-info section="who" [data]="petForm" (dataChange)="onStepDataChange($event)"></app-step-basic-info>
+        </ng-container>
+        <app-step-basic-info *ngIf="currentStep === 2" section="how" [data]="petForm" (dataChange)="onStepDataChange($event)"></app-step-basic-info>
+        <app-step-medical *ngIf="currentStep === 3" [data]="petForm" (dataChange)="onStepDataChange($event)"></app-step-medical>
+      </ng-container>
+
+      <!-- Edición: todo en una pantalla -->
+      <ng-container *ngIf="isEditMode && loaded">
+        <app-step-photo [photo]="petForm.photo" [editMode]="true" (photoChange)="onStepDataChange({ photo: $event })" (photoRemoved)="onPhotoRemoved()"></app-step-photo>
+        <app-step-basic-info section="all" [editMode]="true" [data]="petForm" (dataChange)="onStepDataChange($event)"></app-step-basic-info>
+        <button type="button" class="health-link" (click)="goHealth()">
+          <ion-icon name="shield-checkmark-outline" class="hl-ic"></ion-icon>
+          <span class="row-txt"><b>Salud, alergias y esterilización</b><small>Se editan en su propia sección del perfil</small></span>
+          <ion-icon name="chevron-forward" class="chev"></ion-icon>
+        </button>
+      </ng-container>
+    </main>
+
+    <!-- PIE -->
+    <footer class="add-pet-footer">
+      <ng-container *ngIf="!isEditMode">
+        <div class="btn-row">
+          <button type="button" class="btn-ghost" *ngIf="currentStep === 2" (click)="goBack()">Atrás</button>
+          <button type="button" class="btn-primary" *ngIf="currentStep < totalSteps" (click)="goNext()" [disabled]="!canProceed()">Siguiente</button>
+          <button type="button" class="btn-primary" *ngIf="currentStep === totalSteps" (click)="savePet()" [disabled]="isSaving">
+            {{ isSaving ? 'Guardando…' : 'Guardar mascota' }}
+          </button>
+        </div>
+        <button type="button" class="btn-link" *ngIf="currentStep === totalSteps" (click)="savePet()" [disabled]="isSaving">Completar después</button>
+        <p class="foot-hint" *ngIf="currentStep === 1 && !canProceed()">{{ missingText.includes(' y ') ? 'Faltan' : 'Falta' }} {{ missingText }}</p>
+      </ng-container>
+
+      <ng-container *ngIf="isEditMode">
+        <button type="button" class="btn-primary" (click)="savePet()" [disabled]="!hasChanges || !canSave || isSaving">
+          {{ isSaving ? 'Guardando…' : 'Guardar cambios' }}
+        </button>
+        <p class="foot-hint">{{ hasChanges ? (canSave ? 'Tienes cambios sin guardar' : 'Nombre, especie y sexo no pueden quedar vacíos') : 'Se activa cuando cambias algo' }}</p>
+      </ng-container>
+    </footer>
+  </div>
+
+  <!-- SALIR SIN GUARDAR -->
+  <div class="sheet-backdrop" *ngIf="showExit" (click)="showExit = false">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="exit-title" (click)="$event.stopPropagation()">
+      <span class="grabber"></span>
+      <span class="sheet-ic" aria-hidden="true">🐾</span>
+      <h2 id="exit-title">{{ isEditMode ? '¿Salir sin guardar los cambios?' : '¿Salir sin guardar' + (petForm.name ? ' a ' + petForm.name : '') + '?' }}</h2>
+      <p>{{ isEditMode ? 'Los cambios que hiciste se perderán.' : (canSave ? 'Lo que llenaste se perderá. Si quieres, guárdalo ahora con lo que tienes y completa el resto después.' : 'Lo que llenaste se perderá.') }}</p>
+      <button type="button" class="btn-primary" *ngIf="canSave" (click)="showExit = false; savePet()">{{ isEditMode ? 'Guardar cambios' : 'Guardar con lo que tengo' }}</button>
+      <button type="button" class="btn-exit" (click)="leave()">Salir sin guardar</button>
+      <button type="button" class="btn-link" (click)="showExit = false">{{ isEditMode ? 'Seguir editando' : 'Seguir llenando' }}</button>
+    </div>
   </div>
 
 </ion-content>

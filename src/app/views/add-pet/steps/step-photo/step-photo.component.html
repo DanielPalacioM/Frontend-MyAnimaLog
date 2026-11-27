@@ -1,43 +1,29 @@
-<div class="step-photo">
+<div class="step-photo" [class.row]="editMode">
 
-  <div class="photo-zone">
-
-    <ng-container *ngIf="!photo">
-      <div class="photo-circle-placeholder">
-        <img src="assets/images/AddPet/FotoMascotaIcon.png" alt="" />
-        <div class="edit-badge" *ngIf="editMode">
-          <ion-icon name="create-outline"></ion-icon>
-        </div>
-      </div>
-      <p class="photo-placeholder-text">Foto de la mascota</p>
-      <p class="photo-placeholder-sub">Toca para subir o tomar foto</p>
-    </ng-container>
-
-    <ng-container *ngIf="photo">
-      <div class="photo-circle-preview">
-        <img [src]="photo" alt="foto mascota" class="photo-preview" />
-        <div class="edit-badge" *ngIf="editMode">
-          <ion-icon name="create-outline"></ion-icon>
-        </div>
-        <button class="photo-change-btn" (click)="onRemovePhoto()">
-          <ion-icon name="close-circle-outline"></ion-icon>
-        </button>
-      </div>
-    </ng-container>
-
+  <div class="avatar" [class.has-photo]="!!photo">
+    <img *ngIf="photo" [src]="photo" alt="Foto de la mascota" />
+    <ion-icon *ngIf="!photo" name="paw" aria-hidden="true"></ion-icon>
+    <label class="badge" aria-label="Tomar foto" *ngIf="!editMode">
+      <ion-icon name="camera-outline"></ion-icon>
+      <input type="file" accept="image/*" capture="environment" class="file-input-hidden" (change)="onFile($event)" />
+    </label>
+    <button type="button" class="remove" *ngIf="photo" (click)="onRemovePhoto()" aria-label="Quitar foto">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
   </div>
 
-  <div class="photo-actions">
-    <button class="photo-btn" (click)="onCameraClick()">
-      <ion-icon name="camera-outline"></ion-icon>
-      <span>Cámara</span>
-    </button>
-
-    <label class="photo-btn gallery-label">
-      <ion-icon name="images-outline"></ion-icon>
-      <span>Galería</span>
-      <input type="file" accept="image/*" class="file-input-hidden" (change)="onGalleryClick($event)" />
-    </label>
+  <div class="side">
+    <p class="hint">{{ editMode ? 'Foto de perfil' : (photo ? '¡Qué buena foto!' : 'Agrega una foto (opcional)') }}</p>
+    <div class="actions">
+      <label class="pill" *ngIf="!editMode">
+        <ion-icon name="camera-outline"></ion-icon><span>Cámara</span>
+        <input type="file" accept="image/*" capture="environment" class="file-input-hidden" (change)="onFile($event)" />
+      </label>
+      <label class="pill">
+        <ion-icon [name]="editMode ? 'camera-outline' : 'image-outline'"></ion-icon><span>{{ editMode ? 'Cambiar foto' : 'Galería' }}</span>
+        <input type="file" accept="image/*" class="file-input-hidden" (change)="onFile($event)" />
+      </label>
+    </div>
   </div>
 
 </div>

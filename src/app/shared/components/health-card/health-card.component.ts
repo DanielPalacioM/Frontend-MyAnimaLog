@@ -28,7 +28,8 @@ import {
           <span class="hc-ico"><ion-icon name="shield-checkmark-outline"></ion-icon></span>
           <div class="hc-main">
             <p class="hc-name">Esterilizada</p>
-            <p class="hc-sub">{{ neutered }}<span *ngIf="neuteredFrom"> · {{ neuteredFrom }}</span></p>
+            <p class="hc-sub" *ngIf="summary.neuteredUnavailable">Pronto podrás indicarlo aquí</p>
+            <p class="hc-sub" *ngIf="!summary.neuteredUnavailable">{{ neutered }}<span *ngIf="neuteredFrom"> · {{ neuteredFrom }}</span></p>
           </div>
         </div>
 

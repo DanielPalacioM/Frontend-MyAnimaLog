@@ -67,7 +67,8 @@ export class ProfileService {
       }).pipe(
         map(p => ({
           id: userId,
-          username: p?.username || p?.name || '',
+          // Nombre para mostrar: nombre completo si lo tiene (User service), si no el username.
+          username: p?.fullName || p?.username || p?.name || '',
           avatarUrl: p?.profileImageUrl || p?.avatarUrl || null
         })),
         catchError(err => {

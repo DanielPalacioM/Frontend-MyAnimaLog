@@ -18,6 +18,7 @@ describe('PetHealthService', () => {
   const PET = 'de1c7eb4-2682-4d71-96f6-dc4a04e2ae7b';
 
   beforeEach(() => {
+    PetHealthService.summaryMissing = false;
     petService = { getPetById: jasmine.createSpy('getPetById') };
     shared = { getMyRoleForPet: jasmine.createSpy('getMyRoleForPet') };
     TestBed.configureTestingModule({
@@ -160,10 +161,32 @@ describe('PetHealthService', () => {
       expect(out.prevention.INTERNAL.state).toBe('NONE');
     });
 
-    it('con la ruta sin publicar en el gateway (404 sin código) sale como NOT_AVAILABLE', () => {
+    it('sin /clinical-summary en el gateway arma el resumen con /dewormings y /allergies (solo falta esterilización)', () => {
+      let out: any;
+      service.getSummary(PET).subscribe(s => (out = s));
+      http.expectOne(`${base}/pets/${PET}/clinical-summary`).flush({ error: 'Ruta no encontrada' }, { status: 404, statusText: 'Not Found' });
+      http.expectOne(r => r.url === `${base}/dewormings`).flush({
+        petId: PET, dewormings: { INTERNAL: { registered: true, lastApplicationDate: '2026-10-01' }, EXTERNAL: { registered: false, lastApplicationDate: null } }, items: [],
+      });
+      http.expectOne(r => r.url === `${base}/allergies`).flush({ petId: PET, allergyStatus: 'UNKNOWN', allergies: [] });
+      expect(out.neuteredUnavailable).toBeTrue();
+      expect(out.neutered.status).toBe('UNKNOWN');
+      expect(out.prevention.INTERNAL.registered).toBeTrue();
+      expect(out.prevention.EXTERNAL.state).toBe('NONE');
+      expect(out.allergyStatus).toBe('UNKNOWN');
+      // La siguiente mascota ya no vuelve a pedir /clinical-summary
+      service.getSummary('otra').subscribe();
+      http.expectNone(`${base}/pets/otra/clinical-summary`);
+      http.match(r => /\/(dewormings|allergies)$/.test(r.url)).forEach(r => r.flush({}));
+    });
+
+    it('si tampoco responden /dewormings ni /allergies sale como NOT_AVAILABLE', () => {
       let err: HealthError | undefined;
       service.getSummary(PET).subscribe({ error: e => (err = e) });
       http.expectOne(`${base}/pets/${PET}/clinical-summary`).flush({ error: 'Ruta no encontrada' }, { status: 404, statusText: 'Not Found' });
+      http.expectOne(r => r.url === `${base}/dewormings`).flush({ error: 'Ruta no encontrada' }, { status: 404, statusText: 'Not Found' });
+      // forkJoin cancela /allergies al fallar /dewormings
+      http.match(r => r.url === `${base}/allergies`).filter(r => !r.cancelled).forEach(r => r.flush({}, { status: 404, statusText: 'Not Found' }));
       expect(err?.code).toBe('NOT_AVAILABLE');
     });
 

@@ -34,7 +34,15 @@
         </div>
 
         <div class="pill white">
+          <input type="text" placeholder="Nombre completo (opcional)" [(ngModel)]="fullName" name="fullName" maxlength="100" autocomplete="name">
+        </div>
+
+        <div class="pill white">
           <input type="email" placeholder="Email" [(ngModel)]="email" name="email">
+        </div>
+
+        <div class="pill white">
+          <input type="tel" placeholder="Teléfono (opcional)" [(ngModel)]="phone" name="phone" maxlength="20" autocomplete="tel" inputmode="tel">
         </div>
 
         <div class="pill white">

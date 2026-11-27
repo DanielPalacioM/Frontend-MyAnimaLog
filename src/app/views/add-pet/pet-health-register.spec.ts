@@ -57,7 +57,40 @@ describe('AddPetComponent · salud al registrar', () => {
     c.savePet();
     expect(pets.addPet).toHaveBeenCalled();
     expect(health.setNeutered).toHaveBeenCalledWith('p-1', 'YES', undefined);
-    expect(router.navigate).toHaveBeenCalledWith(['/home'], { replaceUrl: true });
+    // Se queda en la bienvenida (el perrito le da la bienvenida) en vez de ir al inicio
+    expect(router.navigate).not.toHaveBeenCalled();
+    expect(c.saved).toEqual({ id: 'p-1', name: 'Luna' });
     expect(c.isSaving).toBeFalse();
+  });
+
+  it('no deja guardar ni pasar del paso 1 sin nombre, especie y sexo', () => {
+    const c = make();
+    expect(c.canProceed()).toBeFalse();
+    expect(c.missingText).toBe('el nombre, la especie y el sexo');
+    c.savePet();
+    expect(pets.addPet).not.toHaveBeenCalled();
+    c.petForm = { ...c.petForm, name: 'Luna', species: 'perro' };
+    expect(c.missingText).toBe('el sexo');
+    c.petForm = { ...c.petForm, sex: 'FEMALE' };
+    expect(c.canProceed()).toBeTrue();
+  });
+
+  it('atrás en el paso 1 con datos pregunta antes de salir; sin datos sale directo', () => {
+    const c = make();
+    const leave = spyOn(c, 'leave');
+    c.goBack();
+    expect(leave).toHaveBeenCalled();
+    c.petForm = { ...c.petForm, name: 'Luna' };
+    c.goBack();
+    expect(c.showExit).toBeTrue();
+    expect(leave).toHaveBeenCalledTimes(1);
+  });
+
+  it('la bienvenida resume la mascota y su salud', () => {
+    const c = make();
+    c.petForm = { ...c.petForm, name: 'Milo', species: 'perro', sex: 'MALE', breed: 'Pastor Alemán', ageMonths: 11,
+      neuteredStatus: 'YES', allergyAnswer: 'YES', allergies: [{ allergen: 'Pollo', severity: 'MODERATE' }] };
+    expect(c.petLine).toBe('Perro · Pastor Alemán · 11 meses');
+    expect(c.healthChips.map(h => h.label)).toEqual(['✓ Esterilizado', '⚠ Alergia: Pollo']);
   });
 });

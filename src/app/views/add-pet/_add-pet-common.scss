@@ -1,0 +1,105 @@
+// Piezas comunes del registro y la edición de mascota (Figma "Agregar mascota · … (propuesta)").
+// Morado #4037BE, naranja #f5a623, menta #F3FFFB, texto #1a1a2e; Actor para texto y Jua para títulos.
+
+:host { display: block; font-family: 'Actor', sans-serif; color: #1a1a2e; }
+
+.field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+
+.label {
+  font-size: 15.5px;
+  color: #1a1a2e;
+  small { margin-left: 6px; font-size: 12.5px; color: #6B6880; }
+}
+
+.input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1px solid #E4E2F4;
+  border-radius: 14px;
+  background: #F7F6FF;
+  min-width: 0;
+  flex: 1;
+  transition: border-color .15s, background .15s;
+
+  &.focus, &:focus-within { border: 2px solid #4037BE; background: #fff; padding: 0 13px; .ic { color: #4037BE; } }
+  .ic { font-size: 20px; color: #6B6880; flex-shrink: 0; }
+  input, select {
+    flex: 1; min-width: 0; border: none; outline: none; background: transparent;
+    font-family: 'Actor', sans-serif; font-size: 16px; color: #1a1a2e;
+    &::placeholder { color: #6B6880; }
+  }
+  .unit { font-size: 14px; color: #6B6880; flex-shrink: 0; }
+}
+
+// Selector de 2 o 3 opciones (Sexo; Sí / No / No sé)
+.seg {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid #E4E2F4;
+  border-radius: 14px;
+  background: #F7F6FF;
+
+  button {
+    flex: 1;
+    min-height: 42px;
+    border: none;
+    border-radius: 11px;
+    background: transparent;
+    font-family: 'Actor', sans-serif;
+    font-size: 15px;
+    color: #1a1a2e;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+
+    &.on { background: #4037BE; color: #fff; }
+  }
+}
+
+.hint { margin: 0; font-size: 13px; line-height: 18px; color: #6B6880; }
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #E4E2F4;
+  border-radius: 20px;
+  background: #fff;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-family: 'Jua', sans-serif;
+  font-weight: 400;
+  font-size: 17px;
+  color: #1a1a2e;
+}
+
+.card-ic {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: #F1F0FB;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  ion-icon { font-size: 20px; color: #4037BE; }
+}
+
+// El selector de fecha compartido, con el mismo aspecto que los campos
+::ng-deep app-step-basic-info .picker-trigger,
+::ng-deep app-step-medical .picker-trigger {
+  min-height: 52px !important;
+  border: 1px solid #E4E2F4 !important;
+  border-radius: 14px !important;
+  background: #F7F6FF !important;
+  box-shadow: none !important;
+}

@@ -13,7 +13,7 @@
 </div>
 
   <!-- Título -->
-  <h1 class="title">Edit Profile</h1>
+  <h1 class="title">Editar perfil</h1>
 
   <!-- Avatar -->
   <div class="avatar-container">
@@ -31,19 +31,41 @@
   <div class="card">
 
     <div class="input-container">
-      <label>Username</label>
-
+      <label for="pf-fullname">Nombre completo</label>
       <input
+        id="pf-fullname"
+        type="text"
+        [(ngModel)]="newFullName"
+        maxlength="100"
+        autocomplete="name"
+        placeholder="Ej. Luis Santiago">
+    </div>
+
+    <div class="input-container">
+      <label for="pf-username">Nombre de usuario</label>
+      <input
+        id="pf-username"
         type="text"
         [(ngModel)]="newUsername"
-        maxlength="20"
-        placeholder="Enter username"
-        (keyup.enter)="saveUsername()">
+        maxlength="50"
+        placeholder="Sin espacios, ej. luis_santiago">
+    </div>
 
+    <div class="input-container">
+      <label for="pf-phone">Teléfono (opcional)</label>
+      <input
+        id="pf-phone"
+        type="tel"
+        inputmode="tel"
+        autocomplete="tel"
+        [(ngModel)]="newPhone"
+        maxlength="20"
+        placeholder="Ej. 300 123 4567"
+        (keyup.enter)="saveUsername()">
     </div>
 
     <button class="btn-save" (click)="saveUsername()">
-      Save
+      Guardar
     </button>
 
   </div>

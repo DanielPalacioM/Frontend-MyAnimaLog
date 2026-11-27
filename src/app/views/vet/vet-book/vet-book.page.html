@@ -68,8 +68,7 @@
 
         <ng-container *ngIf="!loadingSlots && !slotsError && availability">
           <h3 class="sub-title">{{ freeHoursTitle }}</h3>
-          <p class="closed" *ngIf="day?.closed">La clínica no atiende este día. Prueba con otro.</p>
-          <p class="closed" *ngIf="day && !day.closed && !daySlots.length">No quedan horas libres este día.</p>
+          <p class="closed" *ngIf="day && !daySlots.length">{{ emptyDayText }}</p>
           <div class="slots">
             <button type="button" class="slot" *ngFor="let s of daySlots" [class.on]="isPicked(s.slot)" [disabled]="!s.ok"
                     [attr.aria-pressed]="isPicked(s.slot)" (click)="pickSlot(s.slot)">{{ timeLabel(s.slot.startsAt) }}</button>

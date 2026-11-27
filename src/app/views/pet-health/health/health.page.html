@@ -32,7 +32,7 @@
             <button class="link-btn" *ngIf="canEdit && neutered" (click)="openNeutered()">Editar</button>
           </div>
           <p class="error-box" *ngIf="neuteredFailed">{{ neuteredFailed.code === 'NOT_AVAILABLE' ? 'Todavía no está disponible.' : 'No pudimos cargarla.' }}</p>
-          <button class="btn btn-outline small" *ngIf="canEdit && !neutered && neuteredFailed" (click)="openNeutered()">Indicar si está esterilizada</button>
+          <button class="btn btn-outline small" *ngIf="canEdit && !neutered && neuteredFailed && neuteredFailed.code !== 'NOT_AVAILABLE'" (click)="openNeutered()">Indicar si está esterilizada</button>
           <ng-container *ngIf="neutered">
             <p class="big-value">{{ neuteredText }}</p>
             <p class="block-note" *ngIf="neuteredWho">

@@ -112,6 +112,8 @@ export interface Neutered {
 
 export interface HealthSummary {
   neutered: Neutered;
+  /** La esterilización (`/pets/{id}/clinical-*`) todavía no está publicada: el resto del resumen sí. */
+  neuteredUnavailable?: boolean;
   allergyStatus: AllergyStatus;
   allergies: Allergy[];
   prevention: { INTERNAL: DewormingKindStatus; EXTERNAL: DewormingKindStatus };
