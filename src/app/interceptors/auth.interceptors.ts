@@ -10,6 +10,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { AuthService } from '../services/authServices/auth';
 import { environment } from 'src/environments/environment';
+import { calendarBaseUrl } from 'src/app/shared/utils/calendar-url.util';
 
 // Rutas de auth que no llevan token ni disparan refresh (login, refresh, registro...).
 const PUBLIC_AUTH_PATHS = [
@@ -40,7 +41,7 @@ export class AuthInterceptor implements HttpInterceptor {
     // Logout lleva el token, pero un 401 ahí no debe intentar renovar la sesión.
     // Lo mismo para URLs que no son del gateway: se manda el token como antes, sin refresh.
     // Calendar (citas) es otro servicio con el mismo token: también se renueva la sesión si da 401.
-    const calendarUrl = (environment as { calendarUrl?: string }).calendarUrl;
+    const calendarUrl = calendarBaseUrl();
     const ownApi = req.url.startsWith(environment.apiUrl) || (!!calendarUrl && req.url.startsWith(calendarUrl));
     if (req.url.includes('/auth/logout') || !ownApi) {
       return next.handle(this.withToken(req, this.auth.getToken()));

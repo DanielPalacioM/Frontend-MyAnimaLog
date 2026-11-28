@@ -6,6 +6,7 @@
     "src/**/vet-pages.spec.ts",
     "src/**/vet-appointments.spec.ts",
     "src/**/calendar-clinic.spec.ts",
+    "src/**/calendar-url*.spec.ts",
     "src/**/vet-book-flow.spec.ts",
     "src/**/vet-link.guard.spec.ts",
     "src/**/ai-*.spec.ts",

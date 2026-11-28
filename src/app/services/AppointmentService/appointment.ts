@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, forkJoin, of, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { environment } from 'src/environments/environment';
+import { calendarBaseUrl } from 'src/app/shared/utils/calendar-url.util';
 import {
   Appointment,
   AppointmentStatus,
@@ -36,7 +36,7 @@ export const AVAILABILITY_WINDOW_DAYS = 5;
  */
 @Injectable({ providedIn: 'root' })
 export class AppointmentService {
-  private readonly baseUrl: string = (environment as { calendarUrl?: string }).calendarUrl || environment.apiUrl;
+  private readonly baseUrl: string = calendarBaseUrl();
 
   constructor(private http: HttpClient) {}
 

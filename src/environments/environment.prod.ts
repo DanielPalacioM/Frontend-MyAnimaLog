@@ -9,6 +9,8 @@ export const environment = {
   // Calendar (citas: pedir, mis citas, cancelar, reprogramar) es un servicio aparte del gateway. Con /api y sin barra final.
   // En el celular (Capacitor) funciona directo. En la web desplegada el navegador lo bloquea hasta que Calendar permita CORS
   // desde el dominio de Firebase Hosting (hoy no manda cabeceras CORS).
+  // En la web desplegada se usa calendarWebPath: Firebase Hosting reenvía /api/** a Calendar (firebase.json), sin CORS.
+  calendarWebPath: '/api',
   calendarUrl: 'https://calendar-microservice-20369076707.us-central1.run.app/api',
   apiUrl: 'https://pets-api-gateway-20369076707.us-central1.run.app/api', // cámbialo cuando tengan dominio real
   // Key de navegador restringida por dominio a Maps JavaScript API y Places API (New).
